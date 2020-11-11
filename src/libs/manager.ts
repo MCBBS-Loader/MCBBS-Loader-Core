@@ -1,7 +1,7 @@
 import jQuery from "jquery";
 import $ from "jquery";
-import { addModule } from "./codeload";
-import { GMSetValue } from "./usfunc";
+import { addModule, deleteModule } from "./codeload";
+import { GMGetValue, GMSetValue } from "./usfunc";
 function createBtn(): void {
   jQuery(() => {
     $("ul.user_info_menu_btn").append(
@@ -48,6 +48,22 @@ function dumpManager() {
     $("#install").on("click", () => {
       addModule(atob($("#install_base64").val()?.toString() || ""));
     });
+    var all_modules = GMGetValue("loader.all", {});
+    for (var m of Object.entries(all_modules)) {
+      var meta = GMGetValue("meta-" + m[0], { id: "loader.nameless" });
+      var ele = `<li id='${meta.id || "loader.nameless"}'><div><img src='${
+        meta.icon || ""
+      }' width='32' height='32'></img><span style='font-size:0.8rem'>${
+        meta.name || "Nameless"
+      }</span><button type='button' class='pn pnc' id='remove' ref='${
+        meta.id || "loader.nameless"
+      }'>删除模块</button></div></li>`;
+      // FIXME delete no effect
+      $("#all_modules").append(ele);
+      $("#remove").on("click", (el) => {
+        deleteModule($(el).attr("ref") || "loader.nameless");
+      });
+    }
   });
 }
 export default { createBtn, createMenu, dumpManager };

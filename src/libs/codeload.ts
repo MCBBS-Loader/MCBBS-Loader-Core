@@ -1,6 +1,6 @@
-import $, { data } from "jquery";
-import { setProperty } from "./native";
-import { GMGetValue, GMSetValue } from "./usfunc";
+import $ from "jquery";
+import { getProperty, setProperty } from "./native";
+import { GMDeleteValue, GMGetValue, GMSetValue } from "./usfunc";
 function addModule(code: string): boolean {
   if (!$.trim(code).startsWith("// MCBBS-Module")) {
     return false;
@@ -33,6 +33,7 @@ function addModule(code: string): boolean {
           "code-" + (dataMap.get("id") || "loader.nameless"),
           ccode.split("// -MCBBS-Module")[1]
         );
+        console.log("Module added as " + dataMap.get("id"));
         return true;
       } else {
         return false;
@@ -55,9 +56,10 @@ function parseItem(item: string, map: Map<string, string>): boolean {
 }
 function regMeta(id: string, meta: any): boolean {
   GMSetValue("meta-" + id, meta);
-  var all = GMGetValue("loader.all", []);
+  var all = GMGetValue("loader.all", {});
   try {
-    if (!all.includes(id)) {
+    if (!getProperty(all, id)) {
+      setProperty(all, id, true);
       GMSetValue("loader.all", all);
       return true;
     }
@@ -66,4 +68,21 @@ function regMeta(id: string, meta: any): boolean {
     return false;
   }
 }
-export { addModule };
+function mountCode(id: string, code: string): void {
+  $(() => {
+    $("body").append(`<script id='code-${id}'>${code}</script>`);
+  });
+}
+function unmountCode(id: string): void {
+  $(() => {
+    $(`#code-${id}`).remove();
+  });
+}
+function deleteModule(id: string): void {
+  GMDeleteValue("meta-" + id);
+  GMDeleteValue("code-" + id);
+  var obj = GMGetValue("loader.all", {});
+  setProperty(obj, id, undefined);
+  GMSetValue("loader.all", obj);
+}
+export { addModule, mountCode, deleteModule, unmountCode };
