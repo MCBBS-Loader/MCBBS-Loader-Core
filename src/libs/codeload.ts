@@ -70,7 +70,9 @@ function regMeta(id: string, meta: any): boolean {
 }
 function mountCode(id: string, code: string): void {
   $(() => {
-    $("body").append(`<script id='code-${id}'>${code}</script>`);
+    $("body").append(
+      `<script id='code-${id}'>(function(){${code}})()</script>`
+    );
   });
 }
 function unmountCode(id: string): void {

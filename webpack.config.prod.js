@@ -2,7 +2,6 @@ const path = require("path");
 const webpack = require("webpack");
 const fs = require("fs");
 module.exports = {
-  devtool: "eval-cheap-module-source-map",
   plugins: [
     new webpack.BannerPlugin({
       raw: true,
@@ -14,10 +13,10 @@ module.exports = {
   ],
   entry: "./src/main.ts",
   output: {
-    filename: "[name].bundle.user.js",
+    filename: "[name].bundle.prod.user.js",
     path: path.resolve(__dirname, "dist"),
   },
-  mode: "development",
+  mode: "production",
   module: {
     rules: [
       {

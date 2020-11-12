@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Load custom modules into MCBBS!",
   "scripts": {
-    "build": "npx webpack"
+    "prod": "npx webpack --config webpack.config.prod.js",
+    "dev":"npx webpack --config webpack.config.dev.js",
+    "build":"npm run prod&&npm run dev"
   },
   "repository": {
     "type": "git",
