@@ -27,13 +27,13 @@ function addModule(code: string): boolean {
       );
       setProperty(obj, "update", dataMap.get("update"));
       setProperty(obj, "version", dataMap.get("version") || "1.0.0");
+      setProperty(obj, "update", dataMap.get("update"));
       var succ = regMeta(dataMap.get("id") || "loader.nameless", obj);
       if (succ) {
         GMSetValue(
           "code-" + (dataMap.get("id") || "loader.nameless"),
           ccode.split("// -MCBBS-Module")[1]
         );
-        console.log("Module added as " + dataMap.get("id"));
         return true;
       } else {
         return false;
@@ -85,4 +85,24 @@ function deleteModule(id: string): void {
   setProperty(obj, id, undefined);
   GMSetValue("loader.all", obj);
 }
-export { addModule, mountCode, deleteModule, unmountCode };
+function installFromUrl(url: string) {
+  try {
+    $.get(url, (dataIn) => {
+      try {
+        var data = dataIn.toString();
+        if (typeof data == "string") {
+          addModule(data);
+        } else {
+        }
+      } catch {}
+    });
+  } catch {}
+}
+export {
+  addModule,
+  mountCode,
+  deleteModule,
+  unmountCode,
+  parseItem,
+  installFromUrl,
+};
