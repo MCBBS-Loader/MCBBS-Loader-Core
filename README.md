@@ -8,7 +8,7 @@
 
 MCBBS Loader 可以加载符合要求的 MCBBS 模块到客户端，以扩展 MCBBS 的功能。
 
-[立即获取（需要 TamperMonkey）](https://cdn.jsdelivr.net/gh/MCBBS-Loader/MCBBS-Loader-Core@main/dist/main.bundle.prod.user.js)
+[立即获取 Dev（需要 TamperMonkey）](https://cdn.jsdelivr.net/gh/MCBBS-Loader/MCBBS-Loader-Core@main/dist/main.bundle.dev.user.js)
 
 ---
 
