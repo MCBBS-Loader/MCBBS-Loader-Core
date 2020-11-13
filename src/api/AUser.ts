@@ -1,12 +1,12 @@
 import $ from "jquery";
 import { setWindowProperty } from "../libs/usfunc";
-function getCurrentUserName(): string {
+function getUserName(): string {
   return $(".username").html();
 }
-function getCurrentUserUID(): string {
+function getUserUID(): string {
   return $("#user_info > div.avt > a").attr("href") || "";
 }
-function getCurrentUserAvatar(): string {
+function getUserAvatar(): string {
   return ($("#user_info > div.avt > a > img").attr("src") || "").replace(
     "size=small",
     "size=middle"
@@ -14,9 +14,9 @@ function getCurrentUserAvatar(): string {
 }
 function load() {
   setWindowProperty("AUser", {
-    getCurrentUserName,
-    getCurrentUserUID,
-    getCurrentUserAvatar,
+    getUserName,
+    getUserUID,
+    getUserAvatar,
   });
 }
 export default { load };

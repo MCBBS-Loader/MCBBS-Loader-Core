@@ -84,17 +84,17 @@ function dumpManager() {
           } catch {
             $("#install_state").html("模块添加失败，AJAX 返回错误。");
           }
-        }
-        if (str.startsWith("// MCBBS-Module")) {
+        } else if (str.startsWith("// MCBBS-Module")) {
           if (addModule(str)) {
             $("#install_state").html("模块添加成功，刷新页面试试吧！");
             return;
           } else {
             $("#install_state").html("模块添加失败，JavaScript 代码无效。");
           }
+        } else {
+          $("#install_state").html("模块添加失败，无效输入。");
         }
       }
-      $("#install_state").html("模块添加失败，无效输入。");
     });
     var all_modules = GMGetValue("loader.all", {});
     for (var m of Object.entries(all_modules)) {
