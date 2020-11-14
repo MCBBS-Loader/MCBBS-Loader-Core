@@ -29,8 +29,9 @@ import apiloader from "./libs/apiloader";
   });
 
   GMLog("[MCBBS Loader] 重置令牌：reset_" + RESET_TOKEN);
+
+  apiloader.loadAll();
   jQuery(() => {
-    apiloader.loadAll();
     manager.createBtn();
     manager.createMenu();
     if (GMGetValue("temp.loadmgr", false)) {
@@ -38,6 +39,7 @@ import apiloader from "./libs/apiloader";
       manager.dumpManager();
     }
     for (var c of Object.entries(GMGetValue("loader.all", {}))) {
+      GMLog("Checking update: " + c[0]);
       checkUpdate(GMGetValue("meta-" + c[0], ""), (state) => {
         if (state != "latest") {
           installFromUrl(state);

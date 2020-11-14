@@ -1,5 +1,5 @@
 import { parseItem } from "./codeload";
-
+import $ from "jquery";
 function checkUpdate(meta: any, callback: (state: string) => void): void {
   var id = meta.id || "loader.nameless";
   if (meta.update) {

@@ -1,13 +1,13 @@
 import $ from "jquery";
-import { getProperty, setProperty } from "./native";
+import { setProperty } from "./native";
 import { GMDeleteValue, GMGetValue, GMSetValue } from "./usfunc";
-function addModule(code: string): boolean {
+function addModule(code: string): Map<string, string> | undefined {
   if (!$.trim(code).startsWith("// MCBBS-Module")) {
-    return false;
+    return undefined;
   } else {
     var ccode = $.trim(code);
     if (ccode.split("// -MCBBS-Module").length != 2) {
-      return false;
+      return undefined;
     } else {
       var meta = ccode.split("// -MCBBS-Module")[0];
       var lines = meta.split("// MCBBS-Module")[1].split("\n");
@@ -34,9 +34,9 @@ function addModule(code: string): boolean {
           "code-" + (dataMap.get("id") || "loader.nameless"),
           ccode.split("// -MCBBS-Module")[1]
         );
-        return true;
+        return dataMap;
       } else {
-        return false;
+        return undefined;
       }
     }
   }
@@ -58,12 +58,9 @@ function regMeta(id: string, meta: any): boolean {
   GMSetValue("meta-" + id, meta);
   var all = GMGetValue("loader.all", {});
   try {
-    if (!getProperty(all, id)) {
-      setProperty(all, id, true);
-      GMSetValue("loader.all", all);
-      return true;
-    }
-    return false;
+    setProperty(all, id, true);
+    GMSetValue("loader.all", all);
+    return true;
   } catch {
     return false;
   }

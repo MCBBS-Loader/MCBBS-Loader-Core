@@ -1,7 +1,13 @@
 import jQuery from "jquery";
 import $ from "jquery";
 import { addModule, deleteModule } from "./codeload";
-import { GMGetValue, GMSetValue } from "./usfunc";
+import {
+  getWindowProperty,
+  GMGetValue,
+  GMNotification,
+  GMSetValue,
+  setWindowProperty,
+} from "./usfunc";
 function createBtn(): void {
   jQuery(() => {
     $("ul.user_info_menu_btn").append(
@@ -36,9 +42,12 @@ function dumpManager() {
       .append("<span style='font-size:1rem'>安装新模块</span>")
       .append("<br/>")
       .append(
-        "<textarea style='font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:80%;overflow:auto;word-break:break-all;resize:vertical;' placeholder='BASE64 编码，URL 或 JavaScript代码……' id='install_base64'></textarea>"
+        `<textarea style="font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:80%;overflow:auto;word-break:break-all;resize:vertical;" placeholder='BASE64 编码，URL 或 JavaScript 代码……' id='install_base64'></textarea>`
       )
-      .append("<br/><br/>")
+      .append(
+        "<br/><ul><li>访问 GitHub 资源可用 jsDelivr：https://cdn.jsdelivr.net/gh/你的用户名/你的仓库@分支（一般为 master 或 main）/仓库内文件路径</li></ul>"
+      )
+      .append("<br/>")
       .append(
         "<button class='pn pnc' type='button' id='install'><strong>安装</strong></button>"
       )
@@ -50,11 +59,25 @@ function dumpManager() {
       var str = $("#install_base64").val()?.toString() || "";
       try {
         var x = atob(str);
-        if (addModule(x)) {
-          $("#install_state").html("模块添加成功，刷新页面试试吧！");
+        var st = addModule(x);
+        if (st) {
+          GMNotification(
+            "刚安装好了，请查看。",
+            st.get("name") || "Nameless",
+            st.get("icon") || "https://www.mcbbs.net/favicon.ico",
+            () => {
+              GMSetValue("temp.loadmgr", true);
+              open(window.location.href, "_self");
+            }
+          );
           return;
         } else {
-          $("#install_state").html("模块添加失败，该 BASE64 解码无效。");
+          GMNotification(
+            "解码后的 BASE64 无效。",
+            "安装失败",
+            "https://www.mcbbs.net/favicon.ico",
+            () => {}
+          );
         }
       } catch {
         var isUrlRegex = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g;
@@ -64,35 +87,79 @@ function dumpManager() {
               try {
                 var data = dataIn.toString();
                 if (typeof data == "string") {
-                  if (addModule(data)) {
-                    $("#install_state").html("模块添加成功，刷新页面试试吧！");
+                  var st = addModule(data);
+                  if (st) {
+                    GMNotification(
+                      "刚安装好了，请查看。",
+                      st.get("name") || "Nameless",
+                      st.get("icon") || "https://www.mcbbs.net/favicon.ico",
+                      () => {
+                        GMSetValue("temp.loadmgr", true);
+                        open(window.location.href, "_self");
+                      }
+                    );
                     return;
                   } else {
-                    $("#install_state").html(
-                      "模块添加失败，AJAX 返回的 JavaScript 代码无效。"
+                    GMNotification(
+                      "AJAX 没有返回有效的 JavaScript。",
+                      "安装失败",
+                      "https://www.mcbbs.net/favicon.ico",
+                      () => {}
                     );
                   }
                 } else {
-                  $("#install_state").html(
-                    "模块添加失败，AJAX 返回的数据无效。"
+                  GMNotification(
+                    "AJAX 没有返回有效的 JavaScript。",
+                    "安装失败",
+                    "https://www.mcbbs.net/favicon.ico",
+                    () => {}
                   );
                 }
               } catch {
-                $("#install_state").html("模块添加失败，AJAX 返回的数据无效。");
+                GMNotification(
+                  "AJAX 没有返回有效的 JavaScript。",
+                  "安装失败",
+                  "https://www.mcbbs.net/favicon.ico",
+                  () => {}
+                );
               }
             });
           } catch {
-            $("#install_state").html("模块添加失败，AJAX 返回错误。");
+            GMNotification(
+              "AJAX 没有返回有效的 JavaScript。",
+              "安装失败",
+              "https://www.mcbbs.net/favicon.ico",
+              () => {}
+            );
           }
         } else if (str.startsWith("// MCBBS-Module")) {
-          if (addModule(str)) {
-            $("#install_state").html("模块添加成功，刷新页面试试吧！");
+          var st = addModule(str);
+          if (st) {
+            GMNotification(
+              "刚安装好了，请查看。",
+              st.get("name") || "Nameless",
+              st.get("icon") || "https://www.mcbbs.net/favicon.ico",
+              () => {
+                GMSetValue("temp.loadmgr", true);
+                open(window.location.href, "_self");
+              }
+            );
             return;
           } else {
-            $("#install_state").html("模块添加失败，JavaScript 代码无效。");
+            GMNotification(
+              "无效 JavaScript。",
+              "安装失败",
+              "https://www.mcbbs.net/favicon.ico",
+              () => {}
+            );
           }
         } else {
-          $("#install_state").html("模块添加失败，无效输入。");
+          GMNotification(
+            "无效输入。",
+            "安装失败",
+            "https://www.mcbbs.net/favicon.ico",
+            () => {}
+          );
         }
       }
     });
@@ -103,10 +170,16 @@ function dumpManager() {
         meta.id || "loader.nameless"
       }'><div style='display:inline;'><img src='${
         meta.icon || ""
-      }' width='48' height='48' style="vertical-align:middle;float:left;"></img><div><span style='font-size:1rem;color:#5d2391'><strong>${
+      }' width='50' height='50' style="vertical-align:middle;float:left;"></img><div>&nbsp;&nbsp;<span style='font-size:0.8rem;color:#5d2391'><strong>${
         meta.name || "Nameless"
-      }</strong></span><br/><span style='font-size:0.6rem;color:#df307f;'>${
+      }</strong></span>&nbsp;&nbsp;&nbsp;<span style='font-size:4px;color:#150029;'>${
+        meta.id || "loader.nameless"
+      }@${
+        meta.version || "1.0.0"
+      }</span><br/>&nbsp;&nbsp;<span style='font-size:8px;color:#df307f;'>${
         meta.author || "Someone"
+      }</span><br/>&nbsp;&nbsp;<span style='font-size:4px'>${
+        meta.description
       }</span><button style='float:right;' type='button' class='pn pnc remove' ref='${
         meta.id || "loader.nameless"
       }'>删除模块</button></div></div></li>`;
@@ -114,7 +187,15 @@ function dumpManager() {
       $(".remove").on("click", (e) => {
         var el = e.target;
         deleteModule($(el).attr("ref") || "loader.nameless");
-        $("#install_state").html("已尝试移除模块，刷新页面试试吧！");
+        GMNotification(
+          "刚刚移除了，请查看。",
+          $(el).attr("ref") || "loader.nameless",
+          "https://www.mcbbs.net/favicon.ico",
+          () => {
+            GMSetValue("temp.loadmgr", true);
+            open(window.location.href);
+          }
+        );
       });
     }
   });
