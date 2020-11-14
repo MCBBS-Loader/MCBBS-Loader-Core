@@ -6,7 +6,7 @@
 // @author       mcbbs-loader
 // @match        http*://www.mcbbs.net/*
 // @run-at       document-start
-// @updateURL    https://cdn.jsdelivr.net/gh/MCBBS-Loader/MCBBS-Loader-Core@stable/dist/stable.bundle.prod.js
+// @updateURL    https://cdn.jsdelivr.net/gh/MCBBS-Loader/MCBBS-Loader-Core@stable/dist/stable.bundle.prod.user.js
 // @grant        unsafeWindow
 // @grant        GM_addStyle
 // @grant        GM_deleteValue
