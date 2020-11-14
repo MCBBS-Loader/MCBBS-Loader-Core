@@ -182,8 +182,28 @@ function dumpManager() {
         meta.description
       }</span><button style='float:right;' type='button' class='pn pnc remove' ref='${
         meta.id || "loader.nameless"
-      }'>删除模块</button></div></div></li>`;
+      }'><strong>删除模块</strong></button>&nbsp;&nbsp;<button style='float:right;' type='button' class='pn pnc onoff' ref='${
+        meta.id || "loader.nameless"
+      }'><strong>${
+        GMGetValue("loader.all", {})[meta.id] ? "禁用" : "启用"
+      }</strong></button></div></div></li>`;
       $("#all_modules").append(ele);
+      $(".onoff").on("click", (e) => {
+        var el = e.target;
+        var action = $(el).html();
+        if (action == "启用") {
+          var all = GMGetValue("loader.all", {});
+          all[$(el).attr("ref") || "loader.nameless"] = true;
+          GMSetValue("loader.all", all);
+          $(el).html("禁用");
+        }
+        if (action == "禁用") {
+          var all = GMGetValue("loader.all", {});
+          all[$(el).attr("ref") || "loader.nameless"] = false;
+          GMSetValue("loader.all", all);
+          $(el).html("启用");
+        }
+      });
       $(".remove").on("click", (e) => {
         var el = e.target;
         deleteModule($(el).attr("ref") || "loader.nameless");
@@ -193,7 +213,7 @@ function dumpManager() {
           "https://www.mcbbs.net/favicon.ico",
           () => {
             GMSetValue("temp.loadmgr", true);
-            open(window.location.href);
+            open(window.location.href, "_self");
           }
         );
       });

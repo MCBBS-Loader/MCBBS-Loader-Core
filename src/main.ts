@@ -16,14 +16,16 @@ import apiloader from "./libs/apiloader";
   var sureToReset = false;
   setWindowProperty("reset_" + RESET_TOKEN, () => {
     if (sureToReset) {
-      for (var c of Object.entries(GMGetValue("loader.all", {}))) {
-        deleteModule(c[0]);
+      var all = GMGetValue("loader.all", {});
+      for (var c of Object.entries(all)) {
+        all[c[0]] = false;
       }
+      setWindowProperty("loader.all", all);
       GMLog("[MCBBS Loader] 重置完成，下次别安装不可靠模块了~");
     } else {
       sureToReset = true;
       GMLog(
-        "[MCBBS Loader] 确定要重置吗？这将移除所有模块，该过程不可撤销！\n如果确定重置，请再调用一次该函数。"
+        "[MCBBS Loader] 确定要重置吗？这将禁用所有模块！\n如果确定重置，请再调用一次该函数。"
       );
     }
   });
@@ -39,13 +41,14 @@ import apiloader from "./libs/apiloader";
       manager.dumpManager();
     }
     for (var c of Object.entries(GMGetValue("loader.all", {}))) {
-      GMLog("Checking update: " + c[0]);
-      checkUpdate(GMGetValue("meta-" + c[0], ""), (state) => {
-        if (state != "latest") {
-          installFromUrl(state);
-        }
-        mountCode(c[0], GMGetValue("code-" + c[0], "") || "");
-      });
+      if (c[1]) {
+        checkUpdate(GMGetValue("meta-" + c[0], ""), (state) => {
+          if (state != "latest") {
+            installFromUrl(state);
+          }
+          mountCode(c[0], GMGetValue("code-" + c[0], "") || "");
+        });
+      }
     }
   });
 })();
