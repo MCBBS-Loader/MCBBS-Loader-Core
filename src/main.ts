@@ -9,7 +9,9 @@ import {
 } from "./libs/usfunc";
 import jQuery from "jquery";
 import apiloader from "./libs/apiloader";
+import AInfo from "./api/AInfo";
 (() => {
+  GMLog(`[MCBBS Loader] 加载器和 API 版本：${AInfo.getAPIVersion()}`);
   const RESET_TOKEN = Math.floor(
     Math.random() * 1048576 * 1048576 * 1048576
   ).toString(16);
@@ -41,12 +43,14 @@ import apiloader from "./libs/apiloader";
       manager.dumpManager();
     }
     for (var c of Object.entries(GMGetValue("loader.all", {}))) {
-      if (c[1]) {
-        checkUpdate(GMGetValue("meta-" + c[0], ""), (state) => {
+      var a = c[0];
+      var b = c[1];
+      if (b) {
+        mountCode(a, GMGetValue("code-" + a, "") || "");
+        checkUpdate(GMGetValue("meta-" + a, ""), (state) => {
           if (state != "latest") {
             installFromUrl(state);
           }
-          mountCode(c[0], GMGetValue("code-" + c[0], "") || "");
         });
       }
     }

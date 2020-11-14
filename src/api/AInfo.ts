@@ -5,4 +5,4 @@ function getAPIVersion(): string {
 function load() {
   setWindowProperty("AInfo", { getAPIVersion });
 }
-export default { load };
+export default { load, getAPIVersion };

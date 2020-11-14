@@ -1,8 +1,8 @@
 import jQuery from "jquery";
 import $ from "jquery";
+import AInfo from "../api/AInfo";
 import { addModule, deleteModule } from "./codeload";
 import {
-  getWindowProperty,
   GMGetValue,
   GMNotification,
   GMSetValue,
@@ -32,7 +32,9 @@ function dumpManager() {
   jQuery(() => {
     $("div[class='bm bw0']").children().remove();
     $("div[class='bm bw0']")
-      .append("<span style='font-size:1.5rem'>模块管理</span>")
+      .append(
+        `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${AInfo.getAPIVersion()}</span>`
+      )
       .append("<br/>")
       .append("<hr/>")
       .append("<span style='font-size:1rem'>已安装的模块</span>")
@@ -42,7 +44,7 @@ function dumpManager() {
       .append("<span style='font-size:1rem'>安装新模块</span>")
       .append("<br/>")
       .append(
-        `<textarea style="font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:80%;overflow:auto;word-break:break-all;resize:vertical;" placeholder='BASE64 编码，URL 或 JavaScript 代码……' id='install_base64'></textarea>`
+        `<textarea style="font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:90%;height:150px;overflow:auto;word-break:break-all;resize:vertical;" placeholder='BASE64 编码，URL 或 JavaScript 代码……' id='install_base64'></textarea>`
       )
       .append(
         "<br/><ul><li>访问 GitHub 资源可用 jsDelivr：https://cdn.jsdelivr.net/gh/你的用户名/你的仓库@分支（一般为 master 或 main）/仓库内文件路径</li></ul>"
@@ -55,20 +57,49 @@ function dumpManager() {
       .append(
         "<span id='install_state' style='font-size:1rem;color:#df307f;'></span>"
       );
+    setWindowProperty("notifyUninstall", (e: string) => {
+      var t = e;
+      deleteModule(t, () => {
+        GMSetValue("temp.loadmgr", true);
+        open(window.location.href, "_self");
+        GMNotification(
+          "刚刚移除了，请查看。",
+          t,
+          "https://www.mcbbs.net/favicon.ico",
+          () => {}
+        );
+      });
+    });
+    setWindowProperty("notifyOnOff", (e: string, s: string) => {
+      var action = s;
+      if (action == "<strong>启用</strong>") {
+        var all = GMGetValue("loader.all", {});
+        all[e] = true;
+        GMSetValue("loader.all", all);
+      }
+      if (action == "<strong>禁用</strong>") {
+        var all = GMGetValue("loader.all", {});
+
+        all[e] = false;
+
+        GMSetValue("loader.all", all);
+      }
+      GMSetValue("temp.loadmgr", true);
+      open(window.location.href, "_self");
+    });
     $("#install").on("click", () => {
       var str = $("#install_base64").val()?.toString() || "";
       try {
         var x = atob(str);
         var st = addModule(x);
         if (st) {
+          GMSetValue("temp.loadmgr", true);
+          open(window.location.href, "_self");
           GMNotification(
             "刚安装好了，请查看。",
             st.get("name") || "Nameless",
             st.get("icon") || "https://www.mcbbs.net/favicon.ico",
-            () => {
-              GMSetValue("temp.loadmgr", true);
-              open(window.location.href, "_self");
-            }
+            () => {}
           );
           return;
         } else {
@@ -89,14 +120,13 @@ function dumpManager() {
                 if (typeof data == "string") {
                   var st = addModule(data);
                   if (st) {
+                    GMSetValue("temp.loadmgr", true);
+                    open(window.location.href, "_self");
                     GMNotification(
                       "刚安装好了，请查看。",
                       st.get("name") || "Nameless",
                       st.get("icon") || "https://www.mcbbs.net/favicon.ico",
-                      () => {
-                        GMSetValue("temp.loadmgr", true);
-                        open(window.location.href, "_self");
-                      }
+                      () => {}
                     );
                     return;
                   } else {
@@ -135,14 +165,13 @@ function dumpManager() {
         } else if (str.startsWith("// MCBBS-Module")) {
           var st = addModule(str);
           if (st) {
+            GMSetValue("temp.loadmgr", true);
+            open(window.location.href, "_self");
             GMNotification(
               "刚安装好了，请查看。",
               st.get("name") || "Nameless",
               st.get("icon") || "https://www.mcbbs.net/favicon.ico",
-              () => {
-                GMSetValue("temp.loadmgr", true);
-                open(window.location.href, "_self");
-              }
+              () => {}
             );
             return;
           } else {
@@ -180,44 +209,16 @@ function dumpManager() {
         meta.author || "Someone"
       }</span><br/>&nbsp;&nbsp;<span style='font-size:4px'>${
         meta.description
-      }</span><button style='float:right;' type='button' class='pn pnc remove' ref='${
-        meta.id || "loader.nameless"
-      }'><strong>删除模块</strong></button>&nbsp;&nbsp;<button style='float:right;' type='button' class='pn pnc onoff' ref='${
-        meta.id || "loader.nameless"
-      }'><strong>${
+      }</span><button style='float:right;' type='button' class='pn pnc remove' onclick='window.notifyUninstall("${
+        meta.id
+      }")'><strong>删除模块</strong></button>&nbsp;&nbsp;<button style='float:right;' type='button' class='pn pnc onoff' onclick='window.notifyOnOff("${
+        meta.id
+      }",this.innerHTML)'><strong>${
         GMGetValue("loader.all", {})[meta.id] ? "禁用" : "启用"
       }</strong></button></div></div></li>`;
       $("#all_modules").append(ele);
-      $(".onoff").on("click", (e) => {
-        var el = e.target;
-        var action = $(el).html();
-        if (action == "启用") {
-          var all = GMGetValue("loader.all", {});
-          all[$(el).attr("ref") || "loader.nameless"] = true;
-          GMSetValue("loader.all", all);
-          $(el).html("禁用");
-        }
-        if (action == "禁用") {
-          var all = GMGetValue("loader.all", {});
-          all[$(el).attr("ref") || "loader.nameless"] = false;
-          GMSetValue("loader.all", all);
-          $(el).html("启用");
-        }
-      });
-      $(".remove").on("click", (e) => {
-        var el = e.target;
-        deleteModule($(el).attr("ref") || "loader.nameless");
-        GMNotification(
-          "刚刚移除了，请查看。",
-          $(el).attr("ref") || "loader.nameless",
-          "https://www.mcbbs.net/favicon.ico",
-          () => {
-            GMSetValue("temp.loadmgr", true);
-            open(window.location.href, "_self");
-          }
-        );
-      });
     }
   });
 }
+
 export default { createBtn, createMenu, dumpManager };

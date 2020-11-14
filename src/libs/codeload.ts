@@ -77,12 +77,13 @@ function unmountCode(id: string): void {
     $(`#code-${id}`).remove();
   });
 }
-function deleteModule(id: string): void {
+function deleteModule(id: string, callback: () => void): void {
   GMDeleteValue("meta-" + id);
   GMDeleteValue("code-" + id);
   var obj = GMGetValue("loader.all", {});
   setProperty(obj, id, undefined);
   GMSetValue("loader.all", obj);
+  callback();
 }
 function installFromUrl(url: string) {
   try {

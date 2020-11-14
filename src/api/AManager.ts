@@ -19,4 +19,4 @@ function require(url: string, callback: () => void) {
     callback();
   });
 }
-export default { load };
+export default { load, require, getAllModules, openManager };

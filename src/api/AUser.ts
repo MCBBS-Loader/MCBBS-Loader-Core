@@ -19,4 +19,4 @@ function load() {
     getUserAvatar,
   });
 }
-export default { load };
+export default { load, getUserName, getUserUID, getUserAvatar };
