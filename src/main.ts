@@ -22,6 +22,7 @@ import AInfo from "./api/AInfo";
       for (var c of Object.entries(all)) {
         all[c[0]] = false;
       }
+      GMSetValue("loader.all", all);
       setWindowProperty("loader.all", all);
       GMLog("[MCBBS Loader] 重置完成，下次别安装不可靠模块了~");
     } else {
