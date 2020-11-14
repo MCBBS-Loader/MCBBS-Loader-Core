@@ -72,16 +72,15 @@ function dumpManager() {
     });
     setWindowProperty("notifyOnOff", (e: string, s: string) => {
       var action = s;
-      if (action == "<strong>启用</strong>") {
-        var all = GMGetValue("loader.all", {});
-        all[e] = true;
-        GMSetValue("loader.all", all);
-      }
-      if (action == "<strong>禁用</strong>") {
+      if (GMGetValue("loader.all", {})[s]) {
         var all = GMGetValue("loader.all", {});
 
         all[e] = false;
 
+        GMSetValue("loader.all", all);
+      } else {
+        var all = GMGetValue("loader.all", {});
+        all[e] = true;
         GMSetValue("loader.all", all);
       }
       GMSetValue("temp.loadmgr", true);
@@ -213,7 +212,7 @@ function dumpManager() {
         meta.id
       }")'><strong>删除模块</strong></button>&nbsp;&nbsp;<button style='float:right;' type='button' class='pn pnc onoff' onclick='window.notifyOnOff("${
         meta.id
-      }",this.innerHTML)'><strong>${
+      }","${meta.id}")'><strong>${
         GMGetValue("loader.all", {})[meta.id] ? "禁用" : "启用"
       }</strong></button></div></div></li>`;
       $("#all_modules").append(ele);
