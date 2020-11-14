@@ -8,8 +8,6 @@
 
 MCBBS Loader 可以加载符合要求的 MCBBS 模块到客户端，以扩展 MCBBS 的功能。
 
-[立即获取 Dev（需要 TamperMonkey）](https://cdn.jsdelivr.net/gh/MCBBS-Loader/MCBBS-Loader-Core@main/dist/main.bundle.dev.user.js)
-
 ---
 
 ## 模块标准
@@ -48,7 +46,7 @@ console.log("This is a module!");
 
 以上项目中，只有 `id` 是必填项。
 
-有关 MCBBS Loader 提供的 API，请参阅 [模块开发指南](./docs/devmodule.md)
+有关更多信息，请访问我们的 [网站](https://mcbbs-loader.github.io/) 或 [网站（中国大陆）](https://mcbbs-loader.xuogroup.top/)
 
 ## 许可证
 
