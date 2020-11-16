@@ -92,7 +92,6 @@ function installFromUrl(url: string) {
         var data = dataIn.toString();
         if (typeof data == "string") {
           addModule(data);
-        } else {
         }
       } catch {}
     });

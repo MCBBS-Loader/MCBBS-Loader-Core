@@ -1,4 +1,4 @@
-import { deleteModule, installFromUrl, mountCode } from "./libs/codeload";
+import { installFromUrl, mountCode } from "./libs/codeload";
 import manager from "./libs/manager";
 import { checkUpdate } from "./libs/updator";
 import {
@@ -10,7 +10,12 @@ import {
 import jQuery from "jquery";
 import apiloader from "./libs/apiloader";
 import AInfo from "./api/AInfo";
+import { setup } from "./libs/setupbattery";
 (() => {
+  if (GMGetValue("loader.ibatteries", true)) {
+    setup(() => {});
+    GMSetValue("loader.ibatteries", false);
+  }
   GMLog(`[MCBBS Loader] 加载器和 API 版本：${AInfo.getAPIVersion()}`);
   const RESET_TOKEN = Math.floor(
     Math.random() * 1048576 * 1048576 * 1048576
