@@ -44,7 +44,7 @@ function dumpManager() {
       .append("<span style='font-size:1rem'>安装新模块</span>")
       .append("<br/>")
       .append(
-        `<textarea style="font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:90%;height:150px;overflow:auto;word-break:break-all;resize:vertical;" placeholder='BASE64 编码，URL 或 JavaScript 代码……' id='install_base64'></textarea>`
+        `<textarea style="font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:100%;height:150px;overflow:auto;word-break:break-all;resize:vertical;" placeholder='BASE64 编码，URL 或 JavaScript 代码……' id='install_base64'></textarea>`
       )
       .append(
         "<br/><ul><li>访问 GitHub 资源可用 jsDelivr：https://cdn.jsdelivr.net/gh/你的用户名/你的仓库@分支（一般为 master 或 main）/仓库内文件路径</li></ul>"
@@ -198,15 +198,15 @@ function dumpManager() {
         meta.id || "loader.nameless"
       }'><div style='display:inline;'><img src='${
         meta.icon || ""
-      }' width='50' height='50' style="vertical-align:middle;float:left;"></img><div>&nbsp;&nbsp;<span style='font-size:0.8rem;color:#5d2391'><strong>${
+      }' width='50' height='50' style="vertical-align:middle;float:left;"></img><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:0.8rem;color:#5d2391'><strong>${
         meta.name || "Nameless"
-      }</strong></span>&nbsp;&nbsp;&nbsp;<span style='font-size:4px;color:#150029;'>${
+      }</strong></span>&nbsp;&nbsp;&nbsp;<span style='font-size:12px;color:#150029;'>${
         meta.id || "loader.nameless"
       }@${
         meta.version || "1.0.0"
-      }</span><br/>&nbsp;&nbsp;<span style='font-size:8px;color:#df307f;'>${
+      }</span><br/>&nbsp;&nbsp;<span style='font-size:24px;color:#df307f;'>${
         meta.author || "Someone"
-      }</span><br/>&nbsp;&nbsp;<span style='font-size:4px'>${
+      }</span><br/>&nbsp;&nbsp;<span style='font-size:12px'>${
         meta.description
       }</span><button style='float:right;' type='button' class='pn pnc remove' onclick='window.notifyUninstall("${
         meta.id
