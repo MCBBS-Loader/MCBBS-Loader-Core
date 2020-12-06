@@ -2,6 +2,7 @@ import jQuery from "jquery";
 import $ from "jquery";
 import AInfo from "../api/AInfo";
 import { addModule, deleteModule } from "./codeload";
+import { closepop, popinfo } from "./popinfo";
 import {
   GMGetValue,
   GMNotification,
@@ -56,12 +57,8 @@ function dumpManager() {
       var t = e;
       deleteModule(t, () => {
         dumpManager();
-        GMNotification(
-          "刚刚移除了，请查看。",
-          t,
-          "https://www.mcbbs.net/favicon.ico",
-          () => {}
-        );
+        popinfo("trash", "成功移除了模块", false);
+        setTimeout(closepop, 3000);
       });
     });
     setWindowProperty("notifyOnOff", (e: string, s: string) => {
@@ -85,24 +82,17 @@ function dumpManager() {
         var st = addModule(x);
         if (st) {
           dumpManager();
-          GMNotification(
-            "刚安装好了，请查看。",
-            st.get("name") || "Nameless",
-            st.get("icon") || "https://www.mcbbs.net/favicon.ico",
-            () => {}
-          );
+          popinfo("check", "成功安装了模块", false);
+          setTimeout(closepop, 3000);
           return;
         } else {
-          GMNotification(
-            "解码后的 BASE64 无效。",
-            "安装失败",
-            "https://www.mcbbs.net/favicon.ico",
-            () => {}
-          );
+          popinfo("exclamation-circle", "安装失败，无效 BASE64.", false);
+          setTimeout(closepop, 5000);
         }
       } catch {
         var isUrlRegex = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g;
         if (isUrlRegex.test(str)) {
+          popinfo("cloud", "正在获取数据……");
           try {
             $.get(str, (dataIn) => {
               try {
@@ -111,72 +101,54 @@ function dumpManager() {
                   var st = addModule(data);
                   if (st) {
                     dumpManager();
-                    GMNotification(
-                      "刚安装好了，请查看。",
-                      st.get("name") || "Nameless",
-                      st.get("icon") || "https://www.mcbbs.net/favicon.ico",
-                      () => {}
-                    );
+                    popinfo("check", "成功安装了模块", false);
+                    setTimeout(closepop, 3000);
                     return;
                   } else {
-                    GMNotification(
-                      "AJAX 没有返回有效的 JavaScript。",
-                      "安装失败",
-                      "https://www.mcbbs.net/favicon.ico",
-                      () => {}
+                    popinfo(
+                      "exclamation-circle",
+                      "安装失败，接收了一个无效数据值",
+                      false
                     );
+                    setTimeout(closepop, 5000);
                   }
                 } else {
-                  GMNotification(
-                    "AJAX 没有返回有效的 JavaScript。",
-                    "安装失败",
-                    "https://www.mcbbs.net/favicon.ico",
-                    () => {}
+                  popinfo(
+                    "exclamation-circle",
+                    "安装失败，接收了一个无效数据值",
+                    false
                   );
+                  setTimeout(closepop, 5000);
                 }
               } catch {
-                GMNotification(
-                  "AJAX 没有返回有效的 JavaScript。",
-                  "安装失败",
-                  "https://www.mcbbs.net/favicon.ico",
-                  () => {}
+                popinfo(
+                  "exclamation-circle",
+                  "安装失败，接收了一个无效数据值",
+                  false
                 );
+                setTimeout(closepop, 5000);
               }
             });
           } catch {
-            GMNotification(
-              "AJAX 没有返回有效的 JavaScript。",
-              "安装失败",
-              "https://www.mcbbs.net/favicon.ico",
-              () => {}
+            popinfo(
+              "exclamation-circle",
+              "安装失败，接收了一个无效数据值",
+              false
             );
+            setTimeout(closepop, 5000);
           }
         } else if (str.startsWith("// MCBBS-Module")) {
           var st = addModule(str);
           if (st) {
             dumpManager();
-            GMNotification(
-              "刚安装好了，请查看。",
-              st.get("name") || "Nameless",
-              st.get("icon") || "https://www.mcbbs.net/favicon.ico",
-              () => {}
-            );
+            popinfo("check", "成功安装了模块", false);
+            setTimeout(closepop, 3000);
             return;
           } else {
-            GMNotification(
-              "无效 JavaScript。",
-              "安装失败",
-              "https://www.mcbbs.net/favicon.ico",
-              () => {}
-            );
+            popinfo("exclamation-circle", "安装失败，JavaScript 无效", false);
           }
         } else {
-          GMNotification(
-            "无效输入。",
-            "安装失败",
-            "https://www.mcbbs.net/favicon.ico",
-            () => {}
-          );
+          popinfo("exclamation-circle", "安装失败，无效输入", false);
         }
       }
     });
