@@ -45,11 +45,13 @@ import { setup } from "./libs/setupbattery";
   jQuery(() => {
     manager.createBtn();
     manager.createMenu();
-    configpage.createMenu();
-    if (GMGetValue("temp.loadmgr", false)) {
-      GMSetValue("temp.loadmgr", false);
+    if (
+      String(window.location) ===
+      "https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager"
+    ) {
       manager.dumpManager();
     }
+    configpage.createMenu();
     if (GMGetValue("temp.loadcfg", false)) {
       GMSetValue("temp.loadcfg", false);
       configpage.dumpConfigPage();
