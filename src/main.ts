@@ -1,7 +1,7 @@
 import { installFromUrl, mountCode } from "./libs/codeload";
 import manager from "./libs/manager";
 import configpage from "./libs/configpage";
-import { checkUpdate } from "./libs/updator";
+import { checkUpdate, cmpVersion } from "./libs/updator";
 import {
   GMGetValue,
   GMLog,
@@ -9,11 +9,20 @@ import {
   setWindowProperty,
 } from "./libs/usfunc";
 import jQuery from "jquery";
+import $ from "jquery";
 import apiloader from "./libs/apiloader";
 import AInfo from "./api/AInfo";
 import { setup } from "./libs/setupbattery";
-import { getProperty, setProperty } from "./libs/native";
+import { getProperty } from "./libs/native";
 (() => {
+  jQuery(() => {
+    $("head").append(
+      "<link type='text/css' rel='stylesheet' href='https://cdn.staticfile.org/font-awesome/5.15.1/css/all.min.css'></link>"
+    );
+    $("head").append(
+      "<link type='text/css' rel='stylesheet' href='https://cdn.staticfile.org/font-awesome/5.15.1/css/v4-shims.min.css'></link>"
+    );
+  });
   if (GMGetValue("loader.ibatteries", true)) {
     setup(() => {});
     GMSetValue("loader.ibatteries", false);
@@ -68,9 +77,18 @@ import { getProperty, setProperty } from "./libs/native";
     var stack: object[] = [];
     var sortedList = [];
     for (var [name, enabled] of Object.entries(GMGetValue("loader.all", {}))) {
-      if (enabled) {
-        // dependencies.set(name, fixRaw(name, JSON.parse(GMGetValue("depend-" + name, "{}"))));
-        // fixRaw 是干什么的？第一个参数貌似缺少
+      if (
+        enabled &&
+        !cmpVersion(
+          GMGetValue("meta-" + name, {}).loader || "0.0.1",
+          AInfo.getAPIVersion()
+        )
+      ) {
+        dependencies.set(
+          name,
+          fixRaw(name, JSON.parse(GMGetValue("depend-" + name, "{}")))
+        );
+        // FIXME fixRaw 是干什么的？第一个参数貌似缺少
         checkUpdate(GMGetValue("meta-" + name, ""), (state) => {
           if (state != "latest") {
             installFromUrl(state);
@@ -112,7 +130,7 @@ import { getProperty, setProperty } from "./libs/native";
       dependencies.forEach((v, k) => {
         var depend = getProperty(v, "depend");
         if (depend instanceof Array) {
-          depend.forEach((e, i) => {
+          depend.forEach((e) => {
             if (!dependencies.get(e)) {
               throw `依赖关系无解，${k}依赖${e}，但是后者未安装或未启用`;
             }
@@ -120,7 +138,7 @@ import { getProperty, setProperty } from "./libs/native";
         }
         var before = getProperty(v, "before");
         if (before instanceof Array) {
-          before.forEach((e, i) => {
+          before.forEach((e) => {
             var target = dependencies.get(e);
             if (target) {
               insert(v, e);
@@ -129,7 +147,7 @@ import { getProperty, setProperty } from "./libs/native";
         }
         var after = getProperty(v, "after");
         if (after instanceof Array) {
-          after.forEach((e, i) => {
+          after.forEach((e) => {
             var target = dependencies.get(e);
             if (target) {
               insert(e, v);
@@ -137,7 +155,7 @@ import { getProperty, setProperty } from "./libs/native";
           });
         }
       });
-      dependencies.forEach((v, k) => {
+      dependencies.forEach((v) => {
         if ((v as any).afterHead === null) {
           stack.push(v);
         }
@@ -159,13 +177,15 @@ import { getProperty, setProperty } from "./libs/native";
           }前加载，而后者需要在前者之前加载`;
         }
       });
-      sortedList.forEach((v, k) => {
+      sortedList.forEach((v) => {
         var name = v.name;
         mountCode(name, GMGetValue("code-" + name, "") || "");
       });
     } catch (ex) {
       GMLog(`[ MCBBS Loader ] ${ex}`);
-      GMLog("[ MCBBS Loader ] 所有插件均未加载，请到管理页面修复依赖关系错误");
+      GMLog(
+        "[ MCBBS Loader ] 所有插件均未成功加载，请到管理页面修复依赖关系错误"
+      );
     }
   });
 })();

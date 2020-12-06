@@ -52,4 +52,4 @@ function cmpVersion(nv: string, ov: string): boolean {
     return false;
   }
 }
-export { checkUpdate };
+export { checkUpdate, cmpVersion };
