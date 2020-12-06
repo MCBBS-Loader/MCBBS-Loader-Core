@@ -69,7 +69,7 @@ import { getProperty, setProperty } from "./libs/native";
     var sortedList = [];
     for (var [name, enabled] of Object.entries(GMGetValue("loader.all", {}))) {
       if (enabled) {
-        dependencies.set(name, fixRaw(JSON.parse(GMGetValue("depend-" + name, "{}"))));
+        dependencies.set(name, fixRaw(name, JSON.parse(GMGetValue("depend-" + name, "{}"))));
         checkUpdate(GMGetValue("meta-" + name, ""), (state) => {
           if (state != "latest") {
             installFromUrl(state);
