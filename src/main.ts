@@ -1,5 +1,6 @@
 import { installFromUrl, mountCode } from "./libs/codeload";
 import manager from "./libs/manager";
+import configpage from "./libs/configpage";
 import { checkUpdate } from "./libs/updator";
 import {
   GMGetValue,
@@ -40,13 +41,21 @@ import { getProperty, setProperty } from "./libs/native";
   });
 
   GMLog("[MCBBS Loader] 重置令牌：reset_" + RESET_TOKEN);
-
   apiloader.loadAll();
+  setWindowProperty("CDT", []);
   jQuery(() => {
     manager.createBtn();
     manager.createMenu();
-    if (String(window.location) === "https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager") {
+    if (
+      String(window.location) ===
+      "https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager"
+    ) {
       manager.dumpManager();
+    }
+    configpage.createMenu();
+    if (GMGetValue("temp.loadcfg", false)) {
+      GMSetValue("temp.loadcfg", false);
+      configpage.dumpConfigPage();
     }
     var fixRaw = (name:string, raw:any) => {
       raw.beforeHead = null;

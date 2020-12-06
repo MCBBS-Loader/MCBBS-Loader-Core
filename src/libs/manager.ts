@@ -2,6 +2,7 @@ import jQuery from "jquery";
 import $ from "jquery";
 import AInfo from "../api/AInfo";
 import { addModule, deleteModule } from "./codeload";
+import { closepop, popinfo } from "./popinfo";
 import {
   GMGetValue,
   GMNotification,
@@ -16,7 +17,11 @@ function createBtn(): void {
   });
 }
 function createMenu(): void {
-  if(String(window.location).startsWith("https://www.mcbbs.net/home.php?mod=spacecp")){
+  if (
+    String(window.location).startsWith(
+      "https://www.mcbbs.net/home.php?mod=spacecp"
+    )
+  ) {
     jQuery(() => {
       $("div.appl > div.tbn > ul").prepend(
         "<li><a id='manage_modules' style='cursor:pointer;'>模块管理</a></li>"
@@ -30,9 +35,8 @@ function createMenu(): void {
 function dumpManager() {
   jQuery(() => {
     $("div[class='bm bw0']").children().remove();
-    $("div[class='bm bw0']")
-      .append(
-`<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${AInfo.getAPIVersion()}</span>
+    $("div[class='bm bw0']").append(
+      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${AInfo.getAPIVersion()}</span>
 <br/>
 <hr/>
 <span style='font-size:1rem'>已安装的模块</span>
@@ -48,21 +52,16 @@ function dumpManager() {
 <button class='pn pnc' type='button' id='install'><strong>安装</strong></button>
 <br/>
 <span id='install_state' style='font-size:1rem;color:#df307f;'></span>`
-      );
+    );
     setWindowProperty("notifyUninstall", (e: string) => {
       var t = e;
       deleteModule(t, () => {
         dumpManager();
-        GMNotification(
-          "刚刚移除了，请查看。",
-          t,
-          "https://www.mcbbs.net/favicon.ico",
-          () => {}
-        );
+        popinfo("trash", "成功移除了模块", false);
+        setTimeout(closepop, 3000);
       });
     });
     setWindowProperty("notifyOnOff", (e: string, s: string) => {
-      var action = s;
       if (GMGetValue("loader.all", {})[s]) {
         var all = GMGetValue("loader.all", {});
 
@@ -83,24 +82,17 @@ function dumpManager() {
         var st = addModule(x);
         if (st) {
           dumpManager();
-          GMNotification(
-            "刚安装好了，请查看。",
-            st.get("name") || "Nameless",
-            st.get("icon") || "https://www.mcbbs.net/favicon.ico",
-            () => {}
-          );
+          popinfo("check", "成功安装了模块", false);
+          setTimeout(closepop, 3000);
           return;
         } else {
-          GMNotification(
-            "解码后的 BASE64 无效。",
-            "安装失败",
-            "https://www.mcbbs.net/favicon.ico",
-            () => {}
-          );
+          popinfo("exclamation-circle", "安装失败，无效 BASE64.", false);
+          setTimeout(closepop, 5000);
         }
       } catch {
         var isUrlRegex = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g;
         if (isUrlRegex.test(str)) {
+          popinfo("cloud", "正在获取数据……");
           try {
             $.get(str, (dataIn) => {
               try {
@@ -109,72 +101,54 @@ function dumpManager() {
                   var st = addModule(data);
                   if (st) {
                     dumpManager();
-                    GMNotification(
-                      "刚安装好了，请查看。",
-                      st.get("name") || "Nameless",
-                      st.get("icon") || "https://www.mcbbs.net/favicon.ico",
-                      () => {}
-                    );
+                    popinfo("check", "成功安装了模块", false);
+                    setTimeout(closepop, 3000);
                     return;
                   } else {
-                    GMNotification(
-                      "AJAX 没有返回有效的 JavaScript。",
-                      "安装失败",
-                      "https://www.mcbbs.net/favicon.ico",
-                      () => {}
+                    popinfo(
+                      "exclamation-circle",
+                      "安装失败，接收了一个无效数据值",
+                      false
                     );
+                    setTimeout(closepop, 5000);
                   }
                 } else {
-                  GMNotification(
-                    "AJAX 没有返回有效的 JavaScript。",
-                    "安装失败",
-                    "https://www.mcbbs.net/favicon.ico",
-                    () => {}
+                  popinfo(
+                    "exclamation-circle",
+                    "安装失败，接收了一个无效数据值",
+                    false
                   );
+                  setTimeout(closepop, 5000);
                 }
               } catch {
-                GMNotification(
-                  "AJAX 没有返回有效的 JavaScript。",
-                  "安装失败",
-                  "https://www.mcbbs.net/favicon.ico",
-                  () => {}
+                popinfo(
+                  "exclamation-circle",
+                  "安装失败，接收了一个无效数据值",
+                  false
                 );
+                setTimeout(closepop, 5000);
               }
             });
           } catch {
-            GMNotification(
-              "AJAX 没有返回有效的 JavaScript。",
-              "安装失败",
-              "https://www.mcbbs.net/favicon.ico",
-              () => {}
+            popinfo(
+              "exclamation-circle",
+              "安装失败，接收了一个无效数据值",
+              false
             );
+            setTimeout(closepop, 5000);
           }
         } else if (str.startsWith("// MCBBS-Module")) {
           var st = addModule(str);
           if (st) {
             dumpManager();
-            GMNotification(
-              "刚安装好了，请查看。",
-              st.get("name") || "Nameless",
-              st.get("icon") || "https://www.mcbbs.net/favicon.ico",
-              () => {}
-            );
+            popinfo("check", "成功安装了模块", false);
+            setTimeout(closepop, 3000);
             return;
           } else {
-            GMNotification(
-              "无效 JavaScript。",
-              "安装失败",
-              "https://www.mcbbs.net/favicon.ico",
-              () => {}
-            );
+            popinfo("exclamation-circle", "安装失败，JavaScript 无效", false);
           }
         } else {
-          GMNotification(
-            "无效输入。",
-            "安装失败",
-            "https://www.mcbbs.net/favicon.ico",
-            () => {}
-          );
+          popinfo("exclamation-circle", "安装失败，无效输入", false);
         }
       }
     });
@@ -185,13 +159,13 @@ function dumpManager() {
         meta.id || "loader.nameless"
       }'><div style='display:inline;'><img src='${
         meta.icon || ""
-      }' width='50' height='50' style="vertical-align:middle;float:left;"></img><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:0.8rem;color:#5d2391'><strong>${
+      }' width='50' height='50' style="vertical-align:middle;float:left;"></img><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:#5d2391'><strong>${
         meta.name || "Nameless"
       }</strong></span>&nbsp;&nbsp;&nbsp;<span style='font-size:12px;color:#150029;'>${
         meta.id || "loader.nameless"
       }@${
         meta.version || "1.0.0"
-      }</span><br/>&nbsp;&nbsp;<span style='font-size:24px;color:#df307f;'>${
+      }</span><br/>&nbsp;&nbsp;<span style='font-size:16px;color:#df307f;'>${
         meta.author || "Someone"
       }</span><br/>&nbsp;&nbsp;<span style='font-size:12px'>${
         meta.description
