@@ -48,12 +48,11 @@ import { getProperty, setProperty } from "./libs/native";
     if (String(window.location) === "https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager") {
       manager.dumpManager();
     }
-    var fixRaw = (raw:any) => {
-      raw.before_count = 0;
-      raw.after_count = 0;
-      raw.before_head = null;
-      raw.after_head = null;
+    var fixRaw = (name:string, raw:any) => {
+      raw.beforeHead = null;
+      raw.afterHead = null;
       raw.done = false;
+      raw.name = name;
       return raw;
     };
     var dependencies = new Map<string, object>();
@@ -72,35 +71,40 @@ import { getProperty, setProperty } from "./libs/native";
     try{// 排个序
       // 邻接表
       var insert = (before:any, after:any) => {
-        before.before_count++;
-        after.after_count++;
-        var node = [before, after, before.before_head, after.after_head, null, null];
-        node[3][5] = node[2][4] = node;
-        after.after_head = before.before_head = node;
+        var node:any = {
+          before: before,
+          after: after,
+          beforeNext: before.beforeHead,
+          afterNext: after.afterHead,
+          beforePrev: null,
+          afterPrev: null
+        };
+        node.beforeNext.beforePrev = node.afterNext.afterPrev = node;
+        after.afterHead = before.beforeHead = node;
       }
       var unlink = (node:any) => {
-        node[3][5] = node[5];
-        node[2][4] = node[4];
-        node[5][3] = node[3];
-        node[4][2] = node[2];
-        if(node === node[1].after_head){
-          node[1].after_head = node[3];
+        node.afterNext.afterPrev = node.afterPrev;
+        node.beforeNext.beforePrev = node.beforePrev;
+        node.afterPrev.afterNext = node.afterNext;
+        node.beforePrev.beforeNext = node.beforeNext;
+        if(node === node.after.afterHead){
+          node.after.afterHead = node.afterNext;
         }
-        if(node === node[0].before_head){
-          node[0].before_head = node[2];
+        if(node === node.before.beforeHead){
+          node.before.beforeHead = node.beforeNext;
         }
-        node[1].after_count--;
-        node[0].before_count--;
-        if(node[0].before_count == 0){
-          stack.push(node[0]);
+        // 如果它不需要在某个插件之后加载，那下一个就加载它
+        if(!node.after.afterHead){
+          stack.push(node.after);
         }
       }
       dependencies.forEach((v, k) => {
         var depend = getProperty(v, "depend");
         if(depend instanceof Array){
           depend.forEach((e, i) => {
-            if(!dependencies.get(e))
-              throw "依赖关系无解";
+            if(!dependencies.get(e)){
+              throw `依赖关系无解，${k}依赖${e}，但是后者未安装或未启用`;
+            }
           });
         }
         var before = getProperty(v, "before");
@@ -123,27 +127,32 @@ import { getProperty, setProperty } from "./libs/native";
         }
       });
       dependencies.forEach((v, k) => {
-        if((v as any).before_head === null){
+        if((v as any).afterHead === null){
           stack.push(v);
         }
       });
       while(stack.length){
-        var process = stack.pop();
+        var process = stack.pop() as any;
         sortedList.push(process);
-        // 是undefined个屁，垃圾Typescript编译器
+        // 加个排序完成标记，解除其他插件需要在本插件之后加载的限制
         process.done = true;
-        while(process.after_head){
-          unlink(process.after_head)
+        while(process.beforeHead){
+          unlink(process.beforeHead)
         }
       }
+      // 如果排序已经结束了还有插件没有进入到序列里来，那么排序一定无解
       dependencies.forEach((v, k) => {
         if(!(v as any).done){
-          throw "依赖关系无解";
+          throw `依赖关系无解，${k}需要在${v.afterHead.name}前加载，而后者需要在前者之前加载`;
         }
       });
+      sortedList.forEach((v, k) => {
+        var name = v.name;
+        mountCode(name, GMGetValue("code-" + name, "") || "");
+      });
     }catch(ex){
-
+      GMLog(`[ MCBBS Loader ] ${ex}`);
+      GMLog("[ MCBBS Loader ] 所有插件均未加载，请到管理页面修复依赖关系错误");
     }
-    mountCode(name, GMGetValue("code-" + name, "") || "");
   });
 })();
