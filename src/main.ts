@@ -57,7 +57,7 @@ import { getProperty, setProperty } from "./libs/native";
       GMSetValue("temp.loadcfg", false);
       configpage.dumpConfigPage();
     }
-    var fixRaw = (name:string, raw:any) => {
+    var fixRaw = (name: string, raw: any) => {
       raw.beforeHead = null;
       raw.afterHead = null;
       raw.done = false;
@@ -69,7 +69,8 @@ import { getProperty, setProperty } from "./libs/native";
     var sortedList = [];
     for (var [name, enabled] of Object.entries(GMGetValue("loader.all", {}))) {
       if (enabled) {
-        dependencies.set(name, fixRaw(JSON.parse(GMGetValue("depend-" + name, "{}"))));
+        // dependencies.set(name, fixRaw(name, JSON.parse(GMGetValue("depend-" + name, "{}"))));
+        // fixRaw 是干什么的？第一个参数貌似缺少
         checkUpdate(GMGetValue("meta-" + name, ""), (state) => {
           if (state != "latest") {
             installFromUrl(state);
@@ -77,89 +78,92 @@ import { getProperty, setProperty } from "./libs/native";
         });
       }
     }
-    try{// 排个序
+    try {
+      // 排个序
       // 邻接表
-      var insert = (before:any, after:any) => {
-        var node:any = {
+      var insert = (before: any, after: any) => {
+        var node: any = {
           before: before,
           after: after,
           beforeNext: before.beforeHead,
           afterNext: after.afterHead,
           beforePrev: null,
-          afterPrev: null
+          afterPrev: null,
         };
         node.beforeNext.beforePrev = node.afterNext.afterPrev = node;
         after.afterHead = before.beforeHead = node;
-      }
-      var unlink = (node:any) => {
+      };
+      var unlink = (node: any) => {
         node.afterNext.afterPrev = node.afterPrev;
         node.beforeNext.beforePrev = node.beforePrev;
         node.afterPrev.afterNext = node.afterNext;
         node.beforePrev.beforeNext = node.beforeNext;
-        if(node === node.after.afterHead){
+        if (node === node.after.afterHead) {
           node.after.afterHead = node.afterNext;
         }
-        if(node === node.before.beforeHead){
+        if (node === node.before.beforeHead) {
           node.before.beforeHead = node.beforeNext;
         }
         // 如果它不需要在某个插件之后加载，那下一个就加载它
-        if(!node.after.afterHead){
+        if (!node.after.afterHead) {
           stack.push(node.after);
         }
-      }
+      };
       dependencies.forEach((v, k) => {
         var depend = getProperty(v, "depend");
-        if(depend instanceof Array){
+        if (depend instanceof Array) {
           depend.forEach((e, i) => {
-            if(!dependencies.get(e)){
+            if (!dependencies.get(e)) {
               throw `依赖关系无解，${k}依赖${e}，但是后者未安装或未启用`;
             }
           });
         }
         var before = getProperty(v, "before");
-        if(before instanceof Array){
+        if (before instanceof Array) {
           before.forEach((e, i) => {
             var target = dependencies.get(e);
-            if(target){
+            if (target) {
               insert(v, e);
             }
           });
         }
         var after = getProperty(v, "after");
-        if(after instanceof Array){
+        if (after instanceof Array) {
           after.forEach((e, i) => {
             var target = dependencies.get(e);
-            if(target){
+            if (target) {
               insert(e, v);
             }
           });
         }
       });
       dependencies.forEach((v, k) => {
-        if((v as any).afterHead === null){
+        if ((v as any).afterHead === null) {
           stack.push(v);
         }
       });
-      while(stack.length){
+      while (stack.length) {
         var process = stack.pop() as any;
         sortedList.push(process);
         // 加个排序完成标记，解除其他插件需要在本插件之后加载的限制
         process.done = true;
-        while(process.beforeHead){
-          unlink(process.beforeHead)
+        while (process.beforeHead) {
+          unlink(process.beforeHead);
         }
       }
       // 如果排序已经结束了还有插件没有进入到序列里来，那么排序一定无解
       dependencies.forEach((v, k) => {
-        if(!(v as any).done){
-          throw `依赖关系无解，${k}需要在${v.afterHead.name}前加载，而后者需要在前者之前加载`;
+        if (!(v as any).done) {
+          throw `依赖关系无解，${k}需要在${
+            getProperty(v, "afterHead")["name"]
+          }前加载，而后者需要在前者之前加载`;
         }
       });
       sortedList.forEach((v, k) => {
         var name = v.name;
         mountCode(name, GMGetValue("code-" + name, "") || "");
       });
-    }catch(ex){
+    } catch (ex) {
       GMLog(`[ MCBBS Loader ] ${ex}`);
       GMLog("[ MCBBS Loader ] 所有插件均未加载，请到管理页面修复依赖关系错误");
     }
