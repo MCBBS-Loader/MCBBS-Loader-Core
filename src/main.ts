@@ -44,8 +44,7 @@ import { setup } from "./libs/setupbattery";
   jQuery(() => {
     manager.createBtn();
     manager.createMenu();
-    if (GMGetValue("temp.loadmgr", false)) {
-      GMSetValue("temp.loadmgr", false);
+    if (String(window.location) === "https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager") {
       manager.dumpManager();
     }
     for (var c of Object.entries(GMGetValue("loader.all", {}))) {

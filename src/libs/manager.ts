@@ -11,57 +11,48 @@ import {
 function createBtn(): void {
   jQuery(() => {
     $("ul.user_info_menu_btn").append(
-      "<li><a id='openmgr' href='https://www.mcbbs.net/home.php?mod=spacecp'>MCBBS 模块管理</a></li>"
+      "<li><a href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager'>MCBBS 模块管理</a></li>"
     );
-    $("ul.user_info_menu_btn > li > a#openmgr").on("click", () => {
-      GMSetValue("temp.loadmgr", true);
-    });
   });
 }
 function createMenu(): void {
-  jQuery(() => {
-    $("div.appl > div.tbn > ul").prepend(
-      "<li><a id='manage_modules' style='cursor:pointer;'>模块管理</a></li>"
-    );
-    $("#manage_modules").on("click", () => {
-      dumpManager();
+  if(String(window.location).startsWith("https://www.mcbbs.net/home.php?mod=spacecp")){
+    jQuery(() => {
+      $("div.appl > div.tbn > ul").prepend(
+        "<li><a id='manage_modules' style='cursor:pointer;'>模块管理</a></li>"
+      );
+      $("#manage_modules").on("click", () => {
+        dumpManager();
+      });
     });
-  });
+  }
 }
 function dumpManager() {
   jQuery(() => {
     $("div[class='bm bw0']").children().remove();
     $("div[class='bm bw0']")
       .append(
-        `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${AInfo.getAPIVersion()}</span>`
-      )
-      .append("<br/>")
-      .append("<hr/>")
-      .append("<span style='font-size:1rem'>已安装的模块</span>")
-      .append("<br/>")
-      .append("<div style='overflow:auto;'><ul id='all_modules'></ul></div>")
-      .append("<hr/>")
-      .append("<span style='font-size:1rem'>安装新模块</span>")
-      .append("<br/>")
-      .append(
-        `<textarea style="font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:100%;height:150px;overflow:auto;word-break:break-all;resize:vertical;" placeholder='BASE64 编码，URL 或 JavaScript 代码……' id='install_base64'></textarea>`
-      )
-      .append(
-        "<br/><ul><li>访问 GitHub 资源可用 jsDelivr：https://cdn.jsdelivr.net/gh/你的用户名/你的仓库@分支（一般为 master 或 main）/仓库内文件路径</li></ul>"
-      )
-      .append("<br/>")
-      .append(
-        "<button class='pn pnc' type='button' id='install'><strong>安装</strong></button>"
-      )
-      .append("<br/>")
-      .append(
-        "<span id='install_state' style='font-size:1rem;color:#df307f;'></span>"
+`<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${AInfo.getAPIVersion()}</span>
+<br/>
+<hr/>
+<span style='font-size:1rem'>已安装的模块</span>
+<br/>
+<div style='overflow:auto;'><ul id='all_modules'></ul></div>
+<hr/>
+<span style='font-size:1rem'>安装新模块</span>
+<br/>
+<textarea style="font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:100%;height:150px;overflow:auto;word-break:break-all;resize:vertical;" placeholder='BASE64 编码，URL 或 JavaScript 代码……' id='install_base64'></textarea>
+<br/>
+<ul><li>访问 GitHub 资源可用 jsDelivr：https://cdn.jsdelivr.net/gh/你的用户名/你的仓库@分支（一般为 master 或 main）/仓库内文件路径</li></ul>
+<br/>
+<button class='pn pnc' type='button' id='install'><strong>安装</strong></button>
+<br/>
+<span id='install_state' style='font-size:1rem;color:#df307f;'></span>`
       );
     setWindowProperty("notifyUninstall", (e: string) => {
       var t = e;
       deleteModule(t, () => {
-        GMSetValue("temp.loadmgr", true);
-        open(window.location.href, "_self");
+        dumpManager();
         GMNotification(
           "刚刚移除了，请查看。",
           t,
@@ -83,8 +74,7 @@ function dumpManager() {
         all[e] = true;
         GMSetValue("loader.all", all);
       }
-      GMSetValue("temp.loadmgr", true);
-      open(window.location.href, "_self");
+      dumpManager();
     });
     $("#install").on("click", () => {
       var str = $("#install_base64").val()?.toString() || "";
@@ -92,8 +82,7 @@ function dumpManager() {
         var x = atob(str);
         var st = addModule(x);
         if (st) {
-          GMSetValue("temp.loadmgr", true);
-          open(window.location.href, "_self");
+          dumpManager();
           GMNotification(
             "刚安装好了，请查看。",
             st.get("name") || "Nameless",
@@ -119,8 +108,7 @@ function dumpManager() {
                 if (typeof data == "string") {
                   var st = addModule(data);
                   if (st) {
-                    GMSetValue("temp.loadmgr", true);
-                    open(window.location.href, "_self");
+                    dumpManager();
                     GMNotification(
                       "刚安装好了，请查看。",
                       st.get("name") || "Nameless",
@@ -164,8 +152,7 @@ function dumpManager() {
         } else if (str.startsWith("// MCBBS-Module")) {
           var st = addModule(str);
           if (st) {
-            GMSetValue("temp.loadmgr", true);
-            open(window.location.href, "_self");
+            dumpManager();
             GMNotification(
               "刚安装好了，请查看。",
               st.get("name") || "Nameless",
