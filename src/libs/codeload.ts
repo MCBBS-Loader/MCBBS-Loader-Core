@@ -1,6 +1,7 @@
 import $ from "jquery";
 import { setProperty } from "./native";
 import { GMDeleteValue, GMGetValue, GMSetValue } from "./usfunc";
+// 安装一个模块
 function addModule(code: string): Map<string, string> | undefined {
   if (!$.trim(code).startsWith("// MCBBS-Module")) {
     return undefined;
@@ -41,6 +42,7 @@ function addModule(code: string): Map<string, string> | undefined {
     }
   }
 }
+// 解析头部信息
 function parseItem(item: string, map: Map<string, string>): boolean {
   var isItemRegex = /\/\/( )?@[a-z]* .*/;
   if (isItemRegex.test(item)) {
@@ -54,6 +56,7 @@ function parseItem(item: string, map: Map<string, string>): boolean {
   }
   return false;
 }
+// 注册元数据
 function regMeta(id: string, meta: any): boolean {
   GMSetValue("meta-" + id, meta);
   var all = GMGetValue("loader.all", {});
@@ -65,6 +68,7 @@ function regMeta(id: string, meta: any): boolean {
     return false;
   }
 }
+// 加载代码
 function mountCode(id: string, code: string): void {
   $(() => {
     $("body").append(
@@ -72,11 +76,13 @@ function mountCode(id: string, code: string): void {
     );
   });
 }
+// 卸载代码
 function unmountCode(id: string): void {
   $(() => {
     $(`#code-${id}`).remove();
   });
 }
+// 删除模块
 function deleteModule(id: string, callback: () => void): void {
   GMDeleteValue("meta-" + id);
   GMDeleteValue("code-" + id);
@@ -85,6 +91,7 @@ function deleteModule(id: string, callback: () => void): void {
   GMSetValue("loader.all", obj);
   callback();
 }
+// 从URL安装
 function installFromUrl(url: string) {
   try {
     $.get(url, (dataIn) => {
