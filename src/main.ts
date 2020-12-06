@@ -1,5 +1,6 @@
 import { installFromUrl, mountCode } from "./libs/codeload";
 import manager from "./libs/manager";
+import configpage from "./libs/configpage";
 import { checkUpdate } from "./libs/updator";
 import {
   GMGetValue,
@@ -39,14 +40,19 @@ import { setup } from "./libs/setupbattery";
   });
 
   GMLog("[MCBBS Loader] 重置令牌：reset_" + RESET_TOKEN);
-
   apiloader.loadAll();
+  setWindowProperty("CDT", []);
   jQuery(() => {
     manager.createBtn();
     manager.createMenu();
+    configpage.createMenu();
     if (GMGetValue("temp.loadmgr", false)) {
       GMSetValue("temp.loadmgr", false);
       manager.dumpManager();
+    }
+    if (GMGetValue("temp.loadcfg", false)) {
+      GMSetValue("temp.loadcfg", false);
+      configpage.dumpConfigPage();
     }
     for (var c of Object.entries(GMGetValue("loader.all", {}))) {
       var a = c[0];

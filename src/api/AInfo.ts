@@ -1,6 +1,6 @@
 import { setWindowProperty } from "../libs/usfunc";
 function getAPIVersion(): string {
-  return "1.0.0";
+  return "0.9.4";
 }
 function load() {
   setWindowProperty("AInfo", { getAPIVersion });
