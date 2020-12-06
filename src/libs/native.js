@@ -4,4 +4,7 @@ function setProperty(obj, key, val) {
 function getProperty(obj, key) {
   return obj[key];
 }
-export { setProperty, getProperty };
+function getUnsafeWindow() {
+  return unsafeWindow || window;
+}
+export { setProperty, getProperty, getUnsafeWindow };

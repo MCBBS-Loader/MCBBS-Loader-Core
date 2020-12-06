@@ -6,7 +6,8 @@
     "stable": "npx webpack --progress --config webpack.config.prod.js&&node build.js stable",
     "dev": "npx webpack --progress --config webpack.config.prod.js&&node build.js dev",
     "nightly": "npx webpack --progress --config webpack.config.prod.js&&node build.js nightly",
-    "build": "npm run dev&&npm run nightly&&npm run stable"
+    "build": "npx webpack --progress --config webpack.config.prod.js&&node build.js nightly&&node build.js stable&&node build.js dev",
+    "debugbuild":"npx webpack --progress --config webpack.config.dev.js&&node builddev.js nightly&&node builddev.js stable&&node builddev.js dev"
   },
   "repository": {
     "type": "git",

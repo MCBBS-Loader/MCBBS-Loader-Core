@@ -1,6 +1,4 @@
 const path = require("path");
-const webpack = require("webpack");
-const fs = require("fs");
 module.exports = {
   entry: "./src/main.ts",
   output: {
