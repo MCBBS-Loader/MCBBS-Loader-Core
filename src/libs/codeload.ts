@@ -16,11 +16,14 @@ function addModule(code: string): Map<string, string> | undefined {
       for (var l of lines) {
         parseItem(l, dataMap);
       }
-      var obj = {};
+      var obj = {}, depend:string, before:string, after:string;
       setProperty(obj, "id", dataMap.get("id") || "loader.nameless");
       setProperty(obj, "name", dataMap.get("name") || "Nameless");
       setProperty(obj, "author", dataMap.get("author") || "Someone");
       setProperty(obj, "icon", dataMap.get("icon"));
+      setProperty(obj, "depend", depend = dataMap.get("depend") || "");
+      setProperty(obj, "before", before = dataMap.get("before") || "");
+      setProperty(obj, "after", after = dataMap.get("after") || "");
       setProperty(
         obj,
         "description",
@@ -34,6 +37,14 @@ function addModule(code: string): Map<string, string> | undefined {
         GMSetValue(
           "code-" + (dataMap.get("id") || "loader.nameless"),
           ccode.split("// -MCBBS-Module")[1]
+        );
+        GMSetValue(
+          "depend-" + (dataMap.get("id") || "loader.nameless"),
+          JSON.stringify({
+            depend: depend.split(","),
+            before: before.split(","),
+            after: after.split(",")
+          })
         );
         return dataMap;
       } else {
@@ -86,6 +97,7 @@ function unmountCode(id: string): void {
 function deleteModule(id: string, callback: () => void): void {
   GMDeleteValue("meta-" + id);
   GMDeleteValue("code-" + id);
+  GMDeleteValue("depend-" + id);
   var obj = GMGetValue("loader.all", {});
   setProperty(obj, id, undefined);
   GMSetValue("loader.all", obj);
