@@ -12,7 +12,7 @@ import jQuery from "jquery";
 import apiloader from "./libs/apiloader";
 import AInfo from "./api/AInfo";
 import { setup } from "./libs/setupbattery";
-import { getProperty, setProperty } from "./libs/native";
+import { getProperty } from "./libs/native";
 (() => {
   if (GMGetValue("loader.ibatteries", true)) {
     setup(() => {});
