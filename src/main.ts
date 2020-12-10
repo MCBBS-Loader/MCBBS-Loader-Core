@@ -10,24 +10,24 @@ import {
 } from "./libs/usfunc";
 import jQuery from "jquery";
 import $ from "jquery";
-import apiloader from "./libs/apiloader";
-import AInfo from "./api/AInfo";
 import { setup } from "./libs/setupbattery";
 import { getProperty } from "./libs/native";
+import { getAPIVersion, initAPI } from "./api/NTAPI";
 (() => {
   jQuery(() => {
     $("head").append(
       "<link type='text/css' rel='stylesheet' href='https://cdn.staticfile.org/font-awesome/5.15.1/css/all.min.css'></link>"
     );
+
     $("head").append(
       "<link type='text/css' rel='stylesheet' href='https://cdn.staticfile.org/font-awesome/5.15.1/css/v4-shims.min.css'></link>"
     );
   });
   if (GMGetValue("loader.ibatteries", true)) {
-    setup(() => {});
+    // setup(() => {});
     GMSetValue("loader.ibatteries", false);
   }
-  GMLog(`[MCBBS Loader] 加载器和 API 版本：${AInfo.getAPIVersion()}`);
+  GMLog(`[MCBBS Loader] 加载器和 API 版本：${getAPIVersion()}`);
   const RESET_TOKEN = Math.floor(
     Math.random() * 1048576 * 1048576 * 1048576
   ).toString(16);
@@ -50,7 +50,7 @@ import { getProperty } from "./libs/native";
   });
 
   GMLog("[MCBBS Loader] 重置令牌：reset_" + RESET_TOKEN);
-  apiloader.loadAll();
+  initAPI();
   setWindowProperty("CDT", []);
   jQuery(() => {
     manager.createBtn();
@@ -77,13 +77,7 @@ import { getProperty } from "./libs/native";
     var stack: object[] = [];
     var sortedList = [];
     for (var [name, enabled] of Object.entries(GMGetValue("loader.all", {}))) {
-      if (
-        enabled &&
-        !cmpVersion(
-          GMGetValue("meta-" + name, {}).loader || "0.0.1",
-          AInfo.getAPIVersion()
-        )
-      ) {
+      if (enabled) {
         dependencies.set(
           name,
           fixRaw(name, JSON.parse(GMGetValue("depend-" + name, "{}")))
