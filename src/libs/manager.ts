@@ -1,11 +1,10 @@
 import jQuery from "jquery";
 import $ from "jquery";
 import { getAPIVersion } from "../api/NTAPI";
-import { addModule, deleteModule } from "./codeload";
+import { addModule, deleteModule, isDirty } from "./codeload";
 import { closepop, popinfo } from "./popinfo";
 import {
   GMGetValue,
-  GMNotification,
   GMSetValue,
   setWindowProperty,
 } from "./usfunc";
@@ -36,7 +35,7 @@ function dumpManager() {
   jQuery(() => {
     $("div[class='bm bw0']").children().remove();
     $("div[class='bm bw0']").append(
-      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}</span>
+      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}&nbsp<font color="red">${isDirty() ? "当前的设置需要刷新才能生效" : ""}</font></span>
 <br/>
 <hr/>
 <span style='font-size:1rem'>已安装的模块</span>
