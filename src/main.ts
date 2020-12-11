@@ -1,7 +1,7 @@
 import { installFromUrl, mountCode } from "./libs/codeload";
 import manager from "./libs/manager";
 import configpage from "./libs/configpage";
-import { checkUpdate, cmpVersion } from "./libs/updator";
+import { checkUpdate } from "./libs/updator";
 import {
   GMGetValue,
   GMLog,
@@ -10,7 +10,6 @@ import {
 } from "./libs/usfunc";
 import jQuery from "jquery";
 import $ from "jquery";
-import { setup } from "./libs/setupbattery";
 import { getProperty } from "./libs/native";
 import { getAPIVersion, initAPI } from "./api/NTAPI";
 (() => {
@@ -141,7 +140,7 @@ import { getAPIVersion, initAPI } from "./api/NTAPI";
         if (before instanceof Array) {
           before.forEach((e) => {
             var target = dependencies.get(e);
-            if(target){
+            if (target){
               insert(v, target);
             }
           });
@@ -161,13 +160,13 @@ import { getAPIVersion, initAPI } from "./api/NTAPI";
           stack.push(v);
         }
       });
-      while(stack.length) {
+      while (stack.length) {
         var process = stack.pop() as any;
         sortedList.push(process);
         // 加个排序完成标记，解除其他插件需要在本插件之后加载的限制
         process.done = true;
-        while (mapNil != process.beforeHead){
-          unlink(process.beforeHead)
+        while (mapNil != process.beforeHead) {
+          unlink(process.beforeHead);
         }
       }
       // 如果排序已经结束了还有插件没有进入到序列里来，那么排序一定无解
@@ -177,10 +176,10 @@ import { getAPIVersion, initAPI } from "./api/NTAPI";
           problemMods.push((v as any).id);
         }
       });
-      if(problemMods.length) {
+      if (problemMods.length) {
         throw `依赖关系无解，${problemMods}的加载顺序冲突`;
       }
-      sortedList.forEach((v, k) => {
+      sortedList.forEach((v) => {
         var id = v.id;
         mountCode(id, GMGetValue("code-" + id, "") || "");
       });

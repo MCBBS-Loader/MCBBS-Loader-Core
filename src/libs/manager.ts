@@ -1,13 +1,9 @@
 import jQuery from "jquery";
 import $ from "jquery";
 import { getAPIVersion } from "../api/NTAPI";
-import { addModule, deleteModule, isDirty } from "./codeload";
+import { addModule, deleteModule, isDirty, markDirty } from "./codeload";
 import { closepop, popinfo } from "./popinfo";
-import {
-  GMGetValue,
-  GMSetValue,
-  setWindowProperty,
-} from "./usfunc";
+import { GMGetValue, GMSetValue, setWindowProperty } from "./usfunc";
 function createBtn(): void {
   jQuery(() => {
     $("ul.user_info_menu_btn").append(
@@ -35,7 +31,7 @@ function dumpManager() {
   jQuery(() => {
     $("div[class='bm bw0']").children().remove();
     $("div[class='bm bw0']").append(
-      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}&nbsp<font color="red">${isDirty() ? "当前的设置需要刷新才能生效" : ""}</font></span>
+      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}&nbsp<font size="2em" color="red">${isDirty() ? "当前的设置需要刷新才能生效" : ""}</font></span>
 <br/>
 <hr/>
 <span style='font-size:1rem'>已安装的模块</span>
@@ -52,26 +48,26 @@ function dumpManager() {
 <br/>
 <span id='install_state' style='font-size:1rem;color:#df307f;'></span>`
     );
-    setWindowProperty("notifyUninstall", (e: string) => {
-      var t = e;
-      deleteModule(t, () => {
+    setWindowProperty("notifyUninstall", (id: string) => {
+      deleteModule(id, () => {
         dumpManager();
         popinfo("trash", "成功移除了模块", false);
         setTimeout(closepop, 3000);
       });
     });
-    setWindowProperty("notifyOnOff", (e: string, s: string) => {
-      if (GMGetValue("loader.all", {})[s]) {
+    setWindowProperty("notifyOnOff", (id: string) => {
+      if (GMGetValue("loader.all", {})[id]) {
         var all = GMGetValue("loader.all", {});
 
-        all[e] = false;
+        all[id] = false;
 
         GMSetValue("loader.all", all);
       } else {
         var all = GMGetValue("loader.all", {});
-        all[e] = true;
+        all[id] = true;
         GMSetValue("loader.all", all);
       }
+      markDirty();
       dumpManager();
     });
     $("#install").on("click", () => {
@@ -81,6 +77,7 @@ function dumpManager() {
         var st = addModule(x);
         if (typeof st != "string") {
           dumpManager();
+          $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
           popinfo("check", "成功安装了模块", false);
           setTimeout(closepop, 3000);
           return;
@@ -136,7 +133,7 @@ function dumpManager() {
             );
             setTimeout(closepop, 5000);
           }
-        } else if (str.startsWith("// MCBBS-Module")) {
+        } else {
           var st = addModule(str);
           if (typeof st != "string") {
             dumpManager();
@@ -147,8 +144,6 @@ function dumpManager() {
           } else {
             popinfo("exclamation-circle", "安装失败，JavaScript 无效", false);
           }
-        } else {
-          popinfo("exclamation-circle", "安装失败，无效输入", false);
         }
       }
     });
@@ -159,7 +154,7 @@ function dumpManager() {
         meta.id || "loader.nameless"
       }'><div style='display:inline;'><img src='${
         meta.icon || ""
-      }' width='50' height='50' style="vertical-align:middle;float:left;"></img><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:#5d2391'><strong>${
+      }' width='50' height='55' style="vertical-align:middle;float:left;"></img><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:#5d2391'><strong>${
         meta.name || "Nameless"
       }</strong></span>&nbsp;&nbsp;&nbsp;<span style='font-size:12px;color:#150029;'>${
         meta.id || "loader.nameless"
@@ -173,15 +168,14 @@ function dumpManager() {
         meta.id
       }")'><strong>删除模块</strong></button>&nbsp;&nbsp;<button style='float:right;' type='button' class='pn pnc onoff' onclick='window.notifyOnOff("${
         meta.id
-      }","${meta.id}")'><strong>${
+      }")'><strong>${
         GMGetValue("loader.all", {})[meta.id] ? "禁用" : "启用"
       }</strong></button><button type='button' style='float:right;' class='pn pnc showsrc' mlsource='${
         meta.id
       }'><strong>查看源代码</strong></button></div></div></li>`;
       $("#all_modules").append(ele);
       $(".showsrc").on("click", (e) => {
-        var id =
-          $(e.target).attr("mlsource") || $(e.target).parent().attr("mlsource");
+        var id = $(e.target).attr("mlsource") || $(e.target).parent().attr("mlsource");
         if (!id) {
           return;
         }
