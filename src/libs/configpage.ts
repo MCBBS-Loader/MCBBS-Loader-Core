@@ -21,12 +21,6 @@ function dumpConfigPage() {
   renderAll();
 }
 
-function constantSave() {
-  autoSave();
-  setTimeout(() => {
-    constantSave();
-  }, 500);
-}
 function autoSave() {
   for (var c of getWindowProperty("CDT")) {
     var val;
@@ -79,7 +73,7 @@ function renderAll() {
       )})<br/>${getProperty(
         c,
         "desc"
-      )}</label><input type='text' id='confval-${getProperty(
+      )}</label><input type='text' class='px' id='confval-${getProperty(
         c,
         "id"
       )}-${getProperty(c, "storageId")}'/><br/>`;
@@ -104,7 +98,10 @@ function renderAll() {
 }
 function createConfigItem(details: Map<string, string>) {
   var type = details.get("type") || "text";
-  var id = details.get("id") || "loader.nameless";
+  var id = details.get("id");
+  if (!id) {
+    return;
+  }
   var desc = details.get("desc") || "";
   var storageId = details.get("storageId") || "impossible";
   var name = details.get("name") || "Nameless";
