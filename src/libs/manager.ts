@@ -96,9 +96,9 @@ function dumpManager() {
             $.get(str, (dataIn) => {
               try {
                 var data = dataIn.toString();
-                if (typeof data == "string") {
+                if (typeof data === "string") {
                   var st = addModule(data);
-                  if (st) {
+                  if (typeof st != "string") {
                     dumpManager();
                     popinfo("check", "成功安装了模块", false);
                     setTimeout(closepop, 3000);
