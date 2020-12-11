@@ -79,7 +79,7 @@ function dumpManager() {
       try {
         var x = atob(str);
         var st = addModule(x);
-        if (st) {
+        if (typeof st != "string") {
           dumpManager();
           popinfo("check", "成功安装了模块", false);
           setTimeout(closepop, 3000);
