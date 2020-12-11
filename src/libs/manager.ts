@@ -138,8 +138,9 @@ function dumpManager() {
           }
         } else if (str.startsWith("// MCBBS-Module")) {
           var st = addModule(str);
-          if (st) {
+          if (typeof st != "string") {
             dumpManager();
+            $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
             popinfo("check", "成功安装了模块", false);
             setTimeout(closepop, 3000);
             return;
@@ -174,8 +175,18 @@ function dumpManager() {
         meta.id
       }","${meta.id}")'><strong>${
         GMGetValue("loader.all", {})[meta.id] ? "禁用" : "启用"
-      }</strong></button></div></div></li>`;
+      }</strong></button><button type='button' style='float:right;' class='pn pnc showsrc' mlsource='${
+        meta.id
+      }'><strong>查看源代码</strong></button></div></div></li>`;
       $("#all_modules").append(ele);
+      $(".showsrc").on("click", (e) => {
+        var id =
+          $(e.target).attr("mlsource") || $(e.target).parent().attr("mlsource");
+        if (!id) {
+          return;
+        }
+        $("#install_base64").val(GMGetValue(`code-${id}`, ""));
+      });
     }
   });
 }

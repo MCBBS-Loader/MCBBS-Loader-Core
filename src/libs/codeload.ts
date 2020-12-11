@@ -7,35 +7,31 @@ var dirty: boolean = false;
 // 安装一个模块
 function addModule(code: string): Map<string, string> | string {
   var isModuleRegex = /\/\*( )*MCBBS[ -]*Module/;
-  if (!isModuleRegex.test($.trim(code))) {
+  if (!isModuleRegex.test(code.trim())) {
     console.log("Not a module");
     return "Not a module";
   } else {
-    var ccode = $.trim(code);
+    var ccode = code.trim();
     var dataMap = new Map<string, string>();
     parseMeta(ccode, dataMap);
     var flitBlank = (strarr: string[]): string[] => {
       var newarr: string[] = [];
       for(var str of strarr) {
-        var target: string = "";
-        for(var char of str){
-          if(char != " " && char != '\t') {
-            target += char;
-          }
-        }
+        var target = str.trim();
         if(target.length){
           newarr.push(target);
         }
       }
       return newarr;
     }
-    var depend: string, before: string, after: string, apiVersion: string | undefined;
-    if (dataMap.get("id") === undefined) {
+    var depend: string, before: string, after: string, apiVersion: string | undefined, 
+      id: string | undefined = dataMap.get("id");
+    if (id === undefined) {
       console.log("No id");
       return "No id";
     }
     var obj: object = {
-      id: dataMap.get("id"),
+      id: id,
       name: dataMap.get("name") || dataMap.get("id"),
       author: dataMap.get("author") || "Someone",
       icon: dataMap.get("icon") || IMG_MCBBS,
@@ -51,11 +47,11 @@ function addModule(code: string): Map<string, string> | string {
       console.log("Doesn't support");
       return "Doesn't support";
     }
-    var succ = regMeta(dataMap.get("id") || "impossible", obj);
+    var succ = regMeta(id, obj);
     if (succ) {
-      GMSetValue("code-" + (dataMap.get("id") || "impossible"), ccode);
+      GMSetValue("code-" + id, ccode);
       GMSetValue(
-        "depend-" + (dataMap.get("id") || "loader.nameless"),
+        "depend-" + id,
         JSON.stringify({
           depend: flitBlank(depend.split(",")),
           before: flitBlank(before.split(",")),
