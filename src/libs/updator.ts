@@ -1,16 +1,13 @@
-import { parseItem } from "./codeload";
 import $ from "jquery";
+import { parseMeta } from "./codeload";
 function checkUpdate(meta: any, callback: (state: string) => void): void {
   var id = meta.id || "loader.nameless";
-  if (meta.update) {
-    $.get(meta.update, (data) => {
+  if (meta.updateURL) {
+    $.get(meta.updateURL, (data) => {
       var ccode = data.toString();
-      var metac = ccode.split("// -MCBBS-Module")[0];
-      var lines = metac.split("// MCBBS-Module")[1].split("\n");
+
       var dataMap = new Map<string, string>();
-      for (var l of lines) {
-        parseItem(l, dataMap);
-      }
+      parseMeta(ccode, dataMap);
       if (dataMap.get("id") != id) {
         callback("latest");
       } else {
@@ -18,7 +15,7 @@ function checkUpdate(meta: any, callback: (state: string) => void): void {
           var nversion = dataMap.get("version") || "1.0.0";
           var oversion = meta.version || "1.0.0";
           if (cmpVersion(nversion, oversion)) {
-            callback(meta.update);
+            callback(meta.updateURL);
           } else {
             callback("latest");
           }
@@ -52,4 +49,4 @@ function cmpVersion(nv: string, ov: string): boolean {
     return false;
   }
 }
-export { checkUpdate };
+export { checkUpdate, cmpVersion };

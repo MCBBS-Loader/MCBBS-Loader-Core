@@ -1,6 +1,6 @@
 import jQuery from "jquery";
 import $ from "jquery";
-import AInfo from "../api/AInfo";
+import { getAPIVersion } from "../api/NTAPI";
 import { addModule, deleteModule } from "./codeload";
 import { closepop, popinfo } from "./popinfo";
 import {
@@ -36,7 +36,7 @@ function dumpManager() {
   jQuery(() => {
     $("div[class='bm bw0']").children().remove();
     $("div[class='bm bw0']").append(
-      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${AInfo.getAPIVersion()}</span>
+      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}</span>
 <br/>
 <hr/>
 <span style='font-size:1rem'>已安装的模块</span>

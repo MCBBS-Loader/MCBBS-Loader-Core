@@ -1,7 +1,7 @@
 import { installFromUrl, mountCode } from "./libs/codeload";
 import manager from "./libs/manager";
 import configpage from "./libs/configpage";
-import { checkUpdate } from "./libs/updator";
+import { checkUpdate, cmpVersion } from "./libs/updator";
 import {
   GMGetValue,
   GMLog,
@@ -9,16 +9,25 @@ import {
   setWindowProperty,
 } from "./libs/usfunc";
 import jQuery from "jquery";
-import apiloader from "./libs/apiloader";
-import AInfo from "./api/AInfo";
+import $ from "jquery";
 import { setup } from "./libs/setupbattery";
-import { getProperty, setProperty } from "./libs/native";
+import { getProperty } from "./libs/native";
+import { getAPIVersion, initAPI } from "./api/NTAPI";
 (() => {
+  jQuery(() => {
+    $("head").append(
+      "<link type='text/css' rel='stylesheet' href='https://cdn.staticfile.org/font-awesome/5.15.1/css/all.min.css'></link>"
+    );
+
+    $("head").append(
+      "<link type='text/css' rel='stylesheet' href='https://cdn.staticfile.org/font-awesome/5.15.1/css/v4-shims.min.css'></link>"
+    );
+  });
   if (GMGetValue("loader.ibatteries", true)) {
-    setup(() => {});
+    // setup(() => {});
     GMSetValue("loader.ibatteries", false);
   }
-  GMLog(`[MCBBS Loader] 加载器和 API 版本：${AInfo.getAPIVersion()}`);
+  GMLog(`[MCBBS Loader] 加载器和 API 版本：${getAPIVersion()}`);
   const RESET_TOKEN = Math.floor(
     Math.random() * 1048576 * 1048576 * 1048576
   ).toString(16);
@@ -41,7 +50,7 @@ import { getProperty, setProperty } from "./libs/native";
   });
 
   GMLog("[MCBBS Loader] 重置令牌：reset_" + RESET_TOKEN);
-  apiloader.loadAll();
+  initAPI();
   setWindowProperty("CDT", []);
   jQuery(() => {
     manager.createBtn();
@@ -79,8 +88,11 @@ import { getProperty, setProperty } from "./libs/native";
     var sortedList = [];
     for (var [id, enabled] of Object.entries(GMGetValue("loader.all", {}))) {
       if (enabled) {
-        dependencies.set(id, fixRaw(id, JSON.parse(GMGetValue("depend-" + id, "{}"))));
-        checkUpdate(GMGetValue("meta-" + id, ""), (state) => {
+        dependencies.set(
+          id,
+          fixRaw(id, JSON.parse(GMGetValue("depend-" + id, "{}")))
+        );
+        checkUpdate(GMGetValue("meta-" + name, ""), (state) => {
           if (state != "latest") {
             installFromUrl(state);
           }
@@ -88,8 +100,8 @@ import { getProperty, setProperty } from "./libs/native";
       }
     }
     try{// 排个序
-      var insert = (before:any, after:any) => {
-        var node:any = {
+      var insert = (before: any, after: any) => {
+        var node: any = {
           before: before,
           after: after,
           beforeNext: before.beforeHead,
@@ -99,35 +111,35 @@ import { getProperty, setProperty } from "./libs/native";
         };
         node.beforeNext.beforePrev = node.afterNext.afterPrev = node;
         after.afterHead = before.beforeHead = node;
-      }
-      var unlink = (node:any) => {
+      };
+      var unlink = (node: any) => {
         node.afterNext.afterPrev = node.afterPrev;
         node.beforeNext.beforePrev = node.beforePrev;
         node.afterPrev.afterNext = node.afterNext;
         node.beforePrev.beforeNext = node.beforeNext;
-        if(node === node.after.afterHead){
+        if (node === node.after.afterHead) {
           node.after.afterHead = node.afterNext;
         }
-        if(node === node.before.beforeHead){
+        if (node === node.before.beforeHead) {
           node.before.beforeHead = node.beforeNext;
         }
         // 如果它不需要在某个插件之后加载，那下一个就加载它
         if(mapNil === node.after.afterHead){
           stack.push(node.after);
         }
-      }
+      };
       dependencies.forEach((v, k) => {
         var depend = getProperty(v, "depend");
-        if(depend instanceof Array){
-          depend.forEach((e, i) => {
-            if(!dependencies.get(e)){
+        if (depend instanceof Array) {
+          depend.forEach((e) => {
+            if (!dependencies.get(e)) {
               throw `依赖关系无解，${k}依赖${e}，但是后者未安装或未启用`;
             }
           });
         }
         var before = getProperty(v, "before");
-        if(before instanceof Array){
-          before.forEach((e, i) => {
+        if (before instanceof Array) {
+          before.forEach((e) => {
             var target = dependencies.get(e);
             if(target){
               insert(v, target);
@@ -135,8 +147,8 @@ import { getProperty, setProperty } from "./libs/native";
           });
         }
         var after = getProperty(v, "after");
-        if(after instanceof Array){
-          after.forEach((e, i) => {
+        if (after instanceof Array) {
+          after.forEach((e) => {
             var target = dependencies.get(e);
             if(target){
               insert(target, v);
@@ -144,7 +156,7 @@ import { getProperty, setProperty } from "./libs/native";
           });
         }
       });
-      dependencies.forEach((v, k) => {
+      dependencies.forEach((v) => {
         if((v as any).afterHead === mapNil){
           stack.push(v);
         }
@@ -154,7 +166,7 @@ import { getProperty, setProperty } from "./libs/native";
         sortedList.push(process);
         // 加个排序完成标记，解除其他插件需要在本插件之后加载的限制
         process.done = true;
-        while(mapNil != process.beforeHead){
+        while (mapNil != process.beforeHead){
           unlink(process.beforeHead)
         }
       }
@@ -172,9 +184,11 @@ import { getProperty, setProperty } from "./libs/native";
         var id = v.id;
         mountCode(id, GMGetValue("code-" + id, "") || "");
       });
-    }catch(ex){
+    } catch (ex) {
       GMLog(`[ MCBBS Loader ] ${ex}`);
-      GMLog("[ MCBBS Loader ] 所有插件均未加载，请到管理页面修复依赖关系错误");
+      GMLog(
+        "[ MCBBS Loader ] 所有插件均未成功加载，请到管理页面修复依赖关系错误"
+      );
     }
   });
 })();
