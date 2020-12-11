@@ -33,6 +33,21 @@ function addModule(code: string): Map<string, string> | undefined {
       setProperty(obj, "version", dataMap.get("version") || "1.0.0");
       setProperty(obj, "update", dataMap.get("update"));
       var succ = regMeta(dataMap.get("id") || "loader.nameless", obj);
+      var flitBlank = (strarr:string[]):string[] => {
+        var newarr:string[] = [];
+        for(var str of strarr) {
+          var target:string = "";
+          for(var char of str){
+            if(char != " " && char != '\t') {
+              target += char;
+            }
+          }
+          if(target.length){
+            newarr.push(target);
+          }
+        }
+        return newarr;
+      }
       if (succ) {
         GMSetValue(
           "code-" + (dataMap.get("id") || "loader.nameless"),
@@ -41,9 +56,9 @@ function addModule(code: string): Map<string, string> | undefined {
         GMSetValue(
           "depend-" + (dataMap.get("id") || "loader.nameless"),
           JSON.stringify({
-            depend: depend.split(","),
-            before: before.split(","),
-            after: after.split(",")
+            depend: flitBlank(depend.split(",")),
+            before: flitBlank(before.split(",")),
+            after: flitBlank(after.split(","))
           })
         );
         return dataMap;

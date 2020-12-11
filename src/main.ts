@@ -57,20 +57,30 @@ import { getProperty, setProperty } from "./libs/native";
       GMSetValue("temp.loadcfg", false);
       configpage.dumpConfigPage();
     }
-    var fixRaw = (name:string, raw:any) => {
-      raw.beforeHead = null;
-      raw.afterHead = null;
+    // 哨兵节点，用于标记链表末尾
+    const mapNil = {
+      before: null,
+      after: null,
+      beforeNext: null,
+      afterNext: null,
+      beforePrev: null,
+      afterPrev: null
+    };
+    var fixRaw = (id:string, raw:any) => {
+      raw.beforeHead = mapNil;
+      raw.afterHead = mapNil;
       raw.done = false;
-      raw.name = name;
+      raw.id = id;
       return raw;
     };
+    // 邻接表
     var dependencies = new Map<string, object>();
     var stack: object[] = [];
     var sortedList = [];
-    for (var [name, enabled] of Object.entries(GMGetValue("loader.all", {}))) {
+    for (var [id, enabled] of Object.entries(GMGetValue("loader.all", {}))) {
       if (enabled) {
-        dependencies.set(name, fixRaw(name, JSON.parse(GMGetValue("depend-" + name, "{}"))));
-        checkUpdate(GMGetValue("meta-" + name, ""), (state) => {
+        dependencies.set(id, fixRaw(id, JSON.parse(GMGetValue("depend-" + id, "{}"))));
+        checkUpdate(GMGetValue("meta-" + id, ""), (state) => {
           if (state != "latest") {
             installFromUrl(state);
           }
@@ -78,15 +88,14 @@ import { getProperty, setProperty } from "./libs/native";
       }
     }
     try{// 排个序
-      // 邻接表
       var insert = (before:any, after:any) => {
         var node:any = {
           before: before,
           after: after,
           beforeNext: before.beforeHead,
           afterNext: after.afterHead,
-          beforePrev: null,
-          afterPrev: null
+          beforePrev: mapNil,
+          afterPrev: mapNil
         };
         node.beforeNext.beforePrev = node.afterNext.afterPrev = node;
         after.afterHead = before.beforeHead = node;
@@ -103,7 +112,7 @@ import { getProperty, setProperty } from "./libs/native";
           node.before.beforeHead = node.beforeNext;
         }
         // 如果它不需要在某个插件之后加载，那下一个就加载它
-        if(!node.after.afterHead){
+        if(mapNil === node.after.afterHead){
           stack.push(node.after);
         }
       }
@@ -121,7 +130,7 @@ import { getProperty, setProperty } from "./libs/native";
           before.forEach((e, i) => {
             var target = dependencies.get(e);
             if(target){
-              insert(v, e);
+              insert(v, target);
             }
           });
         }
@@ -130,34 +139,38 @@ import { getProperty, setProperty } from "./libs/native";
           after.forEach((e, i) => {
             var target = dependencies.get(e);
             if(target){
-              insert(e, v);
+              insert(target, v);
             }
           });
         }
       });
       dependencies.forEach((v, k) => {
-        if((v as any).afterHead === null){
+        if((v as any).afterHead === mapNil){
           stack.push(v);
         }
       });
-      while(stack.length){
+      while(stack.length) {
         var process = stack.pop() as any;
         sortedList.push(process);
         // 加个排序完成标记，解除其他插件需要在本插件之后加载的限制
         process.done = true;
-        while(process.beforeHead){
+        while(mapNil != process.beforeHead){
           unlink(process.beforeHead)
         }
       }
       // 如果排序已经结束了还有插件没有进入到序列里来，那么排序一定无解
+      var problemMods:string[] = [];
       dependencies.forEach((v, k) => {
         if(!(v as any).done){
-          throw `依赖关系无解，${k}需要在${v.afterHead.name}前加载，而后者需要在前者之前加载`;
+          problemMods.push((v as any).id);
         }
       });
+      if(problemMods.length) {
+        throw `依赖关系无解，${problemMods}的加载顺序冲突`;
+      }
       sortedList.forEach((v, k) => {
-        var name = v.name;
-        mountCode(name, GMGetValue("code-" + name, "") || "");
+        var id = v.id;
+        mountCode(id, GMGetValue("code-" + id, "") || "");
       });
     }catch(ex){
       GMLog(`[ MCBBS Loader ] ${ex}`);
