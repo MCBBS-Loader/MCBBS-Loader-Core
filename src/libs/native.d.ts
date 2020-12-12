@@ -6,10 +6,9 @@ declare class UnsupportedOperationException extends Error {
 declare class PermissionDenied extends Error {
 };
 declare class Permission {
-	constructor(name: string);
+	static forName(name: string);
 }
 declare class Ticket {
-	constructor(name: string);
 }
 declare class PermissionManager {
 	static grantPermission(ticket: Ticket | null, permission: Permission): undefined;
@@ -19,4 +18,4 @@ declare class PermissionManager {
 	static consoleTicket(): Ticket;
 	static moduleTicket(id: string): Ticket;
 }
-export { setProperty, getProperty, getUnsafeWindow, Permission, Ticket, PermissionDenied, PermissionManager };
+export { setProperty, getProperty, getUnsafeWindow, UnsupportedOperationException, Permission, Ticket, PermissionDenied, PermissionManager };

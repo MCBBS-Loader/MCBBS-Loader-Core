@@ -23,7 +23,6 @@ import { getAPIVersion, initAPI } from "./api/NTAPI";
     );
   });
   if (GMGetValue("loader.ibatteries", true)) {
-    // setup(() => {});
     GMSetValue("loader.ibatteries", false);
   }
   GMLog(`[MCBBS Loader] 加载器和 API 版本：${getAPIVersion()}`);

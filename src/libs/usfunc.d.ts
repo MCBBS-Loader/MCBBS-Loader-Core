@@ -30,4 +30,5 @@ export {
   GMDownload,
   setWindowProperty,
   getWindowProperty,
+  GM
 };

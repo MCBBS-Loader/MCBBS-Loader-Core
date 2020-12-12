@@ -44,7 +44,9 @@ console.log("This is a module!");
 
 - author：作者名称
 
-- depend：硬依赖，缺失则无法运行，多个项之间使用英文逗号隔开，所有空白字符被忽略
+- permissions：权限，多个项之间用英文逗号隔开，每项的首末空格被忽略
+
+- depend：硬依赖，缺失则无法运行，多个项指定方式和permission一致
 
 - before：需要在指定的模块加载之后加载，如果指定缺失将被忽略，多个项目的指定方式和depend相同
 

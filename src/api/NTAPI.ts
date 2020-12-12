@@ -9,7 +9,7 @@ import {
 import $ from "jquery";
 import { closepop, popinfo } from "../libs/popinfo";
 import { Permission, Ticket, PermissionDenied, PermissionManager} from "../libs/native";
-import { checkedCall } from "../libs/codeload"
+import { checkedCall, getGM, markScriptDirty, getMods } from "../libs/codeload"
 const ML_VERSION = 1;
 var MCBBS = {};
 // 通知相关
@@ -20,8 +20,8 @@ Object.defineProperty(MCBBS, "popStatus", {get: () => popinfo});
 Object.defineProperty(MCBBS, "closeStatus", {get: () => closepop});
 
 // 存储相关
-Object.defineProperty(MCBBS, "storeData", {get: () =>storeData});
-Object.defineProperty(MCBBS, "getData", {get: () =>getData});
+Object.defineProperty(MCBBS, "storeData", {get: () => storeData});
+Object.defineProperty(MCBBS, "getData", {get: () => getData});
 
 // jQuery
 Object.defineProperty(MCBBS, "$", $);
@@ -48,6 +48,9 @@ Object.defineProperty(MCBBS, "PermissionManager", {
     return PermissionManager;
   }
 });
+Object.defineProperty(MCBBS, "getGM", {get: () => getGM});
+Object.defineProperty(MCBBS, "getMods", {get: () => getMods});
+Object.defineProperty(MCBBS, "markScriptDirty", {get: () => markScriptDirty});
 
 // 写入窗口
 function initAPI() {

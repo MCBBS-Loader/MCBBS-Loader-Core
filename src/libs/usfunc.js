@@ -37,6 +37,19 @@ function setWindowProperty(key, value) {
 function getWindowProperty(key) {
   return unsafeWindow[key];
 }
+const GM = {
+  GM_addStyle,
+  GM_deleteValue,
+  GM_download,
+  GM_getResourceText,
+  GM_getResourceURL,
+  GM_getValue,
+  GM_listValues,
+  GM_log,
+  GM_notification,
+  GM_setClipboard,
+  GM_setValue
+};
 export {
   GMAddStyle,
   GMDeleteValue,
@@ -51,4 +64,5 @@ export {
   GMDownload,
   setWindowProperty,
   getWindowProperty,
+  GM
 };

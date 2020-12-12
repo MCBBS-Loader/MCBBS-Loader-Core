@@ -17,6 +17,7 @@ class UnsupportedOperationException extends Error {
 }
 
 const permissionNodes = new WeakMap();
+const permissions = new Map();
 
 class PermissionDenied extends Error {
   constructor(message) {
@@ -26,18 +27,24 @@ class PermissionDenied extends Error {
 // 代表一项权限
 class Permission {
   constructor(name) {
+    if(permissions.get(name))
+      throw new UnsupportedOperationException("dup permission name");
+    permissions.set(name, this);
     this.name = name;
   }
 
   toString() {
     return `[MCBBS Loader Permission] "${name}"`;
   }
+
+  static forName(name) {
+    return permissions.get(name) || new Permission(name);
+  }
 }
 // 代表一项权限检查实体
 class Ticket {
   constructor(name) {
     this.name = name;
-    permissionNodes.set(this, new Set());
   }
 
   toString() {
@@ -94,6 +101,7 @@ class PermissionManager{
     let rval = MODULE_TICKETS.get(id);
     if(!rval) {
       MODULE_TICKETS.set(id, rval = new Ticket(`ticket-for-module-${id}`));
+      permissionNodes.set(rval, new Set());
     }
     return rval;
   }
