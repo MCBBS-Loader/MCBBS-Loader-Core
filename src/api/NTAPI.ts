@@ -9,36 +9,34 @@ import {
 import $ from "jquery";
 import { closepop, popinfo } from "../libs/popinfo";
 const ML_VERSION = 1;
-var MCBBS = {};
-// 通知相关
-Object.defineProperty(MCBBS, "sysNotification", GMNotification);
-
-// 显示相关
-Object.defineProperty(MCBBS, "popStatus", popinfo);
-Object.defineProperty(MCBBS, "closeStatus", closepop);
-
-// 存储相关
-Object.defineProperty(MCBBS, "storeData", storeData);
-Object.defineProperty(MCBBS, "getData", getData);
-
-// jQuery
-Object.defineProperty(MCBBS, "$", $);
+function forkAPI(id: string) {
+  return new MCBBSAPI(id);
+}
 
 // 模块导入导出
 setWindowProperty("MIDT", {});
-Object.defineProperty(MCBBS, "export_", moduleExport);
-Object.defineProperty(MCBBS, "import_", moduleImport);
 
-// 下载部分
-Object.defineProperty(MCBBS, "download", GMDownload);
-
-// 版本号部分
-Object.defineProperty(MCBBS, "getAPIVersion", getAPIVersion);
-
-// 写入窗口
-function initAPI() {
-  setWindowProperty("MCBBS", MCBBS);
+class MCBBSAPI {
+  private id: string;
+  constructor(id: string) {
+    this.id = id;
+  }
+  public getAPIVersion = getAPIVersion;
+  public download = GMDownload;
+  public export_ = moduleExport;
+  public import_ = moduleImport;
+  public $ = $;
+  public storeData(k: string, v: any) {
+    storeData(this.id + "-" + k, v);
+  }
+  public getData(k: string, dv: any) {
+    return getData(this.id + "-" + k, dv);
+  }
+  public popStatus = popinfo;
+  public closeStatus = closepop;
+  public sysNotification = GMNotification;
 }
+
 // 实现部分
 function getAPIVersion() {
   return ML_VERSION;
@@ -82,4 +80,4 @@ function storeData(tag: string, data: any): void {
 function getData(tag: string, defaultVal: any): any {
   return GMGetValue("data-" + tag, defaultVal);
 }
-export { initAPI, getAPIVersion };
+export { forkAPI, getAPIVersion };

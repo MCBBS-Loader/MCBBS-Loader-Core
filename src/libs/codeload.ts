@@ -1,5 +1,6 @@
 import $ from "jquery";
 import { getAPIVersion } from "../api/NTAPI";
+import { getAPIToken } from "./encrypt";
 import { setProperty } from "./native";
 import { GMDeleteValue, GMGetValue, GMSetValue } from "./usfunc";
 const STRING_API_VERSION = String(getAPIVersion());
@@ -16,15 +17,18 @@ function addModule(code: string): Map<string, string> | string {
     parseMeta(ccode, dataMap);
     var flitBlank = (strarr: string[]): string[] => {
       var newarr: string[] = [];
-      for(var str of strarr) {
+      for (var str of strarr) {
         var target = str.trim();
-        if(target.length){
+        if (target.length) {
           newarr.push(target);
         }
       }
       return newarr;
-    }
-    var depend: string, before: string, after: string, apiVersion: string | undefined, 
+    };
+    var depend: string,
+      before: string,
+      after: string,
+      apiVersion: string | undefined,
       id: string | undefined = dataMap.get("id");
     if (id === undefined) {
       console.log("No id");
@@ -35,12 +39,12 @@ function addModule(code: string): Map<string, string> | string {
       name: dataMap.get("name") || dataMap.get("id"),
       author: dataMap.get("author") || "Someone",
       icon: dataMap.get("icon") || IMG_MCBBS,
-      depend: depend = dataMap.get("depend") || "",
-      before: before = dataMap.get("before") || "",
-      after: after = dataMap.get("after") || "",
+      depend: (depend = dataMap.get("depend") || ""),
+      before: (before = dataMap.get("before") || ""),
+      after: (after = dataMap.get("after") || ""),
       description: dataMap.get("description") || "No description provided.",
       updateURL: dataMap.get("updateURL"),
-      apiVersion: apiVersion = dataMap.get("apiVersion"),
+      apiVersion: (apiVersion = dataMap.get("apiVersion")),
       version: dataMap.get("version"),
     };
     if (apiVersion != undefined && apiVersion != STRING_API_VERSION) {
@@ -55,7 +59,7 @@ function addModule(code: string): Map<string, string> | string {
         JSON.stringify({
           depend: flitBlank(depend.split(",")),
           before: flitBlank(before.split(",")),
-          after: flitBlank(after.split(","))
+          after: flitBlank(after.split(",")),
         })
       );
       markDirty();
@@ -100,7 +104,7 @@ function regMeta(id: string, meta: any): boolean {
 function mountCode(id: string, code: string): void {
   $(() => {
     $("body").append(
-      `<script id='code-${id}'>(function(){${code}})()</script>`
+      `<script id='code-${id}' onload='this.parentNode.removeChild(this);'>(function(){var MCBBS = window.forkAPI_${getAPIToken()}("${id}");\n${code}\nvar _sele = document.getElementById('code-${id}');_sele.parentNode.removeChild(_sele);})()</script>`
     );
   });
 }
