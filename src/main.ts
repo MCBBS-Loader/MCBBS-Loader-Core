@@ -57,10 +57,8 @@ import { getAPIToken } from "./libs/encrypt";
   jQuery(() => {
     manager.createBtn();
     manager.createMenu();
-    if (
-      String(window.location) ===
-      "https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager"
-    ) {
+    var isManagerRegex = /bbsmode\=manager/i;
+    if (isManagerRegex.test(String(window.location.search))) {
       $("title").html("MCBBS Loader - 自由的 MCBBS 模块管理器");
       manager.dumpManager();
     }
