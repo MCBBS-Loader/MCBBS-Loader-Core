@@ -1,7 +1,7 @@
 import jQuery from "jquery";
 import $ from "jquery";
 import { getAPIVersion } from "../api/NTAPI";
-import { addModule, deleteModule } from "./codeload";
+import { addModule, deleteModule, isDirty, markDirty } from "./codeload";
 import { closepop, popinfo } from "./popinfo";
 import { GMGetValue, GMSetValue, setWindowProperty } from "./usfunc";
 function createBtn(): void {
@@ -11,7 +11,6 @@ function createBtn(): void {
     );
   });
 }
-
 function createMenu(): void {
   if (
     String(window.location).startsWith(
@@ -32,7 +31,7 @@ function dumpManager() {
   jQuery(() => {
     $("div[class='bm bw0']").children().remove();
     $("div[class='bm bw0']").append(
-      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}</span>
+      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}&nbsp<font size="2em" color="red">${isDirty() ? "当前的设置需要刷新才能生效" : ""}</font></span>
 <br/>
 <hr/>
 <span style='font-size:1rem'>已安装的模块</span>
@@ -49,27 +48,26 @@ function dumpManager() {
 <br/>
 <span id='install_state' style='font-size:1rem;color:#df307f;'></span>`
     );
-    setWindowProperty("notifyUninstall", (e: string) => {
-      var t = e;
-      deleteModule(t, () => {
+    setWindowProperty("notifyUninstall", (id: string) => {
+      deleteModule(id, () => {
         dumpManager();
         popinfo("trash", "成功移除了模块", false);
         setTimeout(closepop, 3000);
-        return;
       });
     });
-    setWindowProperty("notifyOnOff", (e: string) => {
-      if (GMGetValue("loader.all", {})[e]) {
+    setWindowProperty("notifyOnOff", (id: string) => {
+      if (GMGetValue("loader.all", {})[id]) {
         var all = GMGetValue("loader.all", {});
 
-        all[e] = false;
+        all[id] = false;
 
         GMSetValue("loader.all", all);
       } else {
         var all = GMGetValue("loader.all", {});
-        all[e] = true;
+        all[id] = true;
         GMSetValue("loader.all", all);
       }
+      markDirty();
       dumpManager();
     });
     $("#install").on("click", () => {
@@ -86,7 +84,6 @@ function dumpManager() {
         } else {
           popinfo("exclamation-circle", "安装失败，无效 BASE64.", false);
           setTimeout(closepop, 5000);
-          return;
         }
       } catch {
         var isUrlRegex = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g;
@@ -96,7 +93,7 @@ function dumpManager() {
             $.get(str, (dataIn) => {
               try {
                 var data = dataIn.toString();
-                if (typeof data == "string") {
+                if (typeof data === "string") {
                   var st = addModule(data);
                   if (typeof st != "string") {
                     dumpManager();
@@ -110,7 +107,6 @@ function dumpManager() {
                       false
                     );
                     setTimeout(closepop, 5000);
-                    return;
                   }
                 } else {
                   popinfo(
@@ -119,7 +115,6 @@ function dumpManager() {
                     false
                   );
                   setTimeout(closepop, 5000);
-                  return;
                 }
               } catch {
                 popinfo(
@@ -128,7 +123,6 @@ function dumpManager() {
                   false
                 );
                 setTimeout(closepop, 5000);
-                return;
               }
             });
           } catch {
@@ -138,21 +132,19 @@ function dumpManager() {
               false
             );
             setTimeout(closepop, 5000);
-            return;
           }
         } else {
           var st = addModule(str);
           if (typeof st != "string") {
             dumpManager();
+            $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
             popinfo("check", "成功安装了模块", false);
             setTimeout(closepop, 3000);
             return;
           } else {
             popinfo("exclamation-circle", "安装失败，JavaScript 无效", false);
-            return;
           }
         }
-        popinfo("exclamation-circle", "安装失败，无效输入", false);
       }
     });
     var all_modules = GMGetValue("loader.all", {});
@@ -183,8 +175,7 @@ function dumpManager() {
       }'><strong>查看源代码</strong></button></div></div></li>`;
       $("#all_modules").append(ele);
       $(".showsrc").on("click", (e) => {
-        var id =
-          $(e.target).attr("mlsource") || $(e.target).parent().attr("mlsource");
+        var id = $(e.target).attr("mlsource") || $(e.target).parent().attr("mlsource");
         if (!id) {
           return;
         }

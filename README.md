@@ -21,15 +21,18 @@ name=Example Module
 author=You
 description=Lorem ipsum.
 icon=https://example.com/example.png
+depend=com.example.dep1, com.example.dep2, com.example.dep3
+after=com.example.after1, com.example.after2
+before=com.example.before1
 */
 console.log("This is a module!");
 ```
 
-一个模块必须以 `// MCBBS-Module` 开头。
+一个模块必须以 `/* MCBBS-Module` 开头。
 
-每个 `// @` 后面注明了属性值：
+每个属性格式为 `<键>=<值>` ：
 
-- id：唯一识别 ID，建议使用包名
+- id：唯一识别 ID，建议使用包名，不得含有空白字符
 
 - name：显示名称
 
@@ -41,7 +44,15 @@ console.log("This is a module!");
 
 - author：作者名称
 
-信息部分以 `// -MCBBS-Module` 结尾，其下的所有部分均视为可执行代码，会在 DOM 加载完成后执行。
+- depend：硬依赖，缺失则无法运行，多个项之间使用英文逗号隔开，所有空白字符被忽略
+
+- before：需要在指定的模块加载之后加载，如果指定缺失将被忽略，多个项目的指定方式和 depend 相同。
+
+- after：和 before 一样，但是是在指定模块之后
+
+**注意！** `after` 和 `before` 仅指定加载顺序，不保证依赖关系，如果要指定硬依赖并决定先后顺序，请**同时指定** `after` 和 `before` ！
+
+信息部分以 `*/` 结尾，其下的所有部分均视为可执行代码，会在 DOM 加载完成后执行。
 
 以上项目中，只有 `id` 是必填项。
 
