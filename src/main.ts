@@ -1,4 +1,4 @@
-import { installFromUrl, mountCode } from "./libs/codeload";
+import { deleteModule, installFromUrl, mountCode } from "./libs/codeload";
 import manager from "./libs/manager";
 import configpage from "./libs/configpage";
 import { checkUpdate } from "./libs/updator";
@@ -14,6 +14,7 @@ import { getProperty, getUnsafeWindow, setLockedProperty } from "./libs/native";
 import { forkAPI, getAPIVersion } from "./api/NTAPI";
 import { loadNTEVT } from "./api/NTEVT";
 import { getAPIToken } from "./libs/encrypt";
+import { popinfo } from "./libs/popinfo";
 (() => {
   loadNTEVT();
   jQuery(() => {
@@ -93,10 +94,23 @@ import { getAPIToken } from "./libs/encrypt";
           id,
           fixRaw(id, JSON.parse(GMGetValue("depend-" + id, "{}")))
         );
-        checkUpdate(GMGetValue("meta-" + name, ""), (state) => {
+
+        checkUpdate(GMGetValue("meta-" + id, ""), (state) => {
           if (state != "latest") {
             installFromUrl(state);
           }
+        });
+      }
+      if (
+        GMGetValue("meta-" + id, "").apiVersion != getAPIVersion() &&
+        GMGetValue("meta-" + id, "").apiVersion != undefined
+      ) {
+        deleteModule(id, () => {
+          console.log(
+            "[MCBBS Loader] 由于 API 版本不兼容，移除了 ID 为 " +
+              id +
+              " 的脚本。\n如有需要，你可以重新安装。"
+          );
         });
       }
     }
@@ -191,6 +205,22 @@ import { getAPIToken } from "./libs/encrypt";
       GMLog(
         "[ MCBBS Loader ] 所有插件均未成功加载，请到管理页面修复依赖关系错误"
       );
+      var isManagerRegex = /bbsmod\=manager/i;
+      if (isManagerRegex.test(String(window.location.search))) {
+        popinfo(
+          "exclamation-circle",
+          "<b>ECONFLICT！</b>自动加载模块失败，你现在正在模块管理页面，请解决依赖冲突。",
+          true,
+          "background-color:#88272790!important;"
+        );
+      } else {
+        popinfo(
+          "exclamation-circle",
+          "<b>ECONFLICT！</b>自动加载模块失败，请求人工管理模块，查看控制台信息并尝试解决依赖错误。",
+          true,
+          "background-color:#88272790!important;"
+        );
+      }
     }
   });
 })();

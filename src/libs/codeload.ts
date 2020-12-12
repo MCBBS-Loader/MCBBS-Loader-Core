@@ -1,7 +1,7 @@
 import $ from "jquery";
 import { getAPIVersion } from "../api/NTAPI";
 import { getAPIToken } from "./encrypt";
-import { setProperty } from "./native";
+import { getProperty, setProperty } from "./native";
 import { GMDeleteValue, GMGetValue, GMSetValue } from "./usfunc";
 const STRING_API_VERSION = String(getAPIVersion());
 var dirty: boolean = false;
@@ -9,8 +9,7 @@ var dirty: boolean = false;
 function addModule(code: string): Map<string, string> | string {
   var isModuleRegex = /\/\*( )*MCBBS[ -]*Module/;
   if (!isModuleRegex.test(code.trim())) {
-    console.log("Not a module");
-    return "Not a module";
+    return "这不是一个模块";
   } else {
     var ccode = code.trim();
     var dataMap = new Map<string, string>();
@@ -31,8 +30,7 @@ function addModule(code: string): Map<string, string> | string {
       apiVersion: string | undefined,
       id: string | undefined = dataMap.get("id");
     if (id === undefined) {
-      console.log("No id");
-      return "No id";
+      return "未提供 id 数据值";
     }
     var obj: object = {
       id: id,
@@ -47,9 +45,24 @@ function addModule(code: string): Map<string, string> | string {
       apiVersion: (apiVersion = dataMap.get("apiVersion")),
       version: dataMap.get("version"),
     };
+    var ins_depend: any[] = [];
+    for (var d of getProperty(obj, "depend").split(",")) {
+      var dep = $.trim(d);
+      var hasURLRegex = /.+?\-\>((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/;
+      if (hasURLRegex.test(dep)) {
+        var i = dep.split("->")[0];
+
+        var u = dep.split("->")[1];
+        installFromUrl(u);
+        ins_depend.push(i);
+      } else {
+        ins_depend.push(dep);
+      }
+    }
+    setProperty(obj, "depend", ins_depend.join(","));
+    depend = ins_depend.join(",");
     if (apiVersion != undefined && apiVersion != STRING_API_VERSION) {
-      console.log("Doesn't support");
-      return "Doesn't support";
+      return "不支持的 API 版本：" + apiVersion;
     }
     var succ = regMeta(id, obj);
     if (succ) {
@@ -65,8 +78,7 @@ function addModule(code: string): Map<string, string> | string {
       markDirty();
       return dataMap;
     } else {
-      console.log("Unknown error");
-      return "Unknown error";
+      return "未知错误";
     }
   }
 }

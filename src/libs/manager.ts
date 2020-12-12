@@ -50,6 +50,9 @@ function dumpManager() {
 <br/>
 <span id='install_state' style='font-size:1rem;color:#df307f;'></span>`
     );
+    $("#install_base64").val(
+      "/* MCBBS Module\nid = com.example\n*/\n// https://cdn.jsdelivr.net/gh/用户名/仓库@分支/文件.js"
+    );
     setWindowProperty("notifyUninstall", (id: string) => {
       deleteModule(id, () => {
         dumpManager();
@@ -84,7 +87,7 @@ function dumpManager() {
           setTimeout(closepop, 3000);
           return;
         } else {
-          popinfo("exclamation-circle", "安装失败，无效 BASE64.", false);
+          popinfo("exclamation-circle", "安装失败：" + st, false);
           setTimeout(closepop, 5000);
         }
       } catch {
@@ -103,11 +106,7 @@ function dumpManager() {
                     setTimeout(closepop, 3000);
                     return;
                   } else {
-                    popinfo(
-                      "exclamation-circle",
-                      "安装失败，接收了一个无效数据值",
-                      false
-                    );
+                    popinfo("exclamation-circle", "安装失败：" + st, false);
                     setTimeout(closepop, 5000);
                   }
                 } else {
@@ -144,7 +143,7 @@ function dumpManager() {
             setTimeout(closepop, 3000);
             return;
           } else {
-            popinfo("exclamation-circle", "安装失败，JavaScript 无效", false);
+            popinfo("exclamation-circle", "安装失败：" + st, false);
             setTimeout(closepop, 5000);
           }
         }
@@ -157,7 +156,7 @@ function dumpManager() {
         meta.id || "loader.nameless"
       }'><div style='display:inline;'><img src='${
         meta.icon || ""
-      }' width='50' height='55' style="vertical-align:middle;float:left;"></img><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:#5d2391'><strong>${
+      }' width='50' height='50' style="vertical-align:middle;float:left;"></img><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:#5d2391'><strong>${
         meta.name || "Nameless"
       }</strong></span>&nbsp;&nbsp;&nbsp;<span style='font-size:12px;color:#150029;'>${
         meta.id || "loader.nameless"
