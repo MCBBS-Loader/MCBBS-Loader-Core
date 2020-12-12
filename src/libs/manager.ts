@@ -31,7 +31,9 @@ function dumpManager() {
   jQuery(() => {
     $("div[class='bm bw0']").children().remove();
     $("div[class='bm bw0']").append(
-      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}&nbsp<font size="2em" color="red">${isDirty() ? "当前的设置需要刷新才能生效" : ""}</font></span>
+      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}&nbsp<font size="2em" color="red">${
+        isDirty() ? "当前的设置需要刷新才能生效" : ""
+      }</font></span>
 <br/>
 <hr/>
 <span style='font-size:1rem'>已安装的模块</span>
@@ -143,6 +145,7 @@ function dumpManager() {
             return;
           } else {
             popinfo("exclamation-circle", "安装失败，JavaScript 无效", false);
+            setTimeout(closepop, 5000);
           }
         }
       }
@@ -175,7 +178,8 @@ function dumpManager() {
       }'><strong>查看源代码</strong></button></div></div></li>`;
       $("#all_modules").append(ele);
       $(".showsrc").on("click", (e) => {
-        var id = $(e.target).attr("mlsource") || $(e.target).parent().attr("mlsource");
+        var id =
+          $(e.target).attr("mlsource") || $(e.target).parent().attr("mlsource");
         if (!id) {
           return;
         }

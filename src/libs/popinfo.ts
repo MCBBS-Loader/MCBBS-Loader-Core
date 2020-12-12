@@ -8,6 +8,7 @@ function popinfo(
   time?: number,
   size?: string
 ) {
+  closepop();
   if (doSpark == undefined) {
     doSpark = true;
   }

@@ -84,7 +84,7 @@ function parseMeta(code: string, map: Map<string, string>): void {
     if (isItemRegex.test($.trim(l))) {
       var k = ($.trim(l).match(kRegex) || [])[0] || "";
       var v = ($.trim(l).match(vRegex) || [])[0] || "";
-      map.set(k, v);
+      map.set($.trim(k), $.trim(v));
     }
   }
 }
