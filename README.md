@@ -54,6 +54,8 @@ console.log("This is a module!");
 
 以上项目中，只有 `id` 是必填项。
 
+before和after仅推荐在多个模块先后操作同一个DOM元素的时候使用
+
 有关更多信息，请访问我们的 [Wiki](https://github.com/MCBBS-Loader/MCBBS-Loader-Core/wiki/) 或 [网站](https://mcbbs-loader.xuogroup.top/)
 
 ## 许可证

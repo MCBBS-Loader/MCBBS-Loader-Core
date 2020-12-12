@@ -126,12 +126,18 @@ function createMenu(): void {
     }
   );
   jQuery(() => {
-    $("div.appl > div.tbn > ul").prepend(
-      "<li><a id='manage_config' style='cursor:pointer;'>模块选项中心</a></li>"
-    );
-    $("#manage_config").on("click", () => {
-      dumpConfigPage();
-    });
+    if (
+      String(window.location).startsWith(
+        "https://www.mcbbs.net/home.php?mod=spacecp"
+      )
+    ) {
+      $("div.appl > div.tbn > ul").prepend(
+        "<li><a id='manage_config' style='cursor:pointer;'>模块选项中心</a></li>"
+      );
+      $("#manage_config").on("click", () => {
+        dumpConfigPage();
+      });
+    }
   });
 }
 export default { createMenu, dumpConfigPage };

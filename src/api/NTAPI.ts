@@ -8,32 +8,46 @@ import {
 } from "../libs/usfunc";
 import $ from "jquery";
 import { closepop, popinfo } from "../libs/popinfo";
+import { Permission, Ticket, PermissionDenied, PermissionManager} from "../libs/native";
+import { checkedCall } from "../libs/codeload"
 const ML_VERSION = 1;
 var MCBBS = {};
 // 通知相关
-Object.defineProperty(MCBBS, "sysNotification", GMNotification);
+Object.defineProperty(MCBBS, "sysNotification", {get: () => GMNotification});
 
 // 显示相关
-Object.defineProperty(MCBBS, "popStatus", popinfo);
-Object.defineProperty(MCBBS, "closeStatus", closepop);
+Object.defineProperty(MCBBS, "popStatus", {get: () => popinfo});
+Object.defineProperty(MCBBS, "closeStatus", {get: () => closepop});
 
 // 存储相关
-Object.defineProperty(MCBBS, "storeData", storeData);
-Object.defineProperty(MCBBS, "getData", getData);
+Object.defineProperty(MCBBS, "storeData", {get: () =>storeData});
+Object.defineProperty(MCBBS, "getData", {get: () =>getData});
 
 // jQuery
 Object.defineProperty(MCBBS, "$", $);
 
 // 模块导入导出
 setWindowProperty("MIDT", {});
-Object.defineProperty(MCBBS, "export_", moduleExport);
-Object.defineProperty(MCBBS, "import_", moduleImport);
+Object.defineProperty(MCBBS, "export_", {get: () => moduleExport});
+Object.defineProperty(MCBBS, "import_", {get: () => moduleImport});
 
 // 下载部分
-Object.defineProperty(MCBBS, "download", GMDownload);
+Object.defineProperty(MCBBS, "download", {get: () => GMDownload});
 
 // 版本号部分
-Object.defineProperty(MCBBS, "getAPIVersion", getAPIVersion);
+Object.defineProperty(MCBBS, "getAPIVersion", {get: () => getAPIVersion});
+
+// 权限控制
+Object.defineProperty(MCBBS, "Permission", {get: () => Permission});
+Object.defineProperty(MCBBS, "Ticket", {get: () => Ticket});
+Object.defineProperty(MCBBS, "PermissionDenied", {get: () => PermissionDenied});
+Object.defineProperty(MCBBS, "checkedCall", {get: () => checkedCall});
+Object.defineProperty(MCBBS, "PermissionManager", {
+  get: () => {
+    PermissionManager.consoleTicket();
+    return PermissionManager;
+  }
+});
 
 // 写入窗口
 function initAPI() {
