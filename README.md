@@ -44,7 +44,7 @@ console.log("This is a module!");
 
 - author：作者名称
 
-- permissions：权限，多个项之间用英文逗号隔开，每项的首末空格被忽略
+- permissions：权限，多个项之间用英文逗号隔开，每项的首末空格被忽略，权限共三项 `loader:gm_function`（调用GM函数） 、 `loader:edit_script`（编辑其他模块的脚本） 、 `loader:manage_mods`（静默安装、卸载、停用、启用模块，静默清除所有数据） 
 
 - depend：硬依赖，缺失则无法运行，多个项指定方式和permission一致
 
