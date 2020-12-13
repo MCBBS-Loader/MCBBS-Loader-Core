@@ -35,7 +35,9 @@ class MCBBSAPI {
   }
   public getAPIVersion = getAPIVersion;
   public download = GMDownload;
-  public export_ = moduleExport;
+  public export_ = (obj: any) => {
+    moduleExport(this.id, obj);
+  };
   public import_ = moduleImport;
   public $ = $;
   public storeData(k: string, v: any) {
