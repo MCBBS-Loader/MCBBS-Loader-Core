@@ -7,6 +7,7 @@ import {
 import $ from "jquery";
 import jQuery from "jquery";
 import { getProperty, setProperty } from "./native";
+import { popinfo } from "./popinfo";
 function dumpConfigPage() {
   $("div[class='bm bw0']").children().remove();
   $("div[class='bm bw0']").html("");
@@ -42,6 +43,7 @@ function autoSave() {
       val
     );
   }
+  popinfo("check", "设置保存成功！", false);
 }
 function getConfigVal(idIn: string, storageIdIn: string, defaultValue: any) {
   return GMGetValue(`configstore-${idIn}-${storageIdIn}`, defaultValue);
@@ -53,27 +55,42 @@ function renderAll() {
       ele = `<input type='checkbox' id='confval-${getProperty(
         c,
         "id"
-      )}-${getProperty(c, "storageId")}'/><label for='confval-${getProperty(
+      )}-${getProperty(
+        c,
+        "storageId"
+      )}'/><label style='font-size:14px' for='confval-${getProperty(
         c,
         "id"
-      )}-${getProperty(c, "storageId")}'>${getProperty(
+      )}-${getProperty(
+        c,
+        "storageId"
+      )}'><span style='font-size:18px;color:#5d2391'><b>${getProperty(
         c,
         "name"
-      )} (${getProperty(c, "id")}:${getProperty(
+      )} </b></span>(${getProperty(c, "id")}:${getProperty(
         c,
         "storageId"
-      )})<br/>${getProperty(c, "desc")}</label><br/>`;
-    } else {
-      ele = `<label for='confval-${getProperty(c, "id")}-${getProperty(
-        c,
-        "storageId"
-      )}'>${getProperty(c, "name")} (${getProperty(c, "id")}:${getProperty(
-        c,
-        "storageId"
-      )})<br/>${getProperty(
+      )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
         c,
         "desc"
-      )}</label><input type='text' class='px' id='confval-${getProperty(
+      )}</span></label><br/>`;
+    } else {
+      ele = `<label style='font-size:14px' for='confval-${getProperty(
+        c,
+        "id"
+      )}-${getProperty(
+        c,
+        "storageId"
+      )}'><span style='font-size:18px;color:#5d2391'><b>${getProperty(
+        c,
+        "name"
+      )}</b></span> (${getProperty(c, "id")}:${getProperty(
+        c,
+        "storageId"
+      )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
+        c,
+        "desc"
+      )}</span></label><input type='text' class='px' id='confval-${getProperty(
         c,
         "id"
       )}-${getProperty(c, "storageId")}'/><br/>`;
@@ -119,12 +136,7 @@ function createMenu(): void {
   setWindowProperty("getConfig", function (id: string, sid: string) {
     return getConfigVal(id, sid, undefined);
   });
-  setWindowProperty(
-    "createConfigItem",
-    function (details: Map<string, string>) {
-      createConfigItem(details);
-    }
-  );
+
   jQuery(() => {
     $("div.appl > div.tbn > ul").prepend(
       "<li><a id='manage_config' style='cursor:pointer;'>模块选项中心</a></li>"
@@ -134,4 +146,4 @@ function createMenu(): void {
     });
   });
 }
-export default { createMenu, dumpConfigPage };
+export default { createMenu, dumpConfigPage, createConfigItem, getConfigVal };

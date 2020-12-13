@@ -15,4 +15,19 @@ function setLockedProperty(a, tag, val) {
 function getUnsafeWindow() {
   return unsafeWindow || window;
 }
-export { setProperty, getProperty, getUnsafeWindow, setLockedProperty };
+function getGM() {
+  return {
+    GM_addStyle,
+    GM_deleteValue,
+    GM_download,
+    GM_getResourceText,
+    GM_getResourceURL,
+    GM_getValue,
+    GM_listValues,
+    GM_log,
+    GM_notification,
+    GM_setClipboard,
+    GM_setValue,
+  };
+}
+export { setProperty, getProperty, getUnsafeWindow, setLockedProperty, getGM };

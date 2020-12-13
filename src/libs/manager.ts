@@ -19,11 +19,8 @@ function createMenu(): void {
   ) {
     jQuery(() => {
       $("div.appl > div.tbn > ul").prepend(
-        "<li><a id='manage_modules' style='cursor:pointer;'>模块管理</a></li>"
+        "<li><a href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager' style='cursor:pointer;'>模块管理</a></li>"
       );
-      $("#manage_modules").on("click", () => {
-        dumpManager();
-      });
     });
   }
 }
@@ -83,9 +80,24 @@ function dumpManager() {
         if (typeof st != "string") {
           dumpManager();
           $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
-          popinfo("check", "成功安装了模块", false);
-          setTimeout(closepop, 3000);
-          return;
+
+          if (
+            st.get("permissions")?.search("loader:core") != -1 &&
+            st.get("permissions")?.search("loader:core") != undefined
+          ) {
+            popinfo(
+              "exclamation-triangle",
+              "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
+                st.get("id") +
+                "。",
+              false,
+              "background-color:#ff950085 !important;"
+            );
+          } else {
+            popinfo("check", "成功安装了模块", false);
+            setTimeout(closepop, 3000);
+            return;
+          }
         } else {
           popinfo("exclamation-circle", "安装失败：" + st, false);
           setTimeout(closepop, 5000);
@@ -102,18 +114,42 @@ function dumpManager() {
                   var st = addModule(data);
                   if (typeof st != "string") {
                     dumpManager();
-                    popinfo("check", "成功安装了模块", false);
-                    setTimeout(closepop, 3000);
-                    return;
+                    $("#install_base64").val(
+                      GMGetValue(`code-${st.get("id")}`, "")
+                    );
+
+                    if (
+                      st.get("permissions")?.search("loader:core") != -1 &&
+                      st.get("permissions")?.search("loader:core") != undefined
+                    ) {
+                      popinfo(
+                        "exclamation-triangle",
+                        "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
+                          st.get("id") +
+                          "。",
+                        false,
+                        "background-color:#ff950085 !important;"
+                      );
+                    } else {
+                      popinfo("check", "成功安装了模块", false);
+                      setTimeout(closepop, 3000);
+                      return;
+                    }
                   } else {
-                    popinfo("exclamation-circle", "安装失败：" + st, false);
+                    popinfo(
+                      "exclamation-circle",
+                      "安装失败：" + st,
+                      false,
+                      "background-color:#88272790!important;"
+                    );
                     setTimeout(closepop, 5000);
                   }
                 } else {
                   popinfo(
                     "exclamation-circle",
                     "安装失败，接收了一个无效数据值",
-                    false
+                    false,
+                    "background-color:#88272790!important;"
                   );
                   setTimeout(closepop, 5000);
                 }
@@ -121,7 +157,8 @@ function dumpManager() {
                 popinfo(
                   "exclamation-circle",
                   "安装失败，接收了一个无效数据值",
-                  false
+                  false,
+                  "background-color:#88272790!important;"
                 );
                 setTimeout(closepop, 5000);
               }
@@ -130,7 +167,8 @@ function dumpManager() {
             popinfo(
               "exclamation-circle",
               "安装失败，接收了一个无效数据值",
-              false
+              false,
+              "background-color:#88272790!important;"
             );
             setTimeout(closepop, 5000);
           }
@@ -139,11 +177,31 @@ function dumpManager() {
           if (typeof st != "string") {
             dumpManager();
             $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
-            popinfo("check", "成功安装了模块", false);
-            setTimeout(closepop, 3000);
-            return;
+
+            if (
+              st.get("permissions")?.search("loader:core") != -1 &&
+              st.get("permissions")?.search("loader:core") != undefined
+            ) {
+              popinfo(
+                "exclamation-triangle",
+                "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
+                  st.get("id") +
+                  "。",
+                false,
+                "background-color:#ff950085 !important;"
+              );
+            } else {
+              popinfo("check", "成功安装了模块", false);
+              setTimeout(closepop, 3000);
+              return;
+            }
           } else {
-            popinfo("exclamation-circle", "安装失败：" + st, false);
+            popinfo(
+              "exclamation-circle",
+              "安装失败：" + st,
+              false,
+              "background-color:#88272790!important;"
+            );
             setTimeout(closepop, 5000);
           }
         }
@@ -151,17 +209,29 @@ function dumpManager() {
     });
     var all_modules = GMGetValue("loader.all", {});
     for (var m of Object.entries(all_modules)) {
-      var meta = GMGetValue("meta-" + m[0], { id: "loader.nameless" });
+      var meta = GMGetValue("meta-" + m[0], { id: "impossible" });
+      var color = "";
+      var isCore = false;
+      if (meta.permissions.search("loader:core") != -1) {
+        color = "#ff0000";
+        isCore = true;
+      } else {
+        color = "#5d2391";
+      }
       var ele = `<li id='${
-        meta.id || "loader.nameless"
+        meta.id || "impossible"
       }'><div style='display:inline;'><img src='${
         meta.icon || ""
-      }' width='50' height='50' style="vertical-align:middle;float:left;"></img><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:#5d2391'><strong>${
+      }' width='50' height='50' style="vertical-align:middle;float:left;"></img><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:${color}'><strong>${
         meta.name || "Nameless"
       }</strong></span>&nbsp;&nbsp;&nbsp;<span style='font-size:12px;color:#150029;'>${
         meta.id || "loader.nameless"
       }@${
-        meta.version || "1.0.0"
+        meta.version ||
+        "1.0.0" +
+          (isCore
+            ? "&nbsp;<span style='color:#ff0000'><b>[COREMOD]</b></span>"
+            : "")
       }</span><br/>&nbsp;&nbsp;<span style='font-size:16px;color:#df307f;'>${
         meta.author || "Someone"
       }</span><br/>&nbsp;&nbsp;<span style='font-size:12px'>${
