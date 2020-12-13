@@ -53,7 +53,7 @@ class MCBBSAPI {
     configpage.createConfigItem(map);
   }
   public getConfigVal(stgid: string, dval?: any) {
-    return configpage.getConfigVal(this.id, stgid, dval);
+    return configpage.getConfigVal(this.id, stgid, dval || undefined);
   }
   public getData(k: string, dv: any) {
     return getData(this.id + "-" + k, dv);
