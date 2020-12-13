@@ -117,7 +117,7 @@ function regMeta(id: string, meta: any): boolean {
 function mountCode(id: string, code: string): void {
   $(() => {
     $("body").append(
-      `<script id='code-${id}' onload='this.parentNode.removeChild(this);'>(function(){var MCBBS = window.forkAPI_${getAPIToken()}("${id}");\n${code}\nvar _sele = document.getElementById('code-${id}');_sele.parentNode.removeChild(_sele);})()</script>`
+      `<script id='code-${id}' onload='this.parentNode.removeChild(this);'>(function(){var MCBBS = Object.freeze(window.forkAPI_${getAPIToken()}("${id}"));\n${code}\nvar _sele = document.getElementById('code-${id}');_sele.parentNode.removeChild(_sele);})()</script>`
     );
   });
 }
