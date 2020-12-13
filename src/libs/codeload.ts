@@ -172,8 +172,7 @@ export {
 function coreModEval(code: string) {
   return new Promise((resolve, reject) => {
     try {
-      eval(code);
-      resolve(0);
+      resolve(eval(code));
     } catch {
       reject();
     }
