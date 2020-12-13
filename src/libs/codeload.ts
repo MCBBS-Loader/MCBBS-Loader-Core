@@ -75,7 +75,7 @@ function addModule(code: string): Map<string, string> | string {
         JSON.stringify({
           depend: ins_depend,
           before: flitBlank(before.split(",")),
-          after: flitBlank(before.split(",")),
+          after: flitBlank(after.split(",")),
         })
       );
       markDirty();
