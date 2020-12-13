@@ -15,6 +15,7 @@ import { forkAPI, getAPIVersion } from "./api/NTAPI";
 import { loadNTEVT } from "./api/NTEVT";
 import { getAPIToken } from "./libs/encrypt";
 import { popinfo } from "./libs/popinfo";
+import { setup } from "./libs/setupbattery";
 (() => {
   loadNTEVT();
   jQuery(() => {
@@ -27,7 +28,7 @@ import { popinfo } from "./libs/popinfo";
     );
   });
   if (GMGetValue("loader.ibatteries", true)) {
-    // setup(() => {});
+    setup(() => {});
     GMSetValue("loader.ibatteries", false);
   }
   GMLog(`[MCBBS Loader] 加载器和 API 版本：${getAPIVersion()}`);
