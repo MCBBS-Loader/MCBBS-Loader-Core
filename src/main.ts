@@ -1,4 +1,4 @@
-import { installFromUrl, mountCode } from "./libs/codeload";
+import { deleteModule, installFromUrl, mountCode } from "./libs/codeload";
 import manager from "./libs/manager";
 import configpage from "./libs/configpage";
 import { checkUpdate } from "./libs/updator";
@@ -10,9 +10,13 @@ import {
 } from "./libs/usfunc";
 import jQuery from "jquery";
 import $ from "jquery";
-import { getProperty } from "./libs/native";
-import { getAPIVersion, initAPI } from "./api/NTAPI";
+import { getProperty, getUnsafeWindow, setLockedProperty } from "./libs/native";
+import { forkAPI, getAPIVersion } from "./api/NTAPI";
+import { loadNTEVT } from "./api/NTEVT";
+import { getAPIToken } from "./libs/encrypt";
+import { popinfo } from "./libs/popinfo";
 (() => {
+  loadNTEVT();
   jQuery(() => {
     $("head").append(
       "<link type='text/css' rel='stylesheet' href='https://cdn.staticfile.org/font-awesome/5.15.1/css/all.min.css'></link>"
@@ -28,10 +32,10 @@ import { getAPIVersion, initAPI } from "./api/NTAPI";
   }
   GMLog(`[MCBBS Loader] 加载器和 API 版本：${getAPIVersion()}`);
   const RESET_TOKEN = Math.floor(
-    Math.random() * 1048576 * 1048576 * 1048576
+    Math.random() * 1048576 * 1048576 * 1048576 * 1048576
   ).toString(16);
   var sureToReset = false;
-  setWindowProperty("reset_" + RESET_TOKEN, () => {
+  setLockedProperty(getUnsafeWindow(), "reset_" + RESET_TOKEN, () => {
     if (sureToReset) {
       var all = GMGetValue("loader.all", {});
       for (var c of Object.entries(all)) {
@@ -49,15 +53,14 @@ import { getAPIVersion, initAPI } from "./api/NTAPI";
   });
 
   GMLog("[MCBBS Loader] 重置令牌：reset_" + RESET_TOKEN);
-  initAPI();
+  setLockedProperty(getUnsafeWindow(), "forkAPI_" + getAPIToken(), forkAPI);
   setWindowProperty("CDT", []);
   jQuery(() => {
     manager.createBtn();
     manager.createMenu();
-    if (
-      String(window.location) ===
-      "https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager"
-    ) {
+    var isManagerRegex = /bbsmod\=manager/i;
+    if (isManagerRegex.test(String(window.location.search))) {
+      $("title").html("MCBBS Loader - 自由的 MCBBS 模块管理器");
       manager.dumpManager();
     }
     configpage.createMenu();
@@ -72,9 +75,9 @@ import { getAPIVersion, initAPI } from "./api/NTAPI";
       beforeNext: null,
       afterNext: null,
       beforePrev: null,
-      afterPrev: null
+      afterPrev: null,
     };
-    var fixRaw = (id:string, raw:any) => {
+    var fixRaw = (id: string, raw: any) => {
       raw.beforeHead = mapNil;
       raw.afterHead = mapNil;
       raw.done = false;
@@ -91,14 +94,28 @@ import { getAPIVersion, initAPI } from "./api/NTAPI";
           id,
           fixRaw(id, JSON.parse(GMGetValue("depend-" + id, "{}")))
         );
-        checkUpdate(GMGetValue("meta-" + name, ""), (state) => {
+
+        checkUpdate(GMGetValue("meta-" + id, ""), (state) => {
           if (state != "latest") {
             installFromUrl(state);
           }
         });
       }
+      if (
+        GMGetValue("meta-" + id, "").apiVersion != getAPIVersion() &&
+        GMGetValue("meta-" + id, "").apiVersion != undefined
+      ) {
+        deleteModule(id, () => {
+          console.log(
+            "[MCBBS Loader] 由于 API 版本不兼容，移除了 ID 为 " +
+              id +
+              " 的脚本。\n如有需要，你可以重新安装。"
+          );
+        });
+      }
     }
-    try{// 排个序
+    try {
+      // 排个序
       var insert = (before: any, after: any) => {
         var node: any = {
           before: before,
@@ -106,7 +123,7 @@ import { getAPIVersion, initAPI } from "./api/NTAPI";
           beforeNext: before.beforeHead,
           afterNext: after.afterHead,
           beforePrev: mapNil,
-          afterPrev: mapNil
+          afterPrev: mapNil,
         };
         node.beforeNext.beforePrev = node.afterNext.afterPrev = node;
         after.afterHead = before.beforeHead = node;
@@ -123,7 +140,7 @@ import { getAPIVersion, initAPI } from "./api/NTAPI";
           node.before.beforeHead = node.beforeNext;
         }
         // 如果它不需要在某个插件之后加载，那下一个就加载它
-        if(mapNil === node.after.afterHead){
+        if (mapNil === node.after.afterHead) {
           stack.push(node.after);
         }
       };
@@ -140,7 +157,7 @@ import { getAPIVersion, initAPI } from "./api/NTAPI";
         if (before instanceof Array) {
           before.forEach((e) => {
             var target = dependencies.get(e);
-            if (target){
+            if (target) {
               insert(v, target);
             }
           });
@@ -149,14 +166,14 @@ import { getAPIVersion, initAPI } from "./api/NTAPI";
         if (after instanceof Array) {
           after.forEach((e) => {
             var target = dependencies.get(e);
-            if(target){
+            if (target) {
               insert(target, v);
             }
           });
         }
       });
       dependencies.forEach((v) => {
-        if((v as any).afterHead === mapNil){
+        if ((v as any).afterHead === mapNil) {
           stack.push(v);
         }
       });
@@ -170,9 +187,9 @@ import { getAPIVersion, initAPI } from "./api/NTAPI";
         }
       }
       // 如果排序已经结束了还有插件没有进入到序列里来，那么排序一定无解
-      var problemMods:string[] = [];
+      var problemMods: string[] = [];
       dependencies.forEach((v, k) => {
-        if(!(v as any).done){
+        if (!(v as any).done) {
           problemMods.push((v as any).id);
         }
       });
@@ -188,6 +205,22 @@ import { getAPIVersion, initAPI } from "./api/NTAPI";
       GMLog(
         "[ MCBBS Loader ] 所有插件均未成功加载，请到管理页面修复依赖关系错误"
       );
+      var isManagerRegex = /bbsmod\=manager/i;
+      if (isManagerRegex.test(String(window.location.search))) {
+        popinfo(
+          "exclamation-circle",
+          "<b>ECONFLICT！</b>自动加载模块失败，你现在正在模块管理页面，请解决依赖冲突。",
+          true,
+          "background-color:#88272790!important;"
+        );
+      } else {
+        popinfo(
+          "exclamation-circle",
+          "<b>ECONFLICT！</b>自动加载模块失败，请求人工管理模块，查看控制台信息并尝试解决依赖错误。",
+          true,
+          "background-color:#88272790!important;"
+        );
+      }
     }
   });
 })();

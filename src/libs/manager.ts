@@ -19,11 +19,8 @@ function createMenu(): void {
   ) {
     jQuery(() => {
       $("div.appl > div.tbn > ul").prepend(
-        "<li><a id='manage_modules' style='cursor:pointer;'>模块管理</a></li>"
+        "<li><a href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager' style='cursor:pointer;'>模块管理</a></li>"
       );
-      $("#manage_modules").on("click", () => {
-        dumpManager();
-      });
     });
   }
 }
@@ -31,7 +28,9 @@ function dumpManager() {
   jQuery(() => {
     $("div[class='bm bw0']").children().remove();
     $("div[class='bm bw0']").append(
-      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}&nbsp<font size="2em" color="red">${isDirty() ? "当前的设置需要刷新才能生效" : ""}</font></span>
+      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}&nbsp<font size="2em" color="red">${
+        isDirty() ? "当前的设置需要刷新才能生效" : ""
+      }</font></span>
 <br/>
 <hr/>
 <span style='font-size:1rem'>已安装的模块</span>
@@ -47,6 +46,9 @@ function dumpManager() {
 <button class='pn pnc' type='button' id='install'><strong>安装</strong></button>
 <br/>
 <span id='install_state' style='font-size:1rem;color:#df307f;'></span>`
+    );
+    $("#install_base64").val(
+      "/* MCBBS Module\nid = com.example\n*/\n// https://cdn.jsdelivr.net/gh/用户名/仓库@分支/文件.js"
     );
     setWindowProperty("notifyUninstall", (id: string) => {
       deleteModule(id, () => {
@@ -78,11 +80,26 @@ function dumpManager() {
         if (typeof st != "string") {
           dumpManager();
           $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
-          popinfo("check", "成功安装了模块", false);
-          setTimeout(closepop, 3000);
-          return;
+
+          if (
+            st.get("permissions")?.search("loader:core") != -1 &&
+            st.get("permissions")?.search("loader:core") != undefined
+          ) {
+            popinfo(
+              "exclamation-triangle",
+              "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
+                st.get("id") +
+                "。",
+              false,
+              "background-color:#ff950085 !important;"
+            );
+          } else {
+            popinfo("check", "成功安装了模块", false);
+            setTimeout(closepop, 3000);
+            return;
+          }
         } else {
-          popinfo("exclamation-circle", "安装失败，无效 BASE64.", false);
+          popinfo("exclamation-circle", "安装失败：" + st, false);
           setTimeout(closepop, 5000);
         }
       } catch {
@@ -97,14 +114,33 @@ function dumpManager() {
                   var st = addModule(data);
                   if (typeof st != "string") {
                     dumpManager();
-                    popinfo("check", "成功安装了模块", false);
-                    setTimeout(closepop, 3000);
-                    return;
+                    $("#install_base64").val(
+                      GMGetValue(`code-${st.get("id")}`, "")
+                    );
+
+                    if (
+                      st.get("permissions")?.search("loader:core") != -1 &&
+                      st.get("permissions")?.search("loader:core") != undefined
+                    ) {
+                      popinfo(
+                        "exclamation-triangle",
+                        "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
+                          st.get("id") +
+                          "。",
+                        false,
+                        "background-color:#ff950085 !important;"
+                      );
+                    } else {
+                      popinfo("check", "成功安装了模块", false);
+                      setTimeout(closepop, 3000);
+                      return;
+                    }
                   } else {
                     popinfo(
                       "exclamation-circle",
-                      "安装失败，接收了一个无效数据值",
-                      false
+                      "安装失败：" + st,
+                      false,
+                      "background-color:#88272790!important;"
                     );
                     setTimeout(closepop, 5000);
                   }
@@ -112,7 +148,8 @@ function dumpManager() {
                   popinfo(
                     "exclamation-circle",
                     "安装失败，接收了一个无效数据值",
-                    false
+                    false,
+                    "background-color:#88272790!important;"
                   );
                   setTimeout(closepop, 5000);
                 }
@@ -120,7 +157,8 @@ function dumpManager() {
                 popinfo(
                   "exclamation-circle",
                   "安装失败，接收了一个无效数据值",
-                  false
+                  false,
+                  "background-color:#88272790!important;"
                 );
                 setTimeout(closepop, 5000);
               }
@@ -129,7 +167,8 @@ function dumpManager() {
             popinfo(
               "exclamation-circle",
               "安装失败，接收了一个无效数据值",
-              false
+              false,
+              "background-color:#88272790!important;"
             );
             setTimeout(closepop, 5000);
           }
@@ -138,28 +177,61 @@ function dumpManager() {
           if (typeof st != "string") {
             dumpManager();
             $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
-            popinfo("check", "成功安装了模块", false);
-            setTimeout(closepop, 3000);
-            return;
+
+            if (
+              st.get("permissions")?.search("loader:core") != -1 &&
+              st.get("permissions")?.search("loader:core") != undefined
+            ) {
+              popinfo(
+                "exclamation-triangle",
+                "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
+                  st.get("id") +
+                  "。",
+                false,
+                "background-color:#ff950085 !important;"
+              );
+            } else {
+              popinfo("check", "成功安装了模块", false);
+              setTimeout(closepop, 3000);
+              return;
+            }
           } else {
-            popinfo("exclamation-circle", "安装失败，JavaScript 无效", false);
+            popinfo(
+              "exclamation-circle",
+              "安装失败：" + st,
+              false,
+              "background-color:#88272790!important;"
+            );
+            setTimeout(closepop, 5000);
           }
         }
       }
     });
     var all_modules = GMGetValue("loader.all", {});
     for (var m of Object.entries(all_modules)) {
-      var meta = GMGetValue("meta-" + m[0], { id: "loader.nameless" });
+      var meta = GMGetValue("meta-" + m[0], { id: "impossible" });
+      var color = "";
+      var isCore = false;
+      if (meta.permissions.search("loader:core") != -1) {
+        color = "#ff0000";
+        isCore = true;
+      } else {
+        color = "#5d2391";
+      }
       var ele = `<li id='${
-        meta.id || "loader.nameless"
+        meta.id || "impossible"
       }'><div style='display:inline;'><img src='${
         meta.icon || ""
-      }' width='50' height='55' style="vertical-align:middle;float:left;"></img><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:#5d2391'><strong>${
+      }' width='50' height='50' style="vertical-align:middle;float:left;"></img><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:${color}'><strong>${
         meta.name || "Nameless"
       }</strong></span>&nbsp;&nbsp;&nbsp;<span style='font-size:12px;color:#150029;'>${
         meta.id || "loader.nameless"
       }@${
-        meta.version || "1.0.0"
+        meta.version ||
+        "1.0.0" +
+          (isCore
+            ? "&nbsp;<span style='color:#ff0000'><b>[COREMOD]</b></span>"
+            : "")
       }</span><br/>&nbsp;&nbsp;<span style='font-size:16px;color:#df307f;'>${
         meta.author || "Someone"
       }</span><br/>&nbsp;&nbsp;<span style='font-size:12px'>${
@@ -175,7 +247,8 @@ function dumpManager() {
       }'><strong>查看源代码</strong></button></div></div></li>`;
       $("#all_modules").append(ele);
       $(".showsrc").on("click", (e) => {
-        var id = $(e.target).attr("mlsource") || $(e.target).parent().attr("mlsource");
+        var id =
+          $(e.target).attr("mlsource") || $(e.target).parent().attr("mlsource");
         if (!id) {
           return;
         }
