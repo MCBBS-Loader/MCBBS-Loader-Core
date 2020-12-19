@@ -24,7 +24,7 @@ function addModule(code: string): Map<string, string> | string {
       }
       return newarr;
     };
-    var depend: string,
+    var depend: string = dataMap.get("depend") || "",
       before: string,
       after: string,
       apiVersion: string | undefined,
@@ -32,13 +32,31 @@ function addModule(code: string): Map<string, string> | string {
     if (id === undefined) {
       return "未提供 id 数据值";
     }
+    var ins_depend: any[] = [];
+    for (var d of depend.split(",")) {
+      var dep = d.trim();
+      if (!dep.length) {
+        continue;
+      }
+      var hasURLRegex = /.+?\-\>((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/;
+      if (hasURLRegex.test(dep)) {
+        var [i, u] = dep.split("->");
+        if (!GMGetValue(`depend-${i}`)) {
+          installFromUrl(u);
+        }
+        ins_depend.push(i);
+      } else {
+        ins_depend.push(dep);
+      }
+    }
+    depend = ins_depend.join(",");
     var obj: object = {
       id: id,
       permissions: dataMap.get("permissions") || "",
       name: dataMap.get("name") || dataMap.get("id"),
       author: dataMap.get("author") || "Someone",
       icon: dataMap.get("icon") || IMG_MCBBS,
-      depend: (depend = dataMap.get("depend") || ""),
+      depend: depend,
       before: (before = dataMap.get("before") || ""),
       after: (after = dataMap.get("after") || ""),
       description: dataMap.get("description") || "No description provided.",
@@ -46,22 +64,6 @@ function addModule(code: string): Map<string, string> | string {
       apiVersion: (apiVersion = dataMap.get("apiVersion")),
       version: dataMap.get("version"),
     };
-    var ins_depend: any[] = [];
-    for (var d of getProperty(obj, "depend").split(",")) {
-      var dep = $.trim(d);
-      var hasURLRegex = /.+?\-\>((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/;
-      if (hasURLRegex.test(dep)) {
-        var i = dep.split("->")[0];
-
-        var u = dep.split("->")[1];
-        installFromUrl(u);
-        ins_depend.push(i);
-      } else {
-        ins_depend.push(dep);
-      }
-    }
-    setProperty(obj, "depend", ins_depend.join(","));
-    depend = ins_depend.join(",");
     if (apiVersion != undefined && apiVersion != STRING_API_VERSION) {
       return "不支持的 API 版本：" + apiVersion;
     }
@@ -71,7 +73,7 @@ function addModule(code: string): Map<string, string> | string {
       GMSetValue(
         "depend-" + id,
         JSON.stringify({
-          depend: flitBlank(depend.split(",")),
+          depend: ins_depend,
           before: flitBlank(before.split(",")),
           after: flitBlank(after.split(",")),
         })
