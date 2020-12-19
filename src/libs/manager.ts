@@ -58,17 +58,9 @@ function dumpManager() {
       });
     });
     setWindowProperty("notifyOnOff", (id: string) => {
-      if (GMGetValue("loader.all", {})[id]) {
-        var all = GMGetValue("loader.all", {});
-
-        all[id] = false;
-
-        GMSetValue("loader.all", all);
-      } else {
-        var all = GMGetValue("loader.all", {});
-        all[id] = true;
-        GMSetValue("loader.all", all);
-      }
+      var all = GMGetValue("loader.all", {});
+      all[id] = !all[id];
+      GMSetValue("loader.all", all);
       markDirty();
       dumpManager();
     });
@@ -81,10 +73,7 @@ function dumpManager() {
           dumpManager();
           $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
 
-          if (
-            st.get("permissions")?.search("loader:core") != -1 &&
-            st.get("permissions")?.search("loader:core") != undefined
-          ) {
+          if ((st.get("permissions")?.search("loader:core") as any) >= 0) {
             popinfo(
               "exclamation-triangle",
               "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
@@ -119,8 +108,7 @@ function dumpManager() {
                     );
 
                     if (
-                      st.get("permissions")?.search("loader:core") != -1 &&
-                      st.get("permissions")?.search("loader:core") != undefined
+                      (st.get("permissions")?.search("loader:core") as any) >= 0
                     ) {
                       popinfo(
                         "exclamation-triangle",
@@ -178,10 +166,7 @@ function dumpManager() {
             dumpManager();
             $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
 
-            if (
-              st.get("permissions")?.search("loader:core") != -1 &&
-              st.get("permissions")?.search("loader:core") != undefined
-            ) {
+            if ((st.get("permissions")?.search("loader:core") as any) >= 0) {
               popinfo(
                 "exclamation-triangle",
                 "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
