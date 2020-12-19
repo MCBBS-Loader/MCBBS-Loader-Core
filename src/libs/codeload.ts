@@ -41,7 +41,7 @@ function addModule(code: string): Map<string, string> | string {
       var hasURLRegex = /.+?\-\>((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/;
       if (hasURLRegex.test(dep)) {
         var [i, u] = dep.split("->");
-        if (!GMGetValue(`depend-${i}`)) {
+        if (!GMGetValue(`depend-${i}`, "{}")) {
           installFromUrl(u);
         }
         ins_depend.push(i);
@@ -174,9 +174,10 @@ export {
 function coreModEval(code: string) {
   return new Promise((resolve, reject) => {
     try {
-      resolve(eval(code));
-    } catch {
-      reject();
+      eval(code);
+      resolve(0);
+    } catch (e) {
+      reject(e);
     }
   });
 }

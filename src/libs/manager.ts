@@ -73,7 +73,7 @@ function dumpManager() {
           dumpManager();
           $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
 
-          if (st.get("permissions")?.search("loader:core") >= 0) {
+          if ((st.get("permissions")?.search("loader:core") as any) >= 0) {
             popinfo(
               "exclamation-triangle",
               "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
@@ -108,7 +108,8 @@ function dumpManager() {
                     );
 
                     if (
-                      st.get("permissions")?.search("loader:core") >= 0) {
+                      (st.get("permissions")?.search("loader:core") as any) >= 0
+                    ) {
                       popinfo(
                         "exclamation-triangle",
                         "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
@@ -165,7 +166,7 @@ function dumpManager() {
             dumpManager();
             $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
 
-            if (st.get("permissions")?.search("loader:core") >= 0) {
+            if ((st.get("permissions")?.search("loader:core") as any) >= 0) {
               popinfo(
                 "exclamation-triangle",
                 "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
