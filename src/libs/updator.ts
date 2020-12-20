@@ -1,6 +1,10 @@
 import $ from "jquery";
+import { getAPIVersion } from "../api/NTAPI";
 import { parseMeta } from "./codeload";
-function checkUpdate(meta: any, callback: (state: string) => void): void {
+function checkUpdate(
+  meta: any,
+  callback: (state: string, ov?: string, nv?: string) => void
+): void {
   var id = meta.id || "loader.nameless";
   if (meta.updateURL) {
     $.get(meta.updateURL, (data) => {
@@ -9,23 +13,34 @@ function checkUpdate(meta: any, callback: (state: string) => void): void {
       var dataMap = new Map<string, string>();
       parseMeta(ccode, dataMap);
       if (dataMap.get("id") != id) {
-        callback("latest");
+        callback("latest-diff-id");
       } else {
         if (typeof dataMap.get("version") == "string") {
           var nversion = dataMap.get("version") || "1.0.0";
           var oversion = meta.version || "1.0.0";
           if (cmpVersion(nversion, oversion)) {
-            callback(meta.updateURL);
+            if (typeof dataMap.get("apiVersion") == "string") {
+              if (
+                dataMap.get("apiVersion") !=
+                new String(getAPIVersion()).toString()
+              ) {
+                callback("latest-api-too-early");
+                return;
+              }
+            }
+            callback(meta.updateURL, oversion, nversion);
+            return;
           } else {
-            callback("latest");
+            callback("latest-version-equal-or-earlier");
+            return;
           }
         } else {
-          callback("latest");
+          callback("latest-no-version");
         }
       }
     });
   } else {
-    callback("latest");
+    callback("latest-no-update-url");
   }
 }
 function cmpVersion(nv: string, ov: string): boolean {

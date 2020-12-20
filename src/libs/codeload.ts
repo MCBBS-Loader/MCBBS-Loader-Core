@@ -141,16 +141,33 @@ function deleteModule(id: string, callback: () => void): void {
   callback();
 }
 // 从URL安装
-function installFromUrl(url: string) {
+function installFromUrl(
+  url: string,
+  onsuccess?: () => void,
+  onerror?: () => void
+) {
   try {
-    $.get(url, (dataIn) => {
-      try {
-        var data = dataIn.toString();
-        if (typeof data == "string") {
-          addModule(data);
+    $.ajax({ url: url, cache: false, timeout: 10000 })
+      .done((dataIn) => {
+        try {
+          var data = dataIn.toString();
+          if (typeof data == "string") {
+            addModule(data);
+            if (onsuccess) {
+              onsuccess();
+            }
+          }
+        } catch {
+          if (onerror) {
+            onerror();
+          }
         }
-      } catch {}
-    });
+      })
+      .fail(() => {
+        if (onerror) {
+          onerror();
+        }
+      });
   } catch {}
 }
 // 判断是否操作过

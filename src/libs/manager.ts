@@ -1,8 +1,15 @@
 import jQuery from "jquery";
 import $ from "jquery";
 import { getAPIVersion } from "../api/NTAPI";
-import { addModule, deleteModule, isDirty, markDirty } from "./codeload";
+import {
+  addModule,
+  deleteModule,
+  installFromUrl,
+  isDirty,
+  markDirty,
+} from "./codeload";
 import { closepop, popinfo } from "./popinfo";
+import { checkUpdate } from "./updator";
 import { GMGetValue, GMSetValue, setWindowProperty } from "./usfunc";
 function createBtn(): void {
   jQuery(() => {
@@ -209,7 +216,9 @@ function dumpManager() {
         meta.icon || ""
       }' width='50' height='50' style="vertical-align:middle;float:left;"></img><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:${color}'><strong>${
         meta.name || "Nameless"
-      }</strong></span>&nbsp;&nbsp;&nbsp;<span style='font-size:12px;color:#150029;'>${
+      }</strong></span>&nbsp;&nbsp;&nbsp;<span id='vtag-${
+        meta.id
+      }' style='font-size:12px;color:#150029;'>${
         meta.id || "loader.nameless"
       }@${
         meta.version ||
@@ -231,15 +240,93 @@ function dumpManager() {
         meta.id
       }'><strong>查看源代码</strong></button></div></div></li>`;
       $("#all_modules").append(ele);
-      $(".showsrc").on("click", (e) => {
-        var id =
-          $(e.target).attr("mlsource") || $(e.target).parent().attr("mlsource");
-        if (!id) {
-          return;
-        }
-        $("#install_base64").val(GMGetValue(`code-${id}`, ""));
-      });
     }
+    $(".showsrc").on("click", (e) => {
+      var id =
+        $(e.target).attr("mlsource") || $(e.target).parent().attr("mlsource");
+      if (!id) {
+        return;
+      }
+      $("#install_base64").val(GMGetValue(`code-${id}`, ""));
+    });
+    $("#all_modules > li").each((i, e) => {
+      var id = $(e).attr("id") || "loader.impossible";
+      var meta = GMGetValue(`meta-${id}`);
+
+      checkUpdate(meta, (state, ov, nv) => {
+        var gtxt;
+        var shouldUpdate = false;
+        switch (state) {
+          case "latest-api-too-early":
+            gtxt = `<span style='color:#f16d2e'><b>[已过期]</b></span>`;
+            break;
+          case "latest-no-update-url":
+          case "latest-no-version":
+            gtxt = `<span style='color:#636363'><b>[本地]</b></span>`;
+            break;
+          case "latest-version-equal-or-earlier":
+            gtxt = `<span style='color:#df307f'><b>[最新]</b></span>`;
+            break;
+          default:
+            if (!state.startsWith("latest")) {
+              gtxt = `<span style='color:#ffaec8'><b>[有可用更新]</b></span>`;
+              shouldUpdate = true;
+            }
+        }
+        var oh = $(`[id='vtag-${meta.id}']`).html();
+
+        oh = `${oh}${shouldUpdate ? "&nbsp;->&nbsp;" + nv : ""}&nbsp;${gtxt}`;
+
+        $(`[id='vtag-${meta.id}']`).html(oh);
+        if (shouldUpdate) {
+          $(`[id='vtag-${meta.id}']`)
+            .parent()
+            .append(
+              `<button type='button' style='float:right' class='pn pnc update' mlurl='${state}'><strong>更新模块</strong></button>`
+            );
+        }
+        $(".update").on("click", (e) => {
+          var url =
+            $(e.target).attr("mlurl") || $(e.target).parent().attr("mlurl");
+          if (!url) {
+            return;
+          }
+          if ($(e.target).attr("mlurl")) {
+            $(e.target).remove();
+          } else {
+            $(e.target).parent().remove();
+          }
+          markDirty();
+          installFromUrl(
+            url,
+            () => {
+              console.log("Install Success");
+              var oh = $(`[id='vtag-${meta.id}']`).html();
+              console.log(oh);
+              oh = oh.replace(
+                `<span style="color:#ffaec8"><b>[有可用更新]</b></span>`,
+                `<span style='color:#df307f'><b>[已更新]</b></span>`
+              );
+              $(`[id='vtag-${meta.id}']`).html(oh);
+            },
+            () => {
+              var oh = $(`[id='vtag-${meta.id}']`).html();
+              oh = oh.replace(
+                `<span style="color:#ffaec8"><b>[有可用更新]</b></span>`,
+                `<span style='color:#ec1c24'><b>[更新失败]</b></span>`
+              );
+              $(`[id='vtag-${meta.id}']`).html(oh);
+            }
+          );
+          popinfo(
+            "cloud",
+            "已尝试更新，更新效果在更新完成后刷新页面才会显示。",
+            false
+          );
+          setTimeout(closepop, 5000);
+        });
+      });
+    });
   });
 }
 

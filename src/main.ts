@@ -96,9 +96,12 @@ import { setup } from "./libs/setupbattery";
           fixRaw(id, JSON.parse(GMGetValue("depend-" + id, "{}")))
         );
 
-        checkUpdate(GMGetValue("meta-" + id, ""), (state) => {
-          if (state != "latest") {
-            installFromUrl(state);
+        checkUpdate(GMGetValue("meta-" + id, ""), (state, ov, nv) => {
+          if (!state.startsWith("latest")) {
+            // installFromUrl(state);
+            console.log(
+              `[MCBBS Loader] 有更新可用，模块 ${id} 具有新版本 ${nv}，当前安装的版本为 ${ov}。`
+            );
           }
         });
       }
