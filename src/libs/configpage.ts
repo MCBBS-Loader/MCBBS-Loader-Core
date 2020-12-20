@@ -9,16 +9,10 @@ import jQuery from "jquery";
 import { getProperty, setProperty } from "./native";
 import { popinfo } from "./popinfo";
 function dumpConfigPage() {
-  $("div[class='bm bw0']").children().remove();
-  $("div[class='bm bw0']").html("");
-  $("div[class='bm bw0']")
-    .append(
-      "<span style='font-size:1.5rem'>设置中心</span>&nbsp;&nbsp;<button id='saveconfig' type='button' class='pn pnc'><span>保存</span></button>"
-    )
-    .append("<div id='config_div'></div>");
-  $("#saveconfig").on("click", () => {
-    autoSave();
-  });
+  $("div[class='bm bw0']").html(
+      "<span style='font-size:1.5rem'>设置中心</span>&nbsp;&nbsp;<button id='saveconfig' type='button' class='pn pnc'>" + 
+      "<span>保存</span></button><div id='config_div'></div>");
+  $("#saveconfig").on("click", autoSave);
   renderAll();
 }
 
@@ -141,9 +135,7 @@ function createMenu(): void {
     $("div.appl > div.tbn > ul").prepend(
       "<li><a id='manage_config' style='cursor:pointer;'>模块选项中心</a></li>"
     );
-    $("#manage_config").on("click", () => {
-      dumpConfigPage();
-    });
+    $("#manage_config").on("click", dumpConfigPage);
   });
 }
 export default { createMenu, dumpConfigPage, createConfigItem, getConfigVal };

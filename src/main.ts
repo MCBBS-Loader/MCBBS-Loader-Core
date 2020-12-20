@@ -1,4 +1,4 @@
-import { deleteModule, installFromUrl, mountCode } from "./libs/codeload";
+import { installFromUrl, isDirty, mountCode, resortDependency, setDenpendencySolved } from "./libs/codeload";
 import manager from "./libs/manager";
 import configpage from "./libs/configpage";
 import { checkUpdate } from "./libs/updator";
@@ -10,7 +10,7 @@ import {
 } from "./libs/usfunc";
 import jQuery from "jquery";
 import $ from "jquery";
-import { getProperty, getUnsafeWindow, setLockedProperty } from "./libs/native";
+import { getUnsafeWindow, setLockedProperty } from "./libs/native";
 import { forkAPI, getAPIVersion } from "./api/NTAPI";
 import { loadNTEVT } from "./api/NTEVT";
 import { getAPIToken } from "./libs/encrypt";
@@ -57,152 +57,20 @@ import { setup } from "./libs/setupbattery";
   setLockedProperty(getUnsafeWindow(), "forkAPI_" + getAPIToken(), forkAPI);
   setWindowProperty("CDT", []);
   jQuery(() => {
-    manager.createBtn();
-    manager.createMenu();
-    var isManagerRegex = /bbsmod\=manager/i;
-    if (isManagerRegex.test(String(window.location.search))) {
-      $("title").html("MCBBS Loader - 自由的 MCBBS 模块管理器");
-      manager.dumpManager();
-    }
-    configpage.createMenu();
-    if (GMGetValue("temp.loadcfg", false)) {
-      GMSetValue("temp.loadcfg", false);
-      configpage.dumpConfigPage();
-    }
-    // 哨兵节点，用于标记链表末尾
-    const mapNil = {
-      before: null,
-      after: null,
-      beforeNext: null,
-      afterNext: null,
-      beforePrev: null,
-      afterPrev: null,
-    };
-    var fixRaw = (id: string, raw: any) => {
-      raw.beforeHead = mapNil;
-      raw.afterHead = mapNil;
-      raw.done = false;
-      raw.id = id;
-      return raw;
-    };
-    // 邻接表
-    var dependencies = new Map<string, object>();
-    var stack: object[] = [];
-    var sortedList = [];
-    for (var [id, enabled] of Object.entries(GMGetValue("loader.all", {}))) {
-      if (enabled) {
-        dependencies.set(
-          id,
-          fixRaw(id, JSON.parse(GMGetValue("depend-" + id, "{}")))
-        );
-
+    // 用户可能是从老版本升级上来的，因此需要立即补全排序好的依赖信息
+    var sortedList = GMGetValue("sorted-modules-list") || resortDependency();
+    if(sortedList instanceof Array) {
+      for(var id of sortedList) {
+        mountCode(id, GMGetValue("code-" + id));
         checkUpdate(GMGetValue("meta-" + id, ""), (state) => {
           if (state != "latest") {
             installFromUrl(state);
           }
         });
       }
-      if (
-        GMGetValue("meta-" + id, "").apiVersion != getAPIVersion() &&
-        GMGetValue("meta-" + id, "").apiVersion != undefined
-      ) {
-        deleteModule(id, () => {
-          console.log(
-            "[MCBBS Loader] 由于 API 版本不兼容，移除了 ID 为 " +
-              id +
-              " 的脚本。\n如有需要，你可以重新安装。"
-          );
-        });
-      }
-    }
-    try {
-      // 排个序
-      var insert = (before: any, after: any) => {
-        var node: any = {
-          before: before,
-          after: after,
-          beforeNext: before.beforeHead,
-          afterNext: after.afterHead,
-          beforePrev: mapNil,
-          afterPrev: mapNil,
-        };
-        node.beforeNext.beforePrev = node.afterNext.afterPrev = node;
-        after.afterHead = before.beforeHead = node;
-      };
-      var unlink = (node: any) => {
-        node.afterNext.afterPrev = node.afterPrev;
-        node.beforeNext.beforePrev = node.beforePrev;
-        node.afterPrev.afterNext = node.afterNext;
-        node.beforePrev.beforeNext = node.beforeNext;
-        if (node === node.after.afterHead) {
-          node.after.afterHead = node.afterNext;
-        }
-        if (node === node.before.beforeHead) {
-          node.before.beforeHead = node.beforeNext;
-        }
-        // 如果它不需要在某个插件之后加载，那下一个就加载它
-        if (mapNil === node.after.afterHead) {
-          stack.push(node.after);
-        }
-      };
-      dependencies.forEach((v, k) => {
-        var depend = getProperty(v, "depend");
-        if (depend instanceof Array) {
-          depend.forEach((e) => {
-            if (!dependencies.get(e)) {
-              throw `依赖关系无解，${k}依赖${e}，但是后者未安装或未启用`;
-            }
-          });
-        }
-        var before = getProperty(v, "before");
-        if (before instanceof Array) {
-          before.forEach((e) => {
-            var target = dependencies.get(e);
-            if (target) {
-              insert(v, target);
-            }
-          });
-        }
-        var after = getProperty(v, "after");
-        if (after instanceof Array) {
-          after.forEach((e) => {
-            var target = dependencies.get(e);
-            if (target) {
-              insert(target, v);
-            }
-          });
-        }
-      });
-      dependencies.forEach((v) => {
-        if ((v as any).afterHead === mapNil) {
-          stack.push(v);
-        }
-      });
-      while (stack.length) {
-        var process = stack.pop() as any;
-        sortedList.push(process);
-        // 加个排序完成标记，解除其他插件需要在本插件之后加载的限制
-        process.done = true;
-        while (mapNil != process.beforeHead) {
-          unlink(process.beforeHead);
-        }
-      }
-      // 如果排序已经结束了还有插件没有进入到序列里来，那么排序一定无解
-      var problemMods: string[] = [];
-      dependencies.forEach((v, k) => {
-        if (!(v as any).done) {
-          problemMods.push((v as any).id);
-        }
-      });
-      if (problemMods.length) {
-        throw `依赖关系无解，${problemMods}的加载顺序冲突`;
-      }
-      sortedList.forEach((v) => {
-        var id = v.id;
-        mountCode(id, GMGetValue("code-" + id, "") || "");
-      });
-    } catch (ex) {
-      GMLog(`[ MCBBS Loader ] ${ex}`);
+      setDenpendencySolved(true);
+    } else {
+      GMLog(`[ MCBBS Loader ] ${sortedList}`);
       GMLog(
         "[ MCBBS Loader ] 所有插件均未成功加载，请到管理页面修复依赖关系错误"
       );
@@ -222,6 +90,19 @@ import { setup } from "./libs/setupbattery";
           "background-color:#88272790!important;"
         );
       }
+      setDenpendencySolved(false);
+    }
+    // 这样可以在管理界面显示依赖关系是否满足
+    manager.createBtn();
+    manager.createMenu();
+    if (/bbsmod\=manager/i.test(String(window.location.search))) {
+      $("title").html("MCBBS Loader - 自由的 MCBBS 模块管理器");
+      manager.dumpManager();
+      configpage.createMenu();// config菜单只能从模块管理页面见到似乎更加合理
+    }
+    if (GMGetValue("temp.loadcfg", false)) {
+      GMSetValue("temp.loadcfg", false);
+      configpage.dumpConfigPage();
     }
   });
 })();
