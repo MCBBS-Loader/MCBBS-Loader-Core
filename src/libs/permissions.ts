@@ -1,15 +1,19 @@
 import { GMGetValue } from "./usfunc";
-import $ from "jquery";
-function hasPermission(id: string, perm: string) {
+const cachedPermission: any = {};
+function cachePermission(id: string) {
+  if(cachedPermission[id]) {
+    return cachedPermission[id];
+  }
+  var permissions: any = cachedPermission[id] = {};
   var meta = GMGetValue("meta-" + id, {});
   if (meta.permissions) {
-    var perms = meta.permissions.split(",");
-    for (var s of perms) {
-      if ($.trim(perm) == $.trim(s)) {
-        return true;
-      }
+    for(var perm of meta.permissions) {
+      permissions[perm.trim()] = true;
     }
   }
-  return false;
+  return permissions
+}
+function hasPermission(id: string, perm: string) {
+  return !!cachePermission(id)[perm.trim()];
 }
 export { hasPermission };
