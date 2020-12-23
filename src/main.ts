@@ -79,6 +79,7 @@ import { setup } from "./libs/setupbattery";
       }
       setDenpendencySolved(true);
     } else {
+      GMSetValue("loader.deperr", sortedList);
       GMLog(`[MCBBS Loader] ${sortedList}`);
       GMLog(
         "[MCBBS Loader] 所有模块均未成功加载，请到管理页面修复依赖关系错误"

@@ -62,6 +62,10 @@ function onFailure(st: string) {
   setTimeout(closepop, 5000);
 }
 function dumpManager() {
+  var emsg = "";
+  if (!isDenpendencySolved()) {
+    emsg = GMGetValue("loader.deperr");
+  }
   jQuery(() => {
     $("div[class='bm bw0']").html(
       `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}&nbsp
@@ -73,6 +77,14 @@ function dumpManager() {
       }</font>
 <br/>
 <hr/>
+<span style='${
+        !isDenpendencySolved() ? "" : "display:none;"
+      }font-size:1rem;'>错误</span>
+
+<div id='deperr' style='overflow:auto;color:#ff0000;${
+        !isDenpendencySolved() ? "" : "display:none;"
+      }'>${emsg}</div>
+<hr style='${!isDenpendencySolved() ? "" : "display:none;"}'/>
 <span style='font-size:1rem'>已安装的模块</span>
 <br/>
 <div style='overflow:auto;'><ul id='all_modules'></ul></div>
