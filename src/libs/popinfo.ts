@@ -1,5 +1,5 @@
 import $ from "jquery";
-
+var timer: Set<number> = new Set();
 function popinfo(
   icon: string,
   msg: string,
@@ -9,6 +9,13 @@ function popinfo(
   time: number = 500,
   size: string = "28px"
 ) {
+  for (var i of timer.values()) {
+    clearTimeout(i);
+  }
+  // 避免 Set 迭代器混乱
+  for (var i of timer.values()) {
+    timer.delete(i);
+  }
   closepop();
   setTimeout(() => {
     var data = `<div id='_popbg' style='${style}user-select:none;cursor:default;width:100%;height:-50px;background-color:#02020275;position:fixed;bottom:-50px;text-align:center;color:#ffffff;'><i style='font-size:${size};vertical-align:middle;' id='_popicon' class='fa fa-${icon}'></i><span style='padding-top:2px;display:inline-block;vertical-align:middle;line-height:50px;'>&nbsp;&nbsp;&nbsp;${msg}</span></div>`;
@@ -25,6 +32,9 @@ function closepop(move: number = 100, cb: () => void = () => {}) {
     cb();
   });
 }
+function registryTimer(t: number) {
+  timer.add(t);
+}
 function spark(jq: JQuery<HTMLElement>, time: number) {
   jq.fadeOut(time, () => {
     jq.fadeIn(time, () => {
@@ -40,9 +50,6 @@ function warn(msg: string) {
     false,
     "background-color:#ff950085 !important;"
   );
-  setTimeout(() => {
-    closepop();
-  }, 8000);
 }
 function error(msg: string) {
   popinfo(
@@ -52,4 +59,4 @@ function error(msg: string) {
     "background-color:#ff950085 !important;"
   );
 }
-export { popinfo, closepop, warn, error };
+export { popinfo, closepop, warn, error, registryTimer };

@@ -9,7 +9,7 @@ import {
   markDirty,
 } from "./codeload";
 import { resortDependency, isDenpendencySolved } from "./codeload";
-import { closepop, popinfo } from "./popinfo";
+import { closepop, popinfo, registryTimer } from "./popinfo";
 import { checkUpdate } from "./updator";
 import { GMGetValue, GMSetValue, setWindowProperty } from "./usfunc";
 function createBtn(): void {
@@ -48,7 +48,7 @@ function onInstall(st: Map<string, string>) {
     );
   } else {
     popinfo("check", "成功安装了模块", false);
-    setTimeout(closepop, 3000);
+    registryTimer(setTimeout(closepop, 3000));
   }
 }
 // 安装失败时的动作
@@ -59,7 +59,7 @@ function onFailure(st: string) {
     false,
     "background-color:#88272790!important;"
   );
-  setTimeout(closepop, 5000);
+  registryTimer(setTimeout(closepop, 5000));
 }
 function dumpManager() {
   var emsg = "";
@@ -107,7 +107,7 @@ function dumpManager() {
         resortDependency();
         dumpManager();
         popinfo("trash", "成功移除了模块", false);
-        setTimeout(closepop, 3000);
+        registryTimer(setTimeout(closepop, 3000));
       });
     });
     setWindowProperty("notifyOnOff", (id: string) => {
@@ -288,7 +288,7 @@ function dumpManager() {
             "已尝试更新，更新效果在更新完成后刷新页面才会显示。",
             false
           );
-          setTimeout(closepop, 5000);
+          registryTimer(setTimeout(closepop, 5000));
         });
       });
     });
