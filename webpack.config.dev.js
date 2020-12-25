@@ -5,6 +5,9 @@ module.exports = {
     filename: "[name].bundle.dev.user.js",
     path: path.resolve(__dirname, "dist"),
   },
+  optimization: {
+    minimize: false,
+  },
   mode: "development",
   devtool: "eval-cheap-module-source-map",
   module: {

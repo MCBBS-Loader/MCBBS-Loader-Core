@@ -8,7 +8,7 @@ import {
   isDirty,
   markDirty,
 } from "./codeload";
-import { resortDependency, isDenpendencySolved } from "./codeload";
+import { resortDependency, isDependencySolved, getDependencyError } from "./codeload";
 import { closepop, popinfo } from "./popinfo";
 import { checkUpdate } from "./updator";
 import { GMGetValue, GMSetValue, setWindowProperty } from "./usfunc";
@@ -62,15 +62,12 @@ function onFailure(st: string) {
   setTimeout(closepop, 5000);
 }
 function dumpManager() {
-  var emsg = "";
-  if (!isDenpendencySolved()) {
-    emsg = GMGetValue("loader.deperr");
-  }
+  var emsg = getDependencyError().replace(/\n/g, "<br>");
   jQuery(() => {
     $("div[class='bm bw0']").html(
       `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}&nbsp
 <font size="2em" color="red">${
-        !isDenpendencySolved() ? "依赖关系未解决" : ""
+        !isDependencySolved() ? "依赖关系未解决" : ""
       }</font></span>&nbsp&nbsp&nbsp&nbsp
 <font size="2em" color="brown">${
         isDirty() ? "当前的设置需要刷新才能生效" : ""
@@ -78,13 +75,13 @@ function dumpManager() {
 <br/>
 <hr/>
 <span style='${
-        !isDenpendencySolved() ? "" : "display:none;"
+        !isDependencySolved() ? "" : "display:none;"
       }font-size:1rem;'>错误</span>
 
 <div id='deperr' style='overflow:auto;color:#ff0000;${
-        !isDenpendencySolved() ? "" : "display:none;"
+        !isDependencySolved() ? "" : "display:none;"
       }'>${emsg}</div>
-<hr style='${!isDenpendencySolved() ? "" : "display:none;"}'/>
+<hr style='${!isDependencySolved() ? "" : "display:none;"}'/>
 <span style='font-size:1rem'>已安装的模块</span>
 <br/>
 <div style='overflow:auto;'><ul id='all_modules'></ul></div>

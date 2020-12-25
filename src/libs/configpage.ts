@@ -19,7 +19,7 @@ function dumpConfigPage() {
 function autoSave() {
   for (var c of getWindowProperty("CDT")) {
     var val;
-    if (getProperty(c, "type") == "checkbox") {
+    if (getProperty(c, "type") === "checkbox") {
       val = getProperty(
         document.getElementById(
           `confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}`
@@ -44,50 +44,43 @@ function getConfigVal(idIn: string, storageIdIn: string, defaultValue: any) {
 }
 function renderAll() {
   for (var c of getWindowProperty("CDT")) {
-    var ele;
+    var ele = `<label style='font-size:14px' for='confval-${getProperty(
+      c,
+      "id"
+    )}-${getProperty(
+      c,
+      "storageId"
+    )}'><span style='font-size:18px;color:#5d2391'><b>${getProperty(
+      c,
+      "name"
+    )} </b></span>(${getProperty(c, "id")}:${getProperty(
+      c,
+      "storageId"
+    )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
+      c,
+      "desc"
+    )}</span>`;
     if (getProperty(c, "type") == "checkbox") {
-      ele = `<input type='checkbox' id='confval-${getProperty(
+      ele += `<input type='checkbox' id='confval-${getProperty(
         c,
         "id"
       )}-${getProperty(
         c,
         "storageId"
-      )}'/><label style='font-size:14px' for='confval-${getProperty(
+      )}' style="float: right;"/><br/>`;
+    } else if (getProperty(c, "type") == "textarea") {
+      ele += `</label><br><textarea id='confval-${getProperty(
         c,
         "id"
       )}-${getProperty(
         c,
         "storageId"
-      )}'><span style='font-size:18px;color:#5d2391'><b>${getProperty(
-        c,
-        "name"
-      )} </b></span>(${getProperty(c, "id")}:${getProperty(
-        c,
-        "storageId"
-      )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
-        c,
-        "desc"
-      )}</span></label><br/>`;
+      )}' style="width: 99%;"></textarea><br/>`;
     } else {
-      ele = `<label style='font-size:14px' for='confval-${getProperty(
+      ele += `<input type='text' class='px' id='confval-${getProperty(
         c,
         "id"
-      )}-${getProperty(
-        c,
-        "storageId"
-      )}'><span style='font-size:18px;color:#5d2391'><b>${getProperty(
-        c,
-        "name"
-      )}</b></span> (${getProperty(c, "id")}:${getProperty(
-        c,
-        "storageId"
-      )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
-        c,
-        "desc"
-      )}</span></label><input type='text' class='px' id='confval-${getProperty(
-        c,
-        "id"
-      )}-${getProperty(c, "storageId")}'/><br/>`;
+      )}-${getProperty(c, "storageId")}' style="background-color: white; float: right;"/><br/>`;
     }
     $("#config_div").append(ele);
     if (getProperty(c, "type") == "checkbox") {
@@ -99,11 +92,17 @@ function renderAll() {
         getConfigVal(getProperty(c, "id"), getProperty(c, "storageId"), false)
       );
     } else {
-      $(
+      var value = getConfigVal(getProperty(c, "id"), getProperty(c, "storageId"), "");
+      var fld = $(
         `[id='confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}']`
-      ).val(
-        getConfigVal(getProperty(c, "id"), getProperty(c, "storageId"), "")
-      );
+      ).val(value);
+      if(getProperty(c, "type") == "textarea") {// 使得textarea的行数动态增长，这样就可以避免滚动
+        fld.prop("rows", value.split("\n").length);
+        // jq似乎没有合适的api绑定这个事件？
+        document.getElementById(`confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}`)!.oninput = function (){
+          (this as any).rows = (this as any).value.split("\n").length;
+        };
+      }
     }
   }
 }
