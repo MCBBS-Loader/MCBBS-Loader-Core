@@ -7,9 +7,11 @@ import {
   installFromUrl,
   isDirty,
   markDirty,
+  resortDependency,
+  isDependencySolved,
+  getDependencyError
 } from "./codeload";
-import { resortDependency, isDependencySolved, getDependencyError } from "./codeload";
-import { closepop, popinfo } from "./popinfo";
+import { closepop, popinfo, registryTimer } from "./popinfo";
 import { checkUpdate } from "./updator";
 import { GMGetValue, GMSetValue, setWindowProperty } from "./usfunc";
 function createBtn(): void {
@@ -48,7 +50,7 @@ function onInstall(st: Map<string, string>) {
     );
   } else {
     popinfo("check", "成功安装了模块", false);
-    setTimeout(closepop, 3000);
+    registryTimer(setTimeout(closepop, 3000));
   }
 }
 // 安装失败时的动作
@@ -59,7 +61,7 @@ function onFailure(st: string) {
     false,
     "background-color:#88272790!important;"
   );
-  setTimeout(closepop, 5000);
+  registryTimer(setTimeout(closepop, 5000));
 }
 function dumpManager() {
   var emsg = getDependencyError().replace(/\n/g, "<br>");
@@ -104,7 +106,7 @@ function dumpManager() {
         resortDependency();
         dumpManager();
         popinfo("trash", "成功移除了模块", false);
-        setTimeout(closepop, 3000);
+        registryTimer(setTimeout(closepop, 3000));
       });
     });
     setWindowProperty("notifyOnOff", (id: string) => {
@@ -260,9 +262,11 @@ function dumpManager() {
           installFromUrl(
             url,
             () => {
-              console.log("Install Success");
+              if (/bbsmod\=manager/i.test(String(window.location.search))) {
+                dumpManager();
+              }
               var oh = $(`[id='vtag-${meta.id}']`).html();
-              console.log(oh);
+
               oh = oh.replace(
                 `<span style="color:#ffaec8"><b>[有可用更新]</b></span>`,
                 `<span style='color:#df307f'><b>[已更新]</b></span>`
@@ -283,7 +287,7 @@ function dumpManager() {
             "已尝试更新，更新效果在更新完成后刷新页面才会显示。",
             false
           );
-          setTimeout(closepop, 5000);
+          registryTimer(setTimeout(closepop, 5000));
         });
       });
     });

@@ -3,7 +3,8 @@ import { getAPIVersion, setMods } from "../api/NTAPI";
 import { getAPIToken } from "./encrypt";
 import { setProperty } from "./native";
 import { GMDeleteValue, GMGetValue, GMSetValue } from "./usfunc";
-import manager from "./manager";
+import { installDependenciesStrict, PackageURL } from "./pkgresolve";
+import { warn } from "./popinfo";
 const STRING_API_VERSION = String(getAPIVersion());
 var dirty: boolean = false,
   dependencyError: string = "";
@@ -190,17 +191,18 @@ function addModule(code: string): Map<string, string> | string {
       if (!dep.length) {
         continue;
       }
-      var hasURLRegex = /.+?\-\>((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/;
-      if (hasURLRegex.test(dep)) {
-        var [i, u] = dep.split("->");
-        if (!GMGetValue(`depend-${i}`, "{}")) {
-          installFromUrl(u);
+      ins_depend.push(new PackageURL(dep).id);
+      installDependenciesStrict(
+        depend.split(","),
+        () => {},
+        (err) => {
+          warn(
+            `模块 ${id} 的必要依赖 ${err} 安装出现失误，该模块可能不会被启用。`
+          );
         }
-        ins_depend.push(i);
-      } else {
-        ins_depend.push(dep);
-      }
+      );
     }
+
     depend = ins_depend.join(",");
     var obj: object = {
       id: id,
@@ -302,26 +304,39 @@ function installFromUrl(
       try {
         var data = dataIn.toString();
         if (typeof data === "string") {
-          addModule(data);
-          if (onsuccess) {
-            onsuccess();
+          var st = addModule(data);
+          if (typeof st == "string") {
+            if (onerror) {
+              onerror();
+            }
+          } else {
+            if (onsuccess) {
+              onsuccess();
+            }
           }
           resortDependency();
-          if (/bbsmod\=manager/i.test(String(window.location.search))) {
-            manager.dumpManager();
-          }
         }
       } catch {
         if (onerror) {
           onerror();
         }
       }
-    }).fail(() => {
-      if (onerror) {
-        onerror();
-      }
-    });
-  } catch {}
+    })
+      .fail(() => {
+        if (onerror) {
+          onerror();
+        }
+      })
+      .catch(() => {
+        if (onerror) {
+          onerror();
+        }
+      });
+  } catch {
+    if (onerror) {
+      onerror();
+    }
+  }
 }
 // 判断是否操作过
 function isDirty() {

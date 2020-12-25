@@ -5,9 +5,6 @@ module.exports = {
     filename: "[name].bundle.prod.user.js",
     path: path.resolve(__dirname, "dist"),
   },
-  optimization: {
-    minimize: false,
-  },
   mode: "production",
   module: {
     rules: [

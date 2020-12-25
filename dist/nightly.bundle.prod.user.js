@@ -10924,18 +10924,39 @@ var jquery_default = /*#__PURE__*/__webpack_require__.n(jquery);
 // EXTERNAL MODULE: ./src/libs/popinfo.ts
 var popinfo = __webpack_require__(758);
 // CONCATENATED MODULE: ./src/libs/permissions.ts
-;
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+
 var cachedPermission = {};
 function cachePermission(id) {
+    var e_1, _a;
     if (cachedPermission[id]) {
         return cachedPermission[id];
     }
     var permissions = cachedPermission[id] = {};
     var meta = (0,usfunc/* GMGetValue */.o9)("meta-" + id, {});
     if (meta.permissions) {
-        for (var _i = 0, _a = meta.permissions; _i < _a.length; _i++) {
-            var perm = _a[_i];
-            permissions[perm.trim()] = true;
+        try {
+            for (var _b = __values(meta.permissions), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var perm = _c.value;
+                permissions[perm.trim()] = true;
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
         }
     }
     return permissions;
@@ -10978,8 +10999,8 @@ var MCBBSAPI = (function () {
         };
         this.import_ = moduleImport;
         this.$ = (jquery_default());
-        this.popStatus = popinfo/* popinfo */.O;
-        this.closeStatus = popinfo/* closepop */.F;
+        this.popStatus = popinfo/* popinfo */.O0;
+        this.closeStatus = popinfo/* closepop */.FY;
         this.sysNotification = usfunc/* GMNotification */.J9;
         this.id = id;
         if (hasPermission(id, "loader:core")) {
@@ -11081,10 +11102,40 @@ function getData(tag, defaultVal) {
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _api_NTAPI__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(876);
 /* harmony import */ var _encrypt__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(585);
-/* harmony import */ var _native__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(321);
-/* harmony import */ var _usfunc__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(204);
-/* harmony import */ var _manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(313);
-;
+/* harmony import */ var _native__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(321);
+/* harmony import */ var _usfunc__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(204);
+/* harmony import */ var _pkgresolve__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(506);
+/* harmony import */ var _popinfo__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(758);
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+var __read = (undefined && undefined.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var e_1, _a;
+
+
 
 
 
@@ -11102,6 +11153,7 @@ function isDependencySolved() {
     return !dependencyError.length;
 }
 function resortDependency() {
+    var e_2, _a;
     var mapNil = {};
     dependencyError = "";
     var fixRaw = function (id, raw) {
@@ -11113,21 +11165,30 @@ function resortDependency() {
     var dependencies = new Map();
     var stack = [];
     var sortedList = [];
-    var all = (0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMGetValue */ .o9)("loader.all", {});
+    var all = (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMGetValue */ .o9)("loader.all", {});
     (0,_api_NTAPI__WEBPACK_IMPORTED_MODULE_1__/* .setMods */ .s3)(all);
-    for (var _i = 0, _a = Object.entries(all); _i < _a.length; _i++) {
-        var _b = _a[_i], id = _b[0], enabled = _b[1];
-        if (enabled) {
-            dependencies.set(id, fixRaw(id, JSON.parse((0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMGetValue */ .o9)("depend-" + id, "{}"))));
+    try {
+        for (var _b = __values(Object.entries(all)), _c = _b.next(); !_c.done; _c = _b.next()) {
+            var _d = __read(_c.value, 2), id = _d[0], enabled = _d[1];
+            if (enabled) {
+                dependencies.set(id, fixRaw(id, JSON.parse((0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMGetValue */ .o9)("depend-" + id, "{}"))));
+            }
+            if (((0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMGetValue */ .o9)("meta-" + id, {}).apiVersion || (0,_api_NTAPI__WEBPACK_IMPORTED_MODULE_1__/* .getAPIVersion */ .Y9)()) !=
+                (0,_api_NTAPI__WEBPACK_IMPORTED_MODULE_1__/* .getAPIVersion */ .Y9)()) {
+                deleteModule(id, function () {
+                    console.log("[MCBBS Loader] 由于 API 版本不兼容，移除了 ID 为 " +
+                        id +
+                        " 的脚本。\n如有需要，你可以重新安装。");
+                });
+            }
         }
-        if (((0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMGetValue */ .o9)("meta-" + id, {}).apiVersion || (0,_api_NTAPI__WEBPACK_IMPORTED_MODULE_1__/* .getAPIVersion */ .Y9)()) !=
-            (0,_api_NTAPI__WEBPACK_IMPORTED_MODULE_1__/* .getAPIVersion */ .Y9)()) {
-            deleteModule(id, function () {
-                console.log("[MCBBS Loader] 由于 API 版本不兼容，移除了 ID 为 " +
-                    id +
-                    " 的脚本。\n如有需要，你可以重新安装。");
-            });
+    }
+    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+    finally {
+        try {
+            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
         }
+        finally { if (e_2) throw e_2.error; }
     }
     var insert = function (before, after) {
         var node = {
@@ -11207,23 +11268,43 @@ function resortDependency() {
             dependencyError += "之前加载，然而此要求无法满足。\n";
         }
     });
-    (0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMSetValue */ .s4)("sorted-modules-list", isDependencySolved() ? sortedList : dependencyError);
+    (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMSetValue */ .s4)("sorted-modules-list", isDependencySolved() ? sortedList : dependencyError);
 }
 var allowedChars = "1234567890!@#$%^&*()qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM_.", charAllowed = {};
-for (var _i = 0, allowedChars_1 = allowedChars; _i < allowedChars_1.length; _i++) {
-    var c = allowedChars_1[_i];
-    charAllowed[c] = true;
+try {
+    for (var allowedChars_1 = __values(allowedChars), allowedChars_1_1 = allowedChars_1.next(); !allowedChars_1_1.done; allowedChars_1_1 = allowedChars_1.next()) {
+        var c = allowedChars_1_1.value;
+        charAllowed[c] = true;
+    }
+}
+catch (e_1_1) { e_1 = { error: e_1_1 }; }
+finally {
+    try {
+        if (allowedChars_1_1 && !allowedChars_1_1.done && (_a = allowedChars_1.return)) _a.call(allowedChars_1);
+    }
+    finally { if (e_1) throw e_1.error; }
 }
 function verifyId(id) {
-    for (var _i = 0, id_1 = id; _i < id_1.length; _i++) {
-        var c = id_1[_i];
-        if (!charAllowed[c]) {
-            return false;
+    var e_3, _a;
+    try {
+        for (var id_1 = __values(id), id_1_1 = id_1.next(); !id_1_1.done; id_1_1 = id_1.next()) {
+            var c = id_1_1.value;
+            if (!charAllowed[c]) {
+                return false;
+            }
         }
+    }
+    catch (e_3_1) { e_3 = { error: e_3_1 }; }
+    finally {
+        try {
+            if (id_1_1 && !id_1_1.done && (_a = id_1.return)) _a.call(id_1);
+        }
+        finally { if (e_3) throw e_3.error; }
     }
     return true;
 }
 function addModule(code) {
+    var e_4, _a;
     var isModuleRegex = /\/\*( )*MCBBS[ -]*Module/;
     var ccode = code.trim();
     if (!isModuleRegex.test(ccode)) {
@@ -11233,13 +11314,23 @@ function addModule(code) {
         var dataMap = new Map();
         parseMeta(ccode, dataMap);
         var flitBlank = function (strarr) {
+            var e_5, _a;
             var newarr = [];
-            for (var _i = 0, strarr_1 = strarr; _i < strarr_1.length; _i++) {
-                var str = strarr_1[_i];
-                var target = str.trim();
-                if (target.length) {
-                    newarr.push(target);
+            try {
+                for (var strarr_1 = __values(strarr), strarr_1_1 = strarr_1.next(); !strarr_1_1.done; strarr_1_1 = strarr_1.next()) {
+                    var str = strarr_1_1.value;
+                    var target = str.trim();
+                    if (target.length) {
+                        newarr.push(target);
+                    }
                 }
+            }
+            catch (e_5_1) { e_5 = { error: e_5_1 }; }
+            finally {
+                try {
+                    if (strarr_1_1 && !strarr_1_1.done && (_a = strarr_1.return)) _a.call(strarr_1);
+                }
+                finally { if (e_5) throw e_5.error; }
             }
             return newarr;
         };
@@ -11251,23 +11342,25 @@ function addModule(code) {
             return "不合要求的 id";
         }
         var ins_depend = [];
-        for (var _i = 0, _a = depend.split(","); _i < _a.length; _i++) {
-            var d = _a[_i];
-            var dep = d.trim();
-            if (!dep.length) {
-                continue;
-            }
-            var hasURLRegex = /.+?\-\>((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/;
-            if (hasURLRegex.test(dep)) {
-                var _b = dep.split("->"), i = _b[0], u = _b[1];
-                if (!(0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMGetValue */ .o9)("depend-" + i, "{}")) {
-                    installFromUrl(u);
+        try {
+            for (var _b = __values(depend.split(",")), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var d = _c.value;
+                var dep = d.trim();
+                if (!dep.length) {
+                    continue;
                 }
-                ins_depend.push(i);
+                ins_depend.push(new _pkgresolve__WEBPACK_IMPORTED_MODULE_3__/* .PackageURL */ .C(dep).id);
+                (0,_pkgresolve__WEBPACK_IMPORTED_MODULE_3__/* .installDependenciesStrict */ .k)(depend.split(","), function () { }, function (err) {
+                    (0,_popinfo__WEBPACK_IMPORTED_MODULE_4__/* .warn */ .ZK)("\u6A21\u5757 " + id + " \u7684\u5FC5\u8981\u4F9D\u8D56 " + err + " \u5B89\u88C5\u51FA\u73B0\u5931\u8BEF\uFF0C\u8BE5\u6A21\u5757\u53EF\u80FD\u4E0D\u4F1A\u88AB\u542F\u7528\u3002");
+                });
             }
-            else {
-                ins_depend.push(dep);
+        }
+        catch (e_4_1) { e_4 = { error: e_4_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
+            finally { if (e_4) throw e_4.error; }
         }
         depend = ins_depend.join(",");
         var obj = {
@@ -11288,8 +11381,8 @@ function addModule(code) {
             return "不支持的 API 版本：" + apiVersion;
         }
         if (regMeta(id, obj)) {
-            (0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMSetValue */ .s4)("code-" + id, ccode);
-            (0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMSetValue */ .s4)("depend-" + id, JSON.stringify({
+            (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMSetValue */ .s4)("code-" + id, ccode);
+            (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMSetValue */ .s4)("depend-" + id, JSON.stringify({
                 depend: ins_depend,
                 before: flitBlank(before.split(",")),
                 after: flitBlank(after.split(",")),
@@ -11303,6 +11396,7 @@ function addModule(code) {
     }
 }
 function parseMeta(code, map) {
+    var e_6, _a;
     var extractMetaRegex = /(?<=\/\*( )*MCBBS[ -]*Module)[\s\S]*?(?=\*\/)/;
     var metaarr = code.match(extractMetaRegex) || [];
     var metas = metaarr[0] || "";
@@ -11311,21 +11405,30 @@ function parseMeta(code, map) {
     var isItemRegex = /.+?\=.*/;
     var kRegex = /.+?(?=\=)/;
     var vRegex = /(?<=\=).*/;
-    for (var _i = 0, allmeta_1 = allmeta; _i < allmeta_1.length; _i++) {
-        var l = allmeta_1[_i];
-        if (isItemRegex.test(jquery__WEBPACK_IMPORTED_MODULE_0___default().trim(l))) {
-            var k = (jquery__WEBPACK_IMPORTED_MODULE_0___default().trim(l).match(kRegex) || [])[0] || "";
-            var v = (jquery__WEBPACK_IMPORTED_MODULE_0___default().trim(l).match(vRegex) || [])[0] || "";
-            map.set(jquery__WEBPACK_IMPORTED_MODULE_0___default().trim(k), jquery__WEBPACK_IMPORTED_MODULE_0___default().trim(v));
+    try {
+        for (var allmeta_1 = __values(allmeta), allmeta_1_1 = allmeta_1.next(); !allmeta_1_1.done; allmeta_1_1 = allmeta_1.next()) {
+            var l = allmeta_1_1.value;
+            if (isItemRegex.test(jquery__WEBPACK_IMPORTED_MODULE_0___default().trim(l))) {
+                var k = (jquery__WEBPACK_IMPORTED_MODULE_0___default().trim(l).match(kRegex) || [])[0] || "";
+                var v = (jquery__WEBPACK_IMPORTED_MODULE_0___default().trim(l).match(vRegex) || [])[0] || "";
+                map.set(jquery__WEBPACK_IMPORTED_MODULE_0___default().trim(k), jquery__WEBPACK_IMPORTED_MODULE_0___default().trim(v));
+            }
         }
+    }
+    catch (e_6_1) { e_6 = { error: e_6_1 }; }
+    finally {
+        try {
+            if (allmeta_1_1 && !allmeta_1_1.done && (_a = allmeta_1.return)) _a.call(allmeta_1);
+        }
+        finally { if (e_6) throw e_6.error; }
     }
 }
 function regMeta(id, meta) {
-    (0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMSetValue */ .s4)("meta-" + id, meta);
-    var all = (0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMGetValue */ .o9)("loader.all", {});
+    (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMSetValue */ .s4)("meta-" + id, meta);
+    var all = (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMGetValue */ .o9)("loader.all", {});
     try {
-        (0,_native__WEBPACK_IMPORTED_MODULE_5__/* .setProperty */ .Hn)(all, id, true);
-        (0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMSetValue */ .s4)("loader.all", all);
+        (0,_native__WEBPACK_IMPORTED_MODULE_6__/* .setProperty */ .Hn)(all, id, true);
+        (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMSetValue */ .s4)("loader.all", all);
         return true;
     }
     catch (_a) {
@@ -11343,12 +11446,12 @@ function unmountCode(id) {
     });
 }
 function deleteModule(id, callback) {
-    (0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMDeleteValue */ .LB)("meta-" + id);
-    (0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMDeleteValue */ .LB)("code-" + id);
-    (0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMDeleteValue */ .LB)("depend-" + id);
-    var obj = (0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMGetValue */ .o9)("loader.all", {});
-    (0,_native__WEBPACK_IMPORTED_MODULE_5__/* .setProperty */ .Hn)(obj, id, undefined);
-    (0,_usfunc__WEBPACK_IMPORTED_MODULE_4__/* .GMSetValue */ .s4)("loader.all", obj);
+    (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMDeleteValue */ .LB)("meta-" + id);
+    (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMDeleteValue */ .LB)("code-" + id);
+    (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMDeleteValue */ .LB)("depend-" + id);
+    var obj = (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMGetValue */ .o9)("loader.all", {});
+    (0,_native__WEBPACK_IMPORTED_MODULE_6__/* .setProperty */ .Hn)(obj, id, undefined);
+    (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMSetValue */ .s4)("loader.all", obj);
     markDirty();
     callback();
 }
@@ -11358,14 +11461,18 @@ function installFromUrl(url, onsuccess, onerror) {
             try {
                 var data = dataIn.toString();
                 if (typeof data === "string") {
-                    addModule(data);
-                    if (onsuccess) {
-                        onsuccess();
+                    var st = addModule(data);
+                    if (typeof st == "string") {
+                        if (onerror) {
+                            onerror();
+                        }
+                    }
+                    else {
+                        if (onsuccess) {
+                            onsuccess();
+                        }
                     }
                     resortDependency();
-                    if (/bbsmod\=manager/i.test(String(window.location.search))) {
-                        _manager__WEBPACK_IMPORTED_MODULE_3__/* .default.dumpManager */ .Z.dumpManager();
-                    }
                 }
             }
             catch (_a) {
@@ -11373,13 +11480,23 @@ function installFromUrl(url, onsuccess, onerror) {
                     onerror();
                 }
             }
-        }).fail(function () {
+        })
+            .fail(function () {
+            if (onerror) {
+                onerror();
+            }
+        })
+            .catch(function () {
             if (onerror) {
                 onerror();
             }
         });
     }
-    catch (_a) { }
+    catch (_a) {
+        if (onerror) {
+            onerror();
+        }
+    }
 }
 function isDirty() {
     return dirty;
@@ -11416,7 +11533,18 @@ var IMG_MCBBS = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAAB5f
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _native__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(321);
 /* harmony import */ var _popinfo__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(758);
-;
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+
 
 
 
@@ -11428,49 +11556,69 @@ function dumpConfigPage() {
     renderAll();
 }
 function autoSave() {
-    for (var _i = 0, _a = (0,_usfunc__WEBPACK_IMPORTED_MODULE_2__/* .getWindowProperty */ .vo)("CDT"); _i < _a.length; _i++) {
-        var c = _a[_i];
-        var val;
-        if ((0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "type") === "checkbox") {
-            val = (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(document.getElementById("confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId")), "checked");
+    var e_1, _a;
+    try {
+        for (var _b = __values((0,_usfunc__WEBPACK_IMPORTED_MODULE_2__/* .getWindowProperty */ .vo)("CDT")), _c = _b.next(); !_c.done; _c = _b.next()) {
+            var c = _c.value;
+            var val;
+            if ((0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "type") === "checkbox") {
+                val = (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(document.getElementById("confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId")), "checked");
+            }
+            else {
+                val = jquery__WEBPACK_IMPORTED_MODULE_0___default()("[id='confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId") + "']").val();
+            }
+            (0,_usfunc__WEBPACK_IMPORTED_MODULE_2__/* .GMSetValue */ .s4)("configstore-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId"), val);
         }
-        else {
-            val = jquery__WEBPACK_IMPORTED_MODULE_0___default()("[id='confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId") + "']").val();
-        }
-        (0,_usfunc__WEBPACK_IMPORTED_MODULE_2__/* .GMSetValue */ .s4)("configstore-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId"), val);
     }
-    (0,_popinfo__WEBPACK_IMPORTED_MODULE_1__/* .popinfo */ .O)("check", "设置保存成功！", false);
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
+    (0,_popinfo__WEBPACK_IMPORTED_MODULE_1__/* .popinfo */ .O0)("check", "设置保存成功！", false);
 }
 function getConfigVal(idIn, storageIdIn, defaultValue) {
     return (0,_usfunc__WEBPACK_IMPORTED_MODULE_2__/* .GMGetValue */ .o9)("configstore-" + idIn + "-" + storageIdIn, defaultValue);
 }
 function renderAll() {
-    for (var _i = 0, _a = (0,_usfunc__WEBPACK_IMPORTED_MODULE_2__/* .getWindowProperty */ .vo)("CDT"); _i < _a.length; _i++) {
-        var c = _a[_i];
-        var ele = "<label style='font-size:14px' for='confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId") + "'><span style='font-size:18px;color:#5d2391'><b>" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "name") + " </b></span>(" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + ":" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId") + ")<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "desc") + "</span>";
-        if ((0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "type") == "checkbox") {
-            ele += "<input type='checkbox' id='confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId") + "' style=\"float: right;\"/><br/>";
-        }
-        else if ((0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "type") == "textarea") {
-            ele += "</label><br><textarea id='confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId") + "' style=\"width: 99%;\"></textarea><br/>";
-        }
-        else {
-            ele += "<input type='text' class='px' id='confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId") + "' style=\"background-color: white; float: right;\"/><br/>";
-        }
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()("#config_div").append(ele);
-        if ((0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "type") == "checkbox") {
-            (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .setProperty */ .Hn)(document.getElementById("confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId")), "checked", getConfigVal((0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id"), (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId"), false));
-        }
-        else {
-            var value = getConfigVal((0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id"), (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId"), "");
-            var fld = jquery__WEBPACK_IMPORTED_MODULE_0___default()("[id='confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId") + "']").val(value);
-            if ((0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "type") == "textarea") {
-                fld.prop("rows", value.split("\n").length);
-                document.getElementById("confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId")).oninput = function () {
-                    this.rows = this.value.split("\n").length;
-                };
+    var e_2, _a;
+    try {
+        for (var _b = __values((0,_usfunc__WEBPACK_IMPORTED_MODULE_2__/* .getWindowProperty */ .vo)("CDT")), _c = _b.next(); !_c.done; _c = _b.next()) {
+            var c = _c.value;
+            var ele = "<label style='font-size:14px' for='confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId") + "'><span style='font-size:18px;color:#5d2391'><b>" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "name") + " </b></span>(" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + ":" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId") + ")<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "desc") + "</span>";
+            if ((0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "type") == "checkbox") {
+                ele += "<input type='checkbox' id='confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId") + "' style=\"float: right;\"/><br/>";
+            }
+            else if ((0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "type") == "textarea") {
+                ele += "</label><br><textarea id='confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId") + "' style=\"width: 99%;\"></textarea><br/>";
+            }
+            else {
+                ele += "<input type='text' class='px' id='confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId") + "' style=\"background-color: white; float: right;\"/><br/>";
+            }
+            jquery__WEBPACK_IMPORTED_MODULE_0___default()("#config_div").append(ele);
+            if ((0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "type") == "checkbox") {
+                (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .setProperty */ .Hn)(document.getElementById("confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId")), "checked", getConfigVal((0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id"), (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId"), false));
+            }
+            else {
+                var value = getConfigVal((0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id"), (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId"), "");
+                var fld = jquery__WEBPACK_IMPORTED_MODULE_0___default()("[id='confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId") + "']").val(value);
+                if ((0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "type") == "textarea") {
+                    fld.prop("rows", value.split("\n").length);
+                    document.getElementById("confval-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "id") + "-" + (0,_native__WEBPACK_IMPORTED_MODULE_3__/* .getProperty */ .$s)(c, "storageId")).oninput = function () {
+                        this.rows = this.value.split("\n").length;
+                    };
+                }
             }
         }
+    }
+    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+    finally {
+        try {
+            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+        }
+        finally { if (e_2) throw e_2.error; }
     }
 }
 function createConfigItem(details) {
@@ -11522,220 +11670,95 @@ function getAPIToken() {
 
 /***/ }),
 
-/***/ 313:
+/***/ 506:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Z": () => __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */   "C": () => /* binding */ PackageURL,
+/* harmony export */   "k": () => /* binding */ installDependenciesStrict
 /* harmony export */ });
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(755);
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _api_NTAPI__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(876);
-/* harmony import */ var _codeload__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(152);
-/* harmony import */ var _popinfo__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(758);
-/* harmony import */ var _updator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(624);
-/* harmony import */ var _usfunc__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(204);
-;
-
-
-
-
-
-
-
-function createBtn() {
-    jquery__WEBPACK_IMPORTED_MODULE_0___default()(function () {
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()("ul.user_info_menu_btn").append("<li><a href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager'>MCBBS 模块管理</a></li>");
-    });
-}
-function createMenu() {
-    if (String(window.location).startsWith("https://www.mcbbs.net/home.php?mod=spacecp")) {
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()(function () {
-            jquery__WEBPACK_IMPORTED_MODULE_0___default()("div.appl > div.tbn > ul").prepend("<li><a href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager' style='cursor:pointer;'>模块管理</a></li>");
-        });
-    }
-}
-function onInstall(st) {
-    var _a;
-    (0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .resortDependency */ .t3)();
-    dumpManager();
-    jquery__WEBPACK_IMPORTED_MODULE_0___default()("#install_base64").val((0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMGetValue */ .o9)("code-" + st.get("id"), ""));
-    if (((_a = st.get("permissions")) === null || _a === void 0 ? void 0 : _a.search("loader:core")) >= 0) {
-        (0,_popinfo__WEBPACK_IMPORTED_MODULE_3__/* .popinfo */ .O)("exclamation-triangle", "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
-            st.get("id") +
-            "。", false, "background-color:#ff950085 !important;");
-    }
-    else {
-        (0,_popinfo__WEBPACK_IMPORTED_MODULE_3__/* .popinfo */ .O)("check", "成功安装了模块", false);
-        setTimeout(_popinfo__WEBPACK_IMPORTED_MODULE_3__/* .closepop */ .F, 3000);
-    }
-}
-function onFailure(st) {
-    (0,_popinfo__WEBPACK_IMPORTED_MODULE_3__/* .popinfo */ .O)("exclamation-circle", "安装失败：" + st, false, "background-color:#88272790!important;");
-    setTimeout(_popinfo__WEBPACK_IMPORTED_MODULE_3__/* .closepop */ .F, 5000);
-}
-function dumpManager() {
-    var emsg = (0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .getDependencyError */ .ul)().replace(/\n/g, "<br>");
-    jquery__WEBPACK_IMPORTED_MODULE_0___default()(function () {
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()("div[class='bm bw0']").html("<span style='font-size:1.5rem'>\u6A21\u5757\u7BA1\u7406&nbsp;&nbsp;&nbsp;\u7248\u672C&nbsp;" + (0,_api_NTAPI__WEBPACK_IMPORTED_MODULE_1__/* .getAPIVersion */ .Y9)() + "&nbsp\n<font size=\"2em\" color=\"red\">" + (!(0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .isDependencySolved */ .m4)() ? "依赖关系未解决" : "") + "</font></span>&nbsp&nbsp&nbsp&nbsp\n<font size=\"2em\" color=\"brown\">" + ((0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .isDirty */ .eT)() ? "当前的设置需要刷新才能生效" : "") + "</font>\n<br/>\n<hr/>\n<span style='" + (!(0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .isDependencySolved */ .m4)() ? "" : "display:none;") + "font-size:1rem;'>\u9519\u8BEF</span>\n\n<div id='deperr' style='overflow:auto;color:#ff0000;" + (!(0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .isDependencySolved */ .m4)() ? "" : "display:none;") + "'>" + emsg + "</div>\n<hr style='" + (!(0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .isDependencySolved */ .m4)() ? "" : "display:none;") + "'/>\n<span style='font-size:1rem'>\u5DF2\u5B89\u88C5\u7684\u6A21\u5757</span>\n<br/>\n<div style='overflow:auto;'><ul id='all_modules'></ul></div>\n<hr/>\n<span style='font-size:1rem'>\u5B89\u88C5\u65B0\u6A21\u5757</span>\n<br/>\n<textarea style=\"font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:100%;height:150px;overflow:auto;word-break:break-all;resize:vertical;\" placeholder='BASE64 \u7F16\u7801\uFF0CURL \u6216 JavaScript \u4EE3\u7801\u2026\u2026' id='install_base64'></textarea>\n<br/>\n<ul><li>\u8BBF\u95EE GitHub \u8D44\u6E90\u53EF\u7528 jsDelivr\uFF1Ahttps://cdn.jsdelivr.net/gh/\u4F60\u7684\u7528\u6237\u540D/\u4F60\u7684\u4ED3\u5E93@\u5206\u652F\uFF08\u4E00\u822C\u4E3A master \u6216 main\uFF09/\u4ED3\u5E93\u5185\u6587\u4EF6\u8DEF\u5F84</li></ul>\n<br/>\n<button class='pn pnc' type='button' id='install'><strong>\u5B89\u88C5</strong></button>\n<br/>\n<span id='install_state' style='font-size:1rem;color:#df307f;'></span>");
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()("#install_base64").val("/* MCBBS Module\nid = com.example\n*/\n// https://cdn.jsdelivr.net/gh/用户名/仓库@分支/文件.js");
-        (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .setWindowProperty */ .oE)("notifyUninstall", function (id) {
-            (0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .deleteModule */ .wZ)(id, function () {
-                (0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .resortDependency */ .t3)();
-                dumpManager();
-                (0,_popinfo__WEBPACK_IMPORTED_MODULE_3__/* .popinfo */ .O)("trash", "成功移除了模块", false);
-                setTimeout(_popinfo__WEBPACK_IMPORTED_MODULE_3__/* .closepop */ .F, 3000);
-            });
-        });
-        (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .setWindowProperty */ .oE)("notifyOnOff", function (id) {
-            var all = (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMGetValue */ .o9)("loader.all", {});
-            all[id] = !all[id];
-            (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMSetValue */ .s4)("loader.all", all);
-            (0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .markDirty */ .no)();
-            (0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .resortDependency */ .t3)();
-            dumpManager();
-        });
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()("#install").on("click", function () {
-            var _a;
-            var str = ((_a = jquery__WEBPACK_IMPORTED_MODULE_0___default()("#install_base64").val()) === null || _a === void 0 ? void 0 : _a.toString()) || "";
-            try {
-                var x = atob(str);
-                var st = (0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .addModule */ .WM)(x);
-                if (typeof st != "string") {
-                    onInstall(st);
-                }
-                else {
-                    onFailure(st);
-                }
-            }
-            catch (_b) {
-                var isUrlRegex = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g;
-                if (isUrlRegex.test(str)) {
-                    (0,_popinfo__WEBPACK_IMPORTED_MODULE_3__/* .popinfo */ .O)("cloud", "正在获取数据……");
-                    try {
-                        jquery__WEBPACK_IMPORTED_MODULE_0___default().get(str, function (dataIn) {
-                            try {
-                                var data = dataIn.toString();
-                                var st = typeof data === "string"
-                                    ? (0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .addModule */ .WM)(data)
-                                    : "接收了一个无效数据值";
-                                if (typeof st != "string") {
-                                    onInstall(st);
-                                }
-                                else {
-                                    onFailure(st);
-                                }
-                            }
-                            catch (_a) {
-                                onFailure("接收了一个无效数据值");
-                            }
-                        });
-                    }
-                    catch (_c) {
-                        onFailure("接收了一个无效数据值");
-                    }
-                }
-                else {
-                    var st = (0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .addModule */ .WM)(str);
-                    if (typeof st != "string") {
-                        onInstall(st);
-                    }
-                    else {
-                        onFailure(st);
-                    }
-                }
-            }
-        });
-        var all_modules = (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMGetValue */ .o9)("loader.all", {});
-        for (var _i = 0, _a = Object.entries(all_modules); _i < _a.length; _i++) {
-            var m = _a[_i];
-            var meta = (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMGetValue */ .o9)("meta-" + m[0], { id: "impossible" });
-            var color = "";
-            var isCore = false;
-            if (meta.permissions.search("loader:core") != -1) {
-                color = "#ff0000";
-                isCore = true;
-            }
-            else {
-                color = "#5d2391";
-            }
-            var ele = "<li id='" + (meta.id || "impossible") + "'><div style='display:inline;'><img src='" + (meta.icon || "") + "' width='50' height='50' style=\"vertical-align:middle;float:left;\"></img><div style=\"height: 8em\">&nbsp;&nbsp;<span style='font-size:18px;color:" + color + "'><strong>" + (meta.name || "Nameless") + "</strong></span>&nbsp;&nbsp;&nbsp;<span id='vtag-" + meta.id + "' style='font-size:12px;color:#150029;'>" + (meta.id || "loader.nameless") + "@" + (meta.version ||
-                "1.0.0" +
-                    (isCore
-                        ? "&nbsp;<span style='color:#ff0000'><b>[COREMOD]</b></span>"
-                        : "")) + "</span><br/>&nbsp;&nbsp;<span style='font-size:16px;color:#df307f;'>" + (meta.author || "Someone") + "</span><br/>&nbsp;&nbsp;<span style='font-size:12px'>" + meta.description + "</span><button style='float:right;' type='button' class='pn pnc remove' onclick='window.notifyUninstall(\"" + meta.id + "\")'><strong>\u5220\u9664\u6A21\u5757</strong></button>&nbsp;&nbsp;<button style='float:right;' type='button' class='pn pnc onoff' onclick='window.notifyOnOff(\"" + meta.id + "\")'><strong>" + ((0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMGetValue */ .o9)("loader.all", {})[meta.id] ? "禁用" : "启用") + "</strong></button><button type='button' style='float:right;' class='pn pnc showsrc' mlsource='" + meta.id + "'><strong>\u67E5\u770B\u6E90\u4EE3\u7801</strong></button></div></div></li>";
-            jquery__WEBPACK_IMPORTED_MODULE_0___default()("#all_modules").append(ele);
+/* harmony import */ var _codeload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(152);
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
         }
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()(".showsrc").on("click", function (e) {
-            var id = jquery__WEBPACK_IMPORTED_MODULE_0___default()(e.target).attr("mlsource") || jquery__WEBPACK_IMPORTED_MODULE_0___default()(e.target).parent().attr("mlsource");
-            if (!id) {
-                return;
-            }
-            jquery__WEBPACK_IMPORTED_MODULE_0___default()("#install_base64").val((0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMGetValue */ .o9)("code-" + id, ""));
-        });
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()("#all_modules > li").each(function (i, e) {
-            var id = jquery__WEBPACK_IMPORTED_MODULE_0___default()(e).attr("id") || "loader.impossible";
-            var meta = (0,_usfunc__WEBPACK_IMPORTED_MODULE_5__/* .GMGetValue */ .o9)("meta-" + id);
-            (0,_updator__WEBPACK_IMPORTED_MODULE_4__/* .checkUpdate */ .P)(meta, function (state, ov, nv) {
-                var gtxt;
-                var shouldUpdate = false;
-                switch (state) {
-                    case "latest-api-too-early":
-                        gtxt = "<span style='color:#f16d2e'><b>[\u5DF2\u8FC7\u671F]</b></span>";
-                        break;
-                    case "latest-no-update-url":
-                    case "latest-no-version":
-                        gtxt = "<span style='color:#636363'><b>[\u672C\u5730]</b></span>";
-                        break;
-                    case "latest-version-equal-or-earlier":
-                        gtxt = "<span style='color:#df307f'><b>[\u6700\u65B0]</b></span>";
-                        break;
-                    default:
-                        if (!state.startsWith("latest")) {
-                            gtxt = "<span style='color:#ffaec8'><b>[\u6709\u53EF\u7528\u66F4\u65B0]</b></span>";
-                            shouldUpdate = true;
-                        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+
+var PackageURL = (function () {
+    function PackageURL(str) {
+        this.service = "github";
+        this.version = "";
+        this.id = "";
+        this.provider = "";
+        var strs = str.split(":");
+        switch (strs.length) {
+            case 1:
+                this.provider = "MCBBS-Loader";
+                this.version = "latest";
+                this.id = str;
+                break;
+            case 2:
+                this.provider = strs[0];
+                this.id = strs[1];
+                this.version = "latest";
+                break;
+            case 3:
+                this.provider = strs[0];
+                this.id = strs[1];
+                this.version = strs[2];
+                break;
+        }
+        if (strs.length > 3) {
+            this.provider = strs[0];
+            this.id = strs[1];
+            this.version = strs[2];
+        }
+    }
+    PackageURL.prototype.getAsURL = function () {
+        return "https://cdn.jsdelivr.net/gh/" + this.provider + "/" + this.id + "@" + this.version + "/" + this.id + ".mcbbs.js";
+    };
+    return PackageURL;
+}());
+function installDependenciesStrict(depurl, onsuccess, onerror) {
+    var e_1, _a;
+    var onerror_called = false;
+    var count = 0;
+    function updateCount() {
+        count = count + 1;
+        if (count >= depurl.length) {
+            onsuccess();
+        }
+    }
+    try {
+        for (var depurl_1 = __values(depurl), depurl_1_1 = depurl_1.next(); !depurl_1_1.done; depurl_1_1 = depurl_1.next()) {
+            var u = depurl_1_1.value;
+            var url = new PackageURL(u).getAsURL();
+            (0,_codeload__WEBPACK_IMPORTED_MODULE_0__/* .installFromUrl */ .qA)(url, function () {
+                updateCount();
+            }, function () {
+                if (!onerror_called) {
+                    onerror_called = true;
+                    onerror(u);
                 }
-                var oh = jquery__WEBPACK_IMPORTED_MODULE_0___default()("[id='vtag-" + meta.id + "']").html();
-                oh = "" + oh + (shouldUpdate ? "&nbsp;->&nbsp;" + nv : "") + "&nbsp;" + gtxt;
-                jquery__WEBPACK_IMPORTED_MODULE_0___default()("[id='vtag-" + meta.id + "']").html(oh);
-                if (shouldUpdate) {
-                    jquery__WEBPACK_IMPORTED_MODULE_0___default()("[id='vtag-" + meta.id + "']")
-                        .parent()
-                        .append("<button type='button' style='float:right' class='pn pnc update' mlurl='" + state + "'><strong>\u66F4\u65B0\u6A21\u5757</strong></button>");
-                }
-                jquery__WEBPACK_IMPORTED_MODULE_0___default()(".update").on("click", function (e) {
-                    var url = jquery__WEBPACK_IMPORTED_MODULE_0___default()(e.target).attr("mlurl") || jquery__WEBPACK_IMPORTED_MODULE_0___default()(e.target).parent().attr("mlurl");
-                    if (!url) {
-                        return;
-                    }
-                    if (jquery__WEBPACK_IMPORTED_MODULE_0___default()(e.target).attr("mlurl")) {
-                        jquery__WEBPACK_IMPORTED_MODULE_0___default()(e.target).remove();
-                    }
-                    else {
-                        jquery__WEBPACK_IMPORTED_MODULE_0___default()(e.target).parent().remove();
-                    }
-                    (0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .markDirty */ .no)();
-                    (0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .installFromUrl */ .qA)(url, function () {
-                        console.log("Install Success");
-                        var oh = jquery__WEBPACK_IMPORTED_MODULE_0___default()("[id='vtag-" + meta.id + "']").html();
-                        console.log(oh);
-                        oh = oh.replace("<span style=\"color:#ffaec8\"><b>[\u6709\u53EF\u7528\u66F4\u65B0]</b></span>", "<span style='color:#df307f'><b>[\u5DF2\u66F4\u65B0]</b></span>");
-                        jquery__WEBPACK_IMPORTED_MODULE_0___default()("[id='vtag-" + meta.id + "']").html(oh);
-                    }, function () {
-                        var oh = jquery__WEBPACK_IMPORTED_MODULE_0___default()("[id='vtag-" + meta.id + "']").html();
-                        oh = oh.replace("<span style=\"color:#ffaec8\"><b>[\u6709\u53EF\u7528\u66F4\u65B0]</b></span>", "<span style='color:#ec1c24'><b>[\u66F4\u65B0\u5931\u8D25]</b></span>");
-                        jquery__WEBPACK_IMPORTED_MODULE_0___default()("[id='vtag-" + meta.id + "']").html(oh);
-                    });
-                    (0,_popinfo__WEBPACK_IMPORTED_MODULE_3__/* .popinfo */ .O)("cloud", "已尝试更新，更新效果在更新完成后刷新页面才会显示。", false);
-                    setTimeout(_popinfo__WEBPACK_IMPORTED_MODULE_3__/* .closepop */ .F, 5000);
-                });
             });
-        });
-    });
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (depurl_1_1 && !depurl_1_1.done && (_a = depurl_1.return)) _a.call(depurl_1);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
 }
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({ createBtn: createBtn, createMenu: createMenu, dumpManager: dumpManager });
+
 
 
 /***/ }),
@@ -11745,18 +11768,60 @@ function dumpManager() {
 
 "use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "O": () => /* binding */ popinfo,
-/* harmony export */   "F": () => /* binding */ closepop
+/* harmony export */   "O0": () => /* binding */ popinfo,
+/* harmony export */   "FY": () => /* binding */ closepop,
+/* harmony export */   "ZK": () => /* binding */ warn,
+/* harmony export */   "eZ": () => /* binding */ registryTimer
 /* harmony export */ });
+/* unused harmony export error */
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(755);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
-;
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+
+var timer = new Set();
 function popinfo(icon, msg, doSpark, style, move, time, size) {
+    var e_1, _a, e_2, _b;
     if (doSpark === void 0) { doSpark = true; }
     if (style === void 0) { style = ""; }
     if (move === void 0) { move = 100; }
     if (time === void 0) { time = 500; }
     if (size === void 0) { size = "28px"; }
+    try {
+        for (var _c = __values(timer.values()), _d = _c.next(); !_d.done; _d = _c.next()) {
+            var i = _d.value;
+            clearTimeout(i);
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
+    try {
+        for (var _e = __values(timer.values()), _f = _e.next(); !_f.done; _f = _e.next()) {
+            var i = _f.value;
+            timer.delete(i);
+        }
+    }
+    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+    finally {
+        try {
+            if (_f && !_f.done && (_b = _e.return)) _b.call(_e);
+        }
+        finally { if (e_2) throw e_2.error; }
+    }
     closepop();
     setTimeout(function () {
         var data = "<div id='_popbg' style='" + style + "user-select:none;cursor:default;width:100%;height:-50px;background-color:#02020275;position:fixed;bottom:-50px;text-align:center;color:#ffffff;'><i style='font-size:" + size + ";vertical-align:middle;' id='_popicon' class='fa fa-" + icon + "'></i><span style='padding-top:2px;display:inline-block;vertical-align:middle;line-height:50px;'>&nbsp;&nbsp;&nbsp;" + msg + "</span></div>";
@@ -11775,6 +11840,9 @@ function closepop(move, cb) {
         cb();
     });
 }
+function registryTimer(t) {
+    timer.add(t);
+}
 function spark(jq, time) {
     jq.fadeOut(time, function () {
         jq.fadeIn(time, function () {
@@ -11782,88 +11850,11 @@ function spark(jq, time) {
         });
     });
 }
-
-
-
-/***/ }),
-
-/***/ 624:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "P": () => /* binding */ checkUpdate
-/* harmony export */ });
-/* unused harmony export cmpVersion */
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(755);
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _api_NTAPI__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(876);
-/* harmony import */ var _codeload__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(152);
-;
-
-
-function checkUpdate(meta, callback) {
-    var id = meta.id || "loader.nameless";
-    if (meta.updateURL) {
-        jquery__WEBPACK_IMPORTED_MODULE_0___default().get(meta.updateURL, function (data) {
-            var ccode = data.toString();
-            var dataMap = new Map();
-            (0,_codeload__WEBPACK_IMPORTED_MODULE_2__/* .parseMeta */ .jw)(ccode, dataMap);
-            if (dataMap.get("id") != id) {
-                callback("latest-diff-id");
-            }
-            else {
-                if (typeof dataMap.get("version") == "string") {
-                    var nversion = dataMap.get("version") || "1.0.0";
-                    var oversion = meta.version || "1.0.0";
-                    if (cmpVersion(nversion, oversion)) {
-                        if (typeof dataMap.get("apiVersion") == "string") {
-                            if (dataMap.get("apiVersion") !=
-                                new String((0,_api_NTAPI__WEBPACK_IMPORTED_MODULE_1__/* .getAPIVersion */ .Y9)()).toString()) {
-                                callback("latest-api-too-early");
-                                return;
-                            }
-                        }
-                        callback(meta.updateURL, oversion, nversion);
-                        return;
-                    }
-                    else {
-                        callback("latest-version-equal-or-earlier");
-                        return;
-                    }
-                }
-                else {
-                    callback("latest-no-version");
-                }
-            }
-        });
-    }
-    else {
-        callback("latest-no-update-url");
-    }
+function warn(msg) {
+    popinfo("exclamation-triangle", msg, false, "background-color:#ff950085 !important;");
 }
-function cmpVersion(nv, ov) {
-    var nvl = nv.split(".");
-    var ovl = ov.split(".");
-    if (nvl.length == 1) {
-        if (parseInt(nvl[0]) > parseInt(ovl[0] || "0")) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    else {
-        for (var i = 0; i < nvl.length; i++) {
-            if (parseInt(nvl[i]) > parseInt(ovl[i] || "0")) {
-                return true;
-            }
-            if (parseInt(nvl[i]) < parseInt(ovl[i] || "0")) {
-                return false;
-            }
-        }
-        return false;
-    }
+function error(msg) {
+    popinfo("exclamation-triangle", msg, false, "background-color:#ff950085 !important;");
 }
 
 
@@ -12272,27 +12263,315 @@ function getWindowProperty(key) {
 
 // EXTERNAL MODULE: ./src/libs/codeload.ts
 var codeload = __webpack_require__(152);
-// EXTERNAL MODULE: ./src/libs/manager.ts
-var manager = __webpack_require__(313);
-// EXTERNAL MODULE: ./src/libs/configpage.ts
-var configpage = __webpack_require__(517);
-// EXTERNAL MODULE: ./src/libs/updator.ts
-var updator = __webpack_require__(624);
-// EXTERNAL MODULE: ./src/libs/usfunc.js
-var usfunc = __webpack_require__(204);
 // EXTERNAL MODULE: ./node_modules/jquery/dist/jquery.js
 var jquery = __webpack_require__(755);
 var jquery_default = /*#__PURE__*/__webpack_require__.n(jquery);
-// EXTERNAL MODULE: ./src/libs/native.js
-var libs_native = __webpack_require__(321);
 // EXTERNAL MODULE: ./src/api/NTAPI.ts + 1 modules
 var NTAPI = __webpack_require__(876);
+// EXTERNAL MODULE: ./src/libs/popinfo.ts
+var popinfo = __webpack_require__(758);
+// CONCATENATED MODULE: ./src/libs/updator.ts
+;
+
+
+function checkUpdate(meta, callback) {
+    var id = meta.id || "loader.nameless";
+    if (meta.updateURL) {
+        jquery_default().get(meta.updateURL, function (data) {
+            var ccode = data.toString();
+            var dataMap = new Map();
+            (0,codeload/* parseMeta */.jw)(ccode, dataMap);
+            if (dataMap.get("id") != id) {
+                callback("latest-diff-id");
+            }
+            else {
+                if (typeof dataMap.get("version") == "string") {
+                    var nversion = dataMap.get("version") || "1.0.0";
+                    var oversion = meta.version || "1.0.0";
+                    if (cmpVersion(nversion, oversion)) {
+                        if (typeof dataMap.get("apiVersion") == "string") {
+                            if (dataMap.get("apiVersion") !=
+                                new String((0,NTAPI/* getAPIVersion */.Y9)()).toString()) {
+                                callback("latest-api-too-early");
+                                return;
+                            }
+                        }
+                        callback(meta.updateURL, oversion, nversion);
+                        return;
+                    }
+                    else {
+                        callback("latest-version-equal-or-earlier");
+                        return;
+                    }
+                }
+                else {
+                    callback("latest-no-version");
+                }
+            }
+        });
+    }
+    else {
+        callback("latest-no-update-url");
+    }
+}
+function cmpVersion(nv, ov) {
+    var nvl = nv.split(".");
+    var ovl = ov.split(".");
+    if (nvl.length == 1) {
+        if (parseInt(nvl[0]) > parseInt(ovl[0] || "0")) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        for (var i = 0; i < nvl.length; i++) {
+            if (parseInt(nvl[i]) > parseInt(ovl[i] || "0")) {
+                return true;
+            }
+            if (parseInt(nvl[i]) < parseInt(ovl[i] || "0")) {
+                return false;
+            }
+        }
+        return false;
+    }
+}
+
+
+// EXTERNAL MODULE: ./src/libs/usfunc.js
+var usfunc = __webpack_require__(204);
+// CONCATENATED MODULE: ./src/libs/manager.ts
+var __values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+
+
+
+
+
+
+
+function createBtn() {
+    jquery_default()(function () {
+        jquery_default()("ul.user_info_menu_btn").append("<li><a href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager'>MCBBS 模块管理</a></li>");
+    });
+}
+function createMenu() {
+    if (String(window.location).startsWith("https://www.mcbbs.net/home.php?mod=spacecp")) {
+        jquery_default()(function () {
+            jquery_default()("div.appl > div.tbn > ul").prepend("<li><a href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager' style='cursor:pointer;'>模块管理</a></li>");
+        });
+    }
+}
+function onInstall(st) {
+    var _a;
+    (0,codeload/* resortDependency */.t3)();
+    dumpManager();
+    jquery_default()("#install_base64").val((0,usfunc/* GMGetValue */.o9)("code-" + st.get("id"), ""));
+    if (((_a = st.get("permissions")) === null || _a === void 0 ? void 0 : _a.search("loader:core")) >= 0) {
+        (0,popinfo/* popinfo */.O0)("exclamation-triangle", "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
+            st.get("id") +
+            "。", false, "background-color:#ff950085 !important;");
+    }
+    else {
+        (0,popinfo/* popinfo */.O0)("check", "成功安装了模块", false);
+        (0,popinfo/* registryTimer */.eZ)(setTimeout(popinfo/* closepop */.FY, 3000));
+    }
+}
+function onFailure(st) {
+    (0,popinfo/* popinfo */.O0)("exclamation-circle", "安装失败：" + st, false, "background-color:#88272790!important;");
+    (0,popinfo/* registryTimer */.eZ)(setTimeout(popinfo/* closepop */.FY, 5000));
+}
+function dumpManager() {
+    var emsg = (0,codeload/* getDependencyError */.ul)().replace(/\n/g, "<br>");
+    jquery_default()(function () {
+        var e_1, _a;
+        jquery_default()("div[class='bm bw0']").html("<span style='font-size:1.5rem'>\u6A21\u5757\u7BA1\u7406&nbsp;&nbsp;&nbsp;\u7248\u672C&nbsp;" + (0,NTAPI/* getAPIVersion */.Y9)() + "&nbsp\n<font size=\"2em\" color=\"red\">" + (!(0,codeload/* isDependencySolved */.m4)() ? "依赖关系未解决" : "") + "</font></span>&nbsp&nbsp&nbsp&nbsp\n<font size=\"2em\" color=\"brown\">" + ((0,codeload/* isDirty */.eT)() ? "当前的设置需要刷新才能生效" : "") + "</font>\n<br/>\n<hr/>\n<span style='" + (!(0,codeload/* isDependencySolved */.m4)() ? "" : "display:none;") + "font-size:1rem;'>\u9519\u8BEF</span>\n\n<div id='deperr' style='overflow:auto;color:#ff0000;" + (!(0,codeload/* isDependencySolved */.m4)() ? "" : "display:none;") + "'>" + emsg + "</div>\n<hr style='" + (!(0,codeload/* isDependencySolved */.m4)() ? "" : "display:none;") + "'/>\n<span style='font-size:1rem'>\u5DF2\u5B89\u88C5\u7684\u6A21\u5757</span>\n<br/>\n<div style='overflow:auto;'><ul id='all_modules'></ul></div>\n<hr/>\n<span style='font-size:1rem'>\u5B89\u88C5\u65B0\u6A21\u5757</span>\n<br/>\n<textarea style=\"font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:100%;height:150px;overflow:auto;word-break:break-all;resize:vertical;\" placeholder='BASE64 \u7F16\u7801\uFF0CURL \u6216 JavaScript \u4EE3\u7801\u2026\u2026' id='install_base64'></textarea>\n<br/>\n<ul><li>\u8BBF\u95EE GitHub \u8D44\u6E90\u53EF\u7528 jsDelivr\uFF1Ahttps://cdn.jsdelivr.net/gh/\u4F60\u7684\u7528\u6237\u540D/\u4F60\u7684\u4ED3\u5E93@\u5206\u652F\uFF08\u4E00\u822C\u4E3A master \u6216 main\uFF09/\u4ED3\u5E93\u5185\u6587\u4EF6\u8DEF\u5F84</li></ul>\n<br/>\n<button class='pn pnc' type='button' id='install'><strong>\u5B89\u88C5</strong></button>\n<br/>\n<span id='install_state' style='font-size:1rem;color:#df307f;'></span>");
+        jquery_default()("#install_base64").val("/* MCBBS Module\nid = com.example\n*/\n// https://cdn.jsdelivr.net/gh/用户名/仓库@分支/文件.js");
+        (0,usfunc/* setWindowProperty */.oE)("notifyUninstall", function (id) {
+            (0,codeload/* deleteModule */.wZ)(id, function () {
+                (0,codeload/* resortDependency */.t3)();
+                dumpManager();
+                (0,popinfo/* popinfo */.O0)("trash", "成功移除了模块", false);
+                (0,popinfo/* registryTimer */.eZ)(setTimeout(popinfo/* closepop */.FY, 3000));
+            });
+        });
+        (0,usfunc/* setWindowProperty */.oE)("notifyOnOff", function (id) {
+            var all = (0,usfunc/* GMGetValue */.o9)("loader.all", {});
+            all[id] = !all[id];
+            (0,usfunc/* GMSetValue */.s4)("loader.all", all);
+            (0,codeload/* markDirty */.no)();
+            (0,codeload/* resortDependency */.t3)();
+            dumpManager();
+        });
+        jquery_default()("#install").on("click", function () {
+            var _a;
+            var str = ((_a = jquery_default()("#install_base64").val()) === null || _a === void 0 ? void 0 : _a.toString()) || "";
+            try {
+                var x = atob(str);
+                var st = (0,codeload/* addModule */.WM)(x);
+                if (typeof st != "string") {
+                    onInstall(st);
+                }
+                else {
+                    onFailure(st);
+                }
+            }
+            catch (_b) {
+                var isUrlRegex = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g;
+                if (isUrlRegex.test(str)) {
+                    (0,popinfo/* popinfo */.O0)("cloud", "正在获取数据……");
+                    try {
+                        jquery_default().get(str, function (dataIn) {
+                            try {
+                                var data = dataIn.toString();
+                                var st = typeof data === "string"
+                                    ? (0,codeload/* addModule */.WM)(data)
+                                    : "接收了一个无效数据值";
+                                if (typeof st != "string") {
+                                    onInstall(st);
+                                }
+                                else {
+                                    onFailure(st);
+                                }
+                            }
+                            catch (_a) {
+                                onFailure("接收了一个无效数据值");
+                            }
+                        });
+                    }
+                    catch (_c) {
+                        onFailure("接收了一个无效数据值");
+                    }
+                }
+                else {
+                    var st = (0,codeload/* addModule */.WM)(str);
+                    if (typeof st != "string") {
+                        onInstall(st);
+                    }
+                    else {
+                        onFailure(st);
+                    }
+                }
+            }
+        });
+        var all_modules = (0,usfunc/* GMGetValue */.o9)("loader.all", {});
+        try {
+            for (var _b = __values(Object.entries(all_modules)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var m = _c.value;
+                var meta = (0,usfunc/* GMGetValue */.o9)("meta-" + m[0], { id: "impossible" });
+                var color = "";
+                var isCore = false;
+                if (meta.permissions.search("loader:core") != -1) {
+                    color = "#ff0000";
+                    isCore = true;
+                }
+                else {
+                    color = "#5d2391";
+                }
+                var ele = "<li id='" + (meta.id || "impossible") + "'><div style='display:inline;'><img src='" + (meta.icon || "") + "' width='50' height='50' style=\"vertical-align:middle;float:left;\"></img><div style=\"height: 8em\">&nbsp;&nbsp;<span style='font-size:18px;color:" + color + "'><strong>" + (meta.name || "Nameless") + "</strong></span>&nbsp;&nbsp;&nbsp;<span id='vtag-" + meta.id + "' style='font-size:12px;color:#150029;'>" + (meta.id || "loader.nameless") + "@" + (meta.version ||
+                    "1.0.0" +
+                        (isCore
+                            ? "&nbsp;<span style='color:#ff0000'><b>[COREMOD]</b></span>"
+                            : "")) + "</span><br/>&nbsp;&nbsp;<span style='font-size:16px;color:#df307f;'>" + (meta.author || "Someone") + "</span><br/>&nbsp;&nbsp;<span style='font-size:12px'>" + meta.description + "</span><button style='float:right;' type='button' class='pn pnc remove' onclick='window.notifyUninstall(\"" + meta.id + "\")'><strong>\u5220\u9664\u6A21\u5757</strong></button>&nbsp;&nbsp;<button style='float:right;' type='button' class='pn pnc onoff' onclick='window.notifyOnOff(\"" + meta.id + "\")'><strong>" + ((0,usfunc/* GMGetValue */.o9)("loader.all", {})[meta.id] ? "禁用" : "启用") + "</strong></button><button type='button' style='float:right;' class='pn pnc showsrc' mlsource='" + meta.id + "'><strong>\u67E5\u770B\u6E90\u4EE3\u7801</strong></button></div></div></li>";
+                jquery_default()("#all_modules").append(ele);
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        jquery_default()(".showsrc").on("click", function (e) {
+            var id = jquery_default()(e.target).attr("mlsource") || jquery_default()(e.target).parent().attr("mlsource");
+            if (!id) {
+                return;
+            }
+            jquery_default()("#install_base64").val((0,usfunc/* GMGetValue */.o9)("code-" + id, ""));
+        });
+        jquery_default()("#all_modules > li").each(function (i, e) {
+            var id = jquery_default()(e).attr("id") || "loader.impossible";
+            var meta = (0,usfunc/* GMGetValue */.o9)("meta-" + id);
+            checkUpdate(meta, function (state, ov, nv) {
+                var gtxt;
+                var shouldUpdate = false;
+                switch (state) {
+                    case "latest-api-too-early":
+                        gtxt = "<span style='color:#f16d2e'><b>[\u5DF2\u8FC7\u671F]</b></span>";
+                        break;
+                    case "latest-no-update-url":
+                    case "latest-no-version":
+                        gtxt = "<span style='color:#636363'><b>[\u672C\u5730]</b></span>";
+                        break;
+                    case "latest-version-equal-or-earlier":
+                        gtxt = "<span style='color:#df307f'><b>[\u6700\u65B0]</b></span>";
+                        break;
+                    default:
+                        if (!state.startsWith("latest")) {
+                            gtxt = "<span style='color:#ffaec8'><b>[\u6709\u53EF\u7528\u66F4\u65B0]</b></span>";
+                            shouldUpdate = true;
+                        }
+                }
+                var oh = jquery_default()("[id='vtag-" + meta.id + "']").html();
+                oh = "" + oh + (shouldUpdate ? "&nbsp;->&nbsp;" + nv : "") + "&nbsp;" + gtxt;
+                jquery_default()("[id='vtag-" + meta.id + "']").html(oh);
+                if (shouldUpdate) {
+                    jquery_default()("[id='vtag-" + meta.id + "']")
+                        .parent()
+                        .append("<button type='button' style='float:right' class='pn pnc update' mlurl='" + state + "'><strong>\u66F4\u65B0\u6A21\u5757</strong></button>");
+                }
+                jquery_default()(".update").on("click", function (e) {
+                    var url = jquery_default()(e.target).attr("mlurl") || jquery_default()(e.target).parent().attr("mlurl");
+                    if (!url) {
+                        return;
+                    }
+                    if (jquery_default()(e.target).attr("mlurl")) {
+                        jquery_default()(e.target).remove();
+                    }
+                    else {
+                        jquery_default()(e.target).parent().remove();
+                    }
+                    (0,codeload/* markDirty */.no)();
+                    (0,codeload/* installFromUrl */.qA)(url, function () {
+                        if (/bbsmod\=manager/i.test(String(window.location.search))) {
+                            dumpManager();
+                        }
+                        var oh = jquery_default()("[id='vtag-" + meta.id + "']").html();
+                        oh = oh.replace("<span style=\"color:#ffaec8\"><b>[\u6709\u53EF\u7528\u66F4\u65B0]</b></span>", "<span style='color:#df307f'><b>[\u5DF2\u66F4\u65B0]</b></span>");
+                        jquery_default()("[id='vtag-" + meta.id + "']").html(oh);
+                    }, function () {
+                        var oh = jquery_default()("[id='vtag-" + meta.id + "']").html();
+                        oh = oh.replace("<span style=\"color:#ffaec8\"><b>[\u6709\u53EF\u7528\u66F4\u65B0]</b></span>", "<span style='color:#ec1c24'><b>[\u66F4\u65B0\u5931\u8D25]</b></span>");
+                        jquery_default()("[id='vtag-" + meta.id + "']").html(oh);
+                    });
+                    (0,popinfo/* popinfo */.O0)("cloud", "已尝试更新，更新效果在更新完成后刷新页面才会显示。", false);
+                    (0,popinfo/* registryTimer */.eZ)(setTimeout(popinfo/* closepop */.FY, 5000));
+                });
+            });
+        });
+    });
+}
+/* harmony default export */ const manager = ({ createBtn: createBtn, createMenu: createMenu, dumpManager: dumpManager });
+
+// EXTERNAL MODULE: ./src/libs/configpage.ts
+var configpage = __webpack_require__(517);
+// EXTERNAL MODULE: ./src/libs/native.js
+var libs_native = __webpack_require__(321);
 // EXTERNAL MODULE: ./src/api/NTEVT.js
 var NTEVT = __webpack_require__(487);
 // EXTERNAL MODULE: ./src/libs/encrypt.ts
 var encrypt = __webpack_require__(585);
-// EXTERNAL MODULE: ./src/libs/popinfo.ts
-var popinfo = __webpack_require__(758);
 // CONCATENATED MODULE: ./src/libs/setupbattery.ts
 ;
 
@@ -12305,7 +12584,18 @@ function setup(callback) {
 
 
 // CONCATENATED MODULE: ./src/main.ts
-;
+var main_values = (undefined && undefined.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+
 
 
 
@@ -12332,11 +12622,21 @@ function setup(callback) {
     var RESET_TOKEN = Math.floor(Math.random() * 1048576 * 1048576 * 1048576 * 1048576).toString(16);
     var sureToReset = false;
     (0,libs_native/* setLockedProperty */.VI)((0,libs_native/* getUnsafeWindow */.LP)(), "reset_" + RESET_TOKEN, function () {
+        var e_1, _a;
         if (sureToReset) {
             var all = (0,usfunc/* GMGetValue */.o9)("loader.all", {});
-            for (var _i = 0, _a = Object.entries(all); _i < _a.length; _i++) {
-                var c = _a[_i];
-                all[c[0]] = false;
+            try {
+                for (var _b = main_values(Object.entries(all)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var c = _c.value;
+                    all[c[0]] = false;
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_1) throw e_1.error; }
             }
             (0,usfunc/* GMSetValue */.s4)("loader.all", all);
             (0,usfunc/* setWindowProperty */.oE)("loader.all", all);
@@ -12351,16 +12651,26 @@ function setup(callback) {
     (0,libs_native/* setLockedProperty */.VI)((0,libs_native/* getUnsafeWindow */.LP)(), "forkAPI_" + (0,encrypt/* getAPIToken */.M)(), NTAPI/* forkAPI */.ur);
     (0,usfunc/* setWindowProperty */.oE)("CDT", []);
     jquery_default()(function () {
+        var e_2, _a;
         var sortedList = (0,usfunc/* GMGetValue */.o9)("sorted-modules-list") || (0,codeload/* resortDependency */.t3)();
         if (sortedList instanceof Array) {
-            for (var _i = 0, sortedList_1 = sortedList; _i < sortedList_1.length; _i++) {
-                var id = sortedList_1[_i];
-                (0,codeload/* mountCode */.uk)(id, (0,usfunc/* GMGetValue */.o9)("code-" + id));
-                (0,updator/* checkUpdate */.P)((0,usfunc/* GMGetValue */.o9)("meta-" + id, ""), function (state, ov, nv) {
-                    if (!state.startsWith("latest")) {
-                        console.log("[MCBBS Loader] \u6709\u66F4\u65B0\u53EF\u7528\uFF0C\u6A21\u5757 " + id + " \u5177\u6709\u65B0\u7248\u672C " + nv + "\uFF0C\u5F53\u524D\u5B89\u88C5\u7684\u7248\u672C\u4E3A " + ov + "\u3002");
-                    }
-                });
+            try {
+                for (var sortedList_1 = main_values(sortedList), sortedList_1_1 = sortedList_1.next(); !sortedList_1_1.done; sortedList_1_1 = sortedList_1.next()) {
+                    var id = sortedList_1_1.value;
+                    (0,codeload/* mountCode */.uk)(id, (0,usfunc/* GMGetValue */.o9)("code-" + id));
+                    checkUpdate((0,usfunc/* GMGetValue */.o9)("meta-" + id, ""), function (state, ov, nv) {
+                        if (!state.startsWith("latest")) {
+                            console.log("[MCBBS Loader] \u6709\u66F4\u65B0\u53EF\u7528\uFF0C\u6A21\u5757 " + id + " \u5177\u6709\u65B0\u7248\u672C " + nv + "\uFF0C\u5F53\u524D\u5B89\u88C5\u7684\u7248\u672C\u4E3A " + ov + "\u3002");
+                        }
+                    });
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (sortedList_1_1 && !sortedList_1_1.done && (_a = sortedList_1.return)) _a.call(sortedList_1);
+                }
+                finally { if (e_2) throw e_2.error; }
             }
         }
         else {
@@ -12368,18 +12678,18 @@ function setup(callback) {
             (0,usfunc/* GMLog */.n$)("[MCBBS Loader] 所有模块均未成功加载，请到管理页面修复依赖关系错误");
             var isManagerRegex = /bbsmod\=manager/i;
             if (isManagerRegex.test(String(window.location.search))) {
-                (0,popinfo/* popinfo */.O)("exclamation-circle", "<b>ECONFLICT！</b>自动加载模块失败，你现在正在模块管理页面，请解决依赖冲突。", true, "background-color:#88272790!important;");
+                (0,popinfo/* popinfo */.O0)("exclamation-circle", "<b>ECONFLICT！</b>自动加载模块失败，你现在正在模块管理页面，请解决依赖冲突。", true, "background-color:#88272790!important;");
             }
             else {
-                (0,popinfo/* popinfo */.O)("exclamation-circle", "<b>ECONFLICT！</b>自动加载模块失败，请求人工管理模块，查看控制台信息并尝试解决依赖错误。", true, "background-color:#88272790!important;");
+                (0,popinfo/* popinfo */.O0)("exclamation-circle", "<b>ECONFLICT！</b>自动加载模块失败，请求人工管理模块，查看控制台信息并尝试解决依赖错误。", true, "background-color:#88272790!important;");
             }
             (0,codeload/* setDependencyError */.mP)(sortedList);
         }
-        manager/* default.createBtn */.Z.createBtn();
-        manager/* default.createMenu */.Z.createMenu();
+        manager.createBtn();
+        manager.createMenu();
         if (/bbsmod\=manager/i.test(String(window.location.search))) {
             jquery_default()("title").html("MCBBS Loader - 自由的 MCBBS 模块管理器");
-            manager/* default.dumpManager */.Z.dumpManager();
+            manager.dumpManager();
             configpage/* default.createMenu */.Z.createMenu();
         }
         if ((0,usfunc/* GMGetValue */.o9)("temp.loadcfg", false)) {
