@@ -263,9 +263,11 @@ function dumpManager() {
           installFromUrl(
             url,
             () => {
-              console.log("Install Success");
+              if (/bbsmod\=manager/i.test(String(window.location.search))) {
+                dumpManager();
+              }
               var oh = $(`[id='vtag-${meta.id}']`).html();
-              console.log(oh);
+
               oh = oh.replace(
                 `<span style="color:#ffaec8"><b>[有可用更新]</b></span>`,
                 `<span style='color:#df307f'><b>[已更新]</b></span>`

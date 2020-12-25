@@ -306,21 +306,33 @@ function installFromUrl(
             onsuccess();
           }
           resortDependency();
+          /* 不要自动刷新！
           if (/bbsmod\=manager/i.test(String(window.location.search))) {
             manager.dumpManager();
           }
+          */
         }
       } catch {
         if (onerror) {
           onerror();
         }
       }
-    }).fail(() => {
-      if (onerror) {
-        onerror();
-      }
-    });
-  } catch {}
+    })
+      .fail(() => {
+        if (onerror) {
+          onerror();
+        }
+      })
+      .catch(() => {
+        if (onerror) {
+          onerror();
+        }
+      });
+  } catch {
+    if (onerror) {
+      onerror();
+    }
+  }
 }
 // 判断是否操作过
 function isDirty() {

@@ -11,11 +11,7 @@ function popinfo(
 ) {
   closepop();
   setTimeout(() => {
-    var data = `<div id='_popbg' style='${
-      style
-    }user-select:none;cursor:default;width:100%;height:-50px;background-color:#02020275;position:fixed;bottom:-50px;text-align:center;color:#ffffff;'><i style='font-size:${
-      size
-    };vertical-align:middle;' id='_popicon' class='fa fa-${icon}'></i><span style='padding-top:2px;display:inline-block;vertical-align:middle;line-height:50px;'>&nbsp;&nbsp;&nbsp;${msg}</span></div>`;
+    var data = `<div id='_popbg' style='${style}user-select:none;cursor:default;width:100%;height:-50px;background-color:#02020275;position:fixed;bottom:-50px;text-align:center;color:#ffffff;'><i style='font-size:${size};vertical-align:middle;' id='_popicon' class='fa fa-${icon}'></i><span style='padding-top:2px;display:inline-block;vertical-align:middle;line-height:50px;'>&nbsp;&nbsp;&nbsp;${msg}</span></div>`;
     $("body").append(data);
     if (doSpark) {
       spark($("#_popicon"), time);
@@ -37,4 +33,23 @@ function spark(jq: JQuery<HTMLElement>, time: number) {
   });
 }
 
-export { popinfo, closepop };
+function warn(msg: string) {
+  popinfo(
+    "exclamation-triangle",
+    msg,
+    false,
+    "background-color:#ff950085 !important;"
+  );
+  setTimeout(() => {
+    closepop();
+  }, 8000);
+}
+function error(msg: string) {
+  popinfo(
+    "exclamation-triangle",
+    msg,
+    false,
+    "background-color:#ff950085 !important;"
+  );
+}
+export { popinfo, closepop, warn, error };
