@@ -13,6 +13,8 @@ import { getGM } from "../libs/native";
 import { coreModEval } from "../libs/codeload";
 import configpage from "../libs/configpage";
 const ML_VERSION = 1;
+var all: any = GMGetValue("loader.all", {});
+
 function forkAPI(id: string) {
   return new MCBBSAPI(id);
 }
@@ -74,7 +76,7 @@ function moduleExport(idIn: string, obj: any) {
   setWindowProperty(`module-export-${idIn}`, obj);
   notifyExport(idIn);
 }
-function moduleImport(id: string, callback: (arg: any) => void) {
+function moduleImport(id: string, callback: (arg: any) => void): boolean {
   if (getWindowProperty(`module-export-${id}`)) {
     callback(getWindowProperty(`module-export-${id}`));
   } else {
@@ -89,6 +91,7 @@ function moduleImport(id: string, callback: (arg: any) => void) {
       getWindowProperty("MIDT")[id] = callback;
     }
   }
+  return !!all[id]; // 让被调用者知道是否import到
 }
 
 function notifyExport(id: string) {

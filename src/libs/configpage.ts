@@ -7,12 +7,13 @@ import {
 import $ from "jquery";
 import jQuery from "jquery";
 import { getProperty, setProperty } from "./native";
-import { popinfo } from "./popinfo";
+import { closepop, popinfo, success } from "./popinfo";
 function dumpConfigPage() {
   $("div[class='bm bw0']").html(
     "<span style='font-size:1.5rem'>设置中心</span>&nbsp;&nbsp;<button id='saveconfig' type='button' class='pn pnc'>" +
       "<span>保存</span></button><div id='config_div'></div>"
   );
+  $("div[class='bm bw0']").css("user-select", "none");
   $("#saveconfig").on("click", autoSave);
   renderAll();
 }
@@ -20,13 +21,19 @@ function dumpConfigPage() {
 function autoSave() {
   for (var c of getWindowProperty("CDT")) {
     var val;
-    if (getProperty(c, "type") == "checkbox") {
-      val = getProperty(
+    if (["checkbox", "check", "bool"].includes(getProperty(c, "type"))) {
+      var tval = getProperty(
         document.getElementById(
           `confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}`
         ),
-        "checked"
+        "className"
       );
+      console.log(tval);
+      if (tval.includes("check-square")) {
+        val = true;
+      } else {
+        val = false;
+      }
     } else {
       val = $(
         `[id='confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}']`
@@ -38,7 +45,7 @@ function autoSave() {
       val
     );
   }
-  popinfo("check", "设置保存成功！", false);
+  success("设置已保存");
 }
 function getConfigVal(idIn: string, storageIdIn: string, defaultValue: any) {
   return GMGetValue(`configstore-${idIn}-${storageIdIn}`, defaultValue);
@@ -50,19 +57,14 @@ function renderAll() {
       case "checkbox":
       case "check":
       case "bool":
-        ele = `<input type='checkbox' id='confval-${getProperty(
+        ele = `
+        <span style='font-size:14px'><span style='font-size:18px;color:#5d2391'><i id='confval-${getProperty(
           c,
           "id"
         )}-${getProperty(
           c,
           "storageId"
-        )}'/><label style='font-size:14px' for='confval-${getProperty(
-          c,
-          "id"
-        )}-${getProperty(
-          c,
-          "storageId"
-        )}'><span style='font-size:18px;color:#5d2391'><b>${getProperty(
+        )}' class='chkbox fa fa-check-square'></i>&nbsp;<b>${getProperty(
           c,
           "name"
         )} </b></span>(${getProperty(c, "id")}:${getProperty(
@@ -71,7 +73,8 @@ function renderAll() {
         )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
           c,
           "desc"
-        )}</span></label><br/>`;
+        )}</span></span>
+        <br/>`;
         break;
       case "line":
       case "txt":
@@ -87,10 +90,10 @@ function renderAll() {
         )}</b></span> (${getProperty(c, "id")}:${getProperty(
           c,
           "storageId"
-        )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
+        )})<br/><span style='color:#df307f'>${getProperty(
           c,
           "desc"
-        )}</span></label><input type='text' class='px' id='confval-${getProperty(
+        )}</span></label><br/><input type='text' style='width:90%' class='px' id='confval-${getProperty(
           c,
           "id"
         )}-${getProperty(c, "storageId")}'/><br/>`;
@@ -111,7 +114,7 @@ function renderAll() {
         )}</b></span> (${getProperty(c, "id")}:${getProperty(
           c,
           "storageId"
-        )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
+        )})<br/><span style='color:#df307f'>${getProperty(
           c,
           "desc"
         )}</span></label><textarea id='confval-${getProperty(
@@ -149,21 +152,48 @@ function renderAll() {
     }
     $("#config_div").append(ele);
     if (["checkbox", "check", "bool"].includes(getProperty(c, "type"))) {
+      var faclass = "chkbox fa fa-square";
+      if (
+        getConfigVal(getProperty(c, "id"), getProperty(c, "storageId"), false)
+      ) {
+        faclass = "chkbox fa fa-check-square";
+      }
       setProperty(
         document.getElementById(
           `confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}`
         ),
-        "checked",
-        getConfigVal(getProperty(c, "id"), getProperty(c, "storageId"), false)
+        "className",
+        faclass
       );
     } else {
-      $(
-        `[id='confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}']`
-      ).val(
-        getConfigVal(getProperty(c, "id"), getProperty(c, "storageId"), "")
+      var value = getConfigVal(
+        getProperty(c, "id"),
+        getProperty(c, "storageId"),
+        ""
       );
+      var fld = $(
+        `[id='confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}']`
+      ).val(value);
+      if (getProperty(c, "type") == "textarea") {
+        // 使得textarea的行数动态增长，这样就可以避免滚动
+        fld.prop("rows", value.split("\n").length);
+        // jq似乎没有合适的api绑定这个事件？
+        document.getElementById(
+          `confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}`
+        )!.oninput = function () {
+          (this as any).rows = (this as any).value.split("\n").length;
+        };
+      }
     }
   }
+  $(".chkbox").on("click", (e) => {
+    var oclass = $(e.target).attr("class");
+    if (oclass?.includes("check-square")) {
+      $(e.target).attr("class", "chkbox fa fa-square");
+    } else {
+      $(e.target).attr("class", "chkbox fa fa-check-square");
+    }
+  });
 }
 function createConfigItem(details: Map<string, string>) {
   var type = details.get("type") || "text";

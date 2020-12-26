@@ -1,4 +1,4 @@
-import jQuery from "jquery";
+import jQuery, { error } from "jquery";
 import $ from "jquery";
 import { getAPIVersion } from "../api/NTAPI";
 import {
@@ -7,9 +7,11 @@ import {
   installFromUrl,
   isDirty,
   markDirty,
+  resortDependency,
+  isDependencySolved,
+  getDependencyError,
 } from "./codeload";
-import { resortDependency, isDenpendencySolved } from "./codeload";
-import { closepop, popinfo, registryTimer } from "./popinfo";
+import { closepop, popinfo, registryTimer, success, warn } from "./popinfo";
 import { checkUpdate } from "./updator";
 import { GMGetValue, GMSetValue, setWindowProperty } from "./usfunc";
 function createBtn(): void {
@@ -38,39 +40,27 @@ function onInstall(st: Map<string, string>) {
   $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
 
   if ((st.get("permissions")?.search("loader:core") as any) >= 0) {
-    popinfo(
-      "exclamation-triangle",
+    warn(
       "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
         st.get("id") +
-        "。",
-      false,
-      "background-color:#ff950085 !important;"
+        "。"
     );
   } else {
-    popinfo("check", "成功安装了模块", false);
-    registryTimer(setTimeout(closepop, 3000));
+    success("成功安装了模块");
   }
 }
 // 安装失败时的动作
 function onFailure(st: string) {
-  popinfo(
-    "exclamation-circle",
-    "安装失败：" + st,
-    false,
-    "background-color:#88272790!important;"
-  );
-  registryTimer(setTimeout(closepop, 5000));
+  error("安装失败：" + st);
 }
 function dumpManager() {
-  var emsg = "";
-  if (!isDenpendencySolved()) {
-    emsg = GMGetValue("loader.deperr");
-  }
+  var emsg = getDependencyError().replace(/\n/g, "<br>");
   jQuery(() => {
+    $("div[class='bm bw0']").css("user-select", "none");
     $("div[class='bm bw0']").html(
       `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}&nbsp
 <font size="2em" color="red">${
-        !isDenpendencySolved() ? "依赖关系未解决" : ""
+        !isDependencySolved() ? "依赖关系未解决" : ""
       }</font></span>&nbsp&nbsp&nbsp&nbsp
 <font size="2em" color="brown">${
         isDirty() ? "当前的设置需要刷新才能生效" : ""
@@ -78,13 +68,13 @@ function dumpManager() {
 <br/>
 <hr/>
 <span style='${
-        !isDenpendencySolved() ? "" : "display:none;"
+        !isDependencySolved() ? "" : "display:none;"
       }font-size:1rem;'>错误</span>
 
 <div id='deperr' style='overflow:auto;color:#ff0000;${
-        !isDenpendencySolved() ? "" : "display:none;"
+        !isDependencySolved() ? "" : "display:none;"
       }'>${emsg}</div>
-<hr style='${!isDenpendencySolved() ? "" : "display:none;"}'/>
+<hr style='${!isDependencySolved() ? "" : "display:none;"}'/>
 <span style='font-size:1rem'>已安装的模块</span>
 <br/>
 <div style='overflow:auto;'><ul id='all_modules'></ul></div>
@@ -107,7 +97,7 @@ function dumpManager() {
         resortDependency();
         dumpManager();
         popinfo("trash", "成功移除了模块", false);
-        registryTimer(setTimeout(closepop, 3000));
+        registryTimer(setTimeout(closepop, 4000));
       });
     });
     setWindowProperty("notifyOnOff", (id: string) => {

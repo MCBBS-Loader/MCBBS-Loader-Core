@@ -1,9 +1,7 @@
 import {
-  installFromUrl,
-  isDirty,
   mountCode,
   resortDependency,
-  setDenpendencySolved,
+  setDependencyError,
 } from "./libs/codeload";
 import manager from "./libs/manager";
 import configpage from "./libs/configpage";
@@ -77,9 +75,7 @@ import { setup } from "./libs/setupbattery";
           }
         });
       }
-      setDenpendencySolved(true);
     } else {
-      GMSetValue("loader.deperr", sortedList);
       GMLog(`[MCBBS Loader] ${sortedList}`);
       GMLog(
         "[MCBBS Loader] 所有模块均未成功加载，请到管理页面修复依赖关系错误"
@@ -100,7 +96,7 @@ import { setup } from "./libs/setupbattery";
           "background-color:#88272790!important;"
         );
       }
-      setDenpendencySolved(false);
+      setDependencyError(sortedList);
     }
     // 这样可以在管理界面显示依赖关系是否满足
     manager.createBtn();
