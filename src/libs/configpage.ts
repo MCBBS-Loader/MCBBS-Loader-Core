@@ -10,8 +10,9 @@ import { getProperty, setProperty } from "./native";
 import { popinfo } from "./popinfo";
 function dumpConfigPage() {
   $("div[class='bm bw0']").html(
-      "<span style='font-size:1.5rem'>设置中心</span>&nbsp;&nbsp;<button id='saveconfig' type='button' class='pn pnc'>" + 
-      "<span>保存</span></button><div id='config_div'></div>");
+    "<span style='font-size:1.5rem'>设置中心</span>&nbsp;&nbsp;<button id='saveconfig' type='button' class='pn pnc'>" +
+      "<span>保存</span></button><div id='config_div'></div>"
+  );
   $("#saveconfig").on("click", autoSave);
   renderAll();
 }
@@ -45,52 +46,109 @@ function getConfigVal(idIn: string, storageIdIn: string, defaultValue: any) {
 function renderAll() {
   for (var c of getWindowProperty("CDT")) {
     var ele;
-    if (getProperty(c, "type") == "checkbox") {
-      ele = `<input type='checkbox' id='confval-${getProperty(
-        c,
-        "id"
-      )}-${getProperty(
-        c,
-        "storageId"
-      )}'/><label style='font-size:14px' for='confval-${getProperty(
-        c,
-        "id"
-      )}-${getProperty(
-        c,
-        "storageId"
-      )}'><span style='font-size:18px;color:#5d2391'><b>${getProperty(
-        c,
-        "name"
-      )} </b></span>(${getProperty(c, "id")}:${getProperty(
-        c,
-        "storageId"
-      )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
-        c,
-        "desc"
-      )}</span></label><br/>`;
-    } else {
-      ele = `<label style='font-size:14px' for='confval-${getProperty(
-        c,
-        "id"
-      )}-${getProperty(
-        c,
-        "storageId"
-      )}'><span style='font-size:18px;color:#5d2391'><b>${getProperty(
-        c,
-        "name"
-      )}</b></span> (${getProperty(c, "id")}:${getProperty(
-        c,
-        "storageId"
-      )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
-        c,
-        "desc"
-      )}</span></label><input type='text' class='px' id='confval-${getProperty(
-        c,
-        "id"
-      )}-${getProperty(c, "storageId")}'/><br/>`;
+    switch (getProperty(c, "type")) {
+      case "checkbox":
+      case "check":
+      case "bool":
+        ele = `<input type='checkbox' id='confval-${getProperty(
+          c,
+          "id"
+        )}-${getProperty(
+          c,
+          "storageId"
+        )}'/><label style='font-size:14px' for='confval-${getProperty(
+          c,
+          "id"
+        )}-${getProperty(
+          c,
+          "storageId"
+        )}'><span style='font-size:18px;color:#5d2391'><b>${getProperty(
+          c,
+          "name"
+        )} </b></span>(${getProperty(c, "id")}:${getProperty(
+          c,
+          "storageId"
+        )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
+          c,
+          "desc"
+        )}</span></label><br/>`;
+        break;
+      case "line":
+      case "txt":
+        ele = `<label style='font-size:14px' for='confval-${getProperty(
+          c,
+          "id"
+        )}-${getProperty(
+          c,
+          "storageId"
+        )}'><span style='font-size:18px;color:#5d2391'><b>${getProperty(
+          c,
+          "name"
+        )}</b></span> (${getProperty(c, "id")}:${getProperty(
+          c,
+          "storageId"
+        )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
+          c,
+          "desc"
+        )}</span></label><input type='text' class='px' id='confval-${getProperty(
+          c,
+          "id"
+        )}-${getProperty(c, "storageId")}'/><br/>`;
+        break;
+      case "textarea":
+      case "text":
+      case "multiline":
+      case "longtxt":
+        ele = `<label style='font-size:14px' for='confval-${getProperty(
+          c,
+          "id"
+        )}-${getProperty(
+          c,
+          "storageId"
+        )}'><span style='font-size:18px;color:#5d2391'><b>${getProperty(
+          c,
+          "name"
+        )}</b></span> (${getProperty(c, "id")}:${getProperty(
+          c,
+          "storageId"
+        )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
+          c,
+          "desc"
+        )}</span></label><textarea id='confval-${getProperty(
+          c,
+          "id"
+        )}-${getProperty(c, "storageId")}' placeholder='为设置项 ${getProperty(
+          c,
+          "id"
+        )}-${getProperty(
+          c,
+          "storageId"
+        )} 设定合适的值……' style='font-family:"Fira Code","Courier New",monospace !important;background-color:#fbf2db;width:90% !important;height:100px !important;overflow:auto;word-break:break-all;resize:vertical !important;' class='pt'></textarea><br/>`;
+        break;
+      default:
+        ele = `<label style='font-size:14px' for='confval-${getProperty(
+          c,
+          "id"
+        )}-${getProperty(
+          c,
+          "storageId"
+        )}'><span style='font-size:18px;color:#5d2391'><b>${getProperty(
+          c,
+          "name"
+        )}</b></span> (${getProperty(c, "id")}:${getProperty(
+          c,
+          "storageId"
+        )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
+          c,
+          "desc"
+        )}</span></label><input type='text' class='px' id='confval-${getProperty(
+          c,
+          "id"
+        )}-${getProperty(c, "storageId")}'/><br/>`;
+        break;
     }
     $("#config_div").append(ele);
-    if (getProperty(c, "type") == "checkbox") {
+    if (["checkbox", "check", "bool"].includes(getProperty(c, "type"))) {
       setProperty(
         document.getElementById(
           `confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}`

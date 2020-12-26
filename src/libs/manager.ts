@@ -91,7 +91,7 @@ function dumpManager() {
 <hr/>
 <span style='font-size:1rem'>安装新模块</span>
 <br/>
-<textarea style="font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:100%;height:150px;overflow:auto;word-break:break-all;resize:vertical;" placeholder='BASE64 编码，URL 或 JavaScript 代码……' id='install_base64'></textarea>
+<textarea style="font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:90%;height:150px;overflow:auto;word-break:break-all;resize:vertical;" placeholder='BASE64 编码，URL 或 JavaScript 代码……' id='install_base64'></textarea>
 <br/>
 <ul><li>访问 GitHub 资源可用 jsDelivr：https://cdn.jsdelivr.net/gh/你的用户名/你的仓库@分支（一般为 master 或 main）/仓库内文件路径</li></ul>
 <br/>
