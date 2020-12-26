@@ -55,7 +55,7 @@ class MCBBSAPI {
     configpage.createConfigItem(map);
   }
   public getConfigVal(stgid: string, dval?: any) {
-    return configpage.getConfigVal(this.id, stgid, dval || undefined);
+    return configpage.getConfigVal(this.id, stgid, dval);// 之前的检查方法会造成默认值为undefined时失败
   }
   public getData(k: string, dv: any) {
     return getData(this.id + "-" + k, dv);
