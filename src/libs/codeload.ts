@@ -52,6 +52,11 @@ function resortDependency() {
             id +
             " 的脚本。\n如有需要，你可以重新安装。"
         );
+        warn(
+          "[MCBBS Loader] 由于 API 版本不兼容，移除了 ID 为 " +
+            id +
+            " 的脚本。\n如有需要，你可以重新安装。"
+        );
       });
     }
   }
@@ -112,7 +117,7 @@ function resortDependency() {
       });
     }
   });
-  dependencies.forEach(v => {
+  dependencies.forEach((v) => {
     if ((v as any).afterHead === mapNil) {
       stack.push(v);
     }
@@ -126,18 +131,22 @@ function resortDependency() {
     }
   }
   // 如果排序已经结束了还有插件没有进入到序列里来，那么排序一定无解，但是相同一个模块的错误只需要输出一次
-  dependencies.forEach(v => {
+  dependencies.forEach((v) => {
     if ((v as any).beforeHead != mapNil) {
       dependencyError += (v as any).id + "要求在";
       var node: any = (v as any).beforeHead;
-      while(node != mapNil) {
-        dependencyError += node.after.id + (node.beforeNext === mapNil ? "" : ",");
+      while (node != mapNil) {
+        dependencyError +=
+          node.after.id + (node.beforeNext === mapNil ? "" : ",");
         node = node.beforeNext;
       }
-      dependencyError += "之前加载，然而此要求无法满足。\n"
+      dependencyError += "之前加载，然而此要求无法满足。\n";
     }
   });
-  GMSetValue("sorted-modules-list", isDependencySolved() ? sortedList : dependencyError);
+  GMSetValue(
+    "sorted-modules-list",
+    isDependencySolved() ? sortedList : dependencyError
+  );
 }
 const allowedChars =
     "1234567890!@#$%^&*()qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM_.",

@@ -51,6 +51,10 @@ function warn(msg: string) {
     "background-color:#ff950085 !important;"
   );
 }
+function success(msg: string) {
+  popinfo("check", msg, false);
+  registryTimer(setTimeout(closepop, 4000));
+}
 function error(msg: string) {
   popinfo(
     "exclamation-triangle",
@@ -59,4 +63,4 @@ function error(msg: string) {
     "background-color:#ff950085 !important;"
   );
 }
-export { popinfo, closepop, warn, error, registryTimer };
+export { popinfo, closepop, warn, error, registryTimer, success };
