@@ -20,7 +20,7 @@ function isDependencySolved(): boolean {
   return !dependencyError.length;
 }
 
-function resortDependency() {
+function resortDependency(): string | string[]{
   // 哨兵节点，用于标记链表末尾，只写不读，初始化全undefined
   const mapNil = {};
   dependencyError = "";
@@ -147,6 +147,7 @@ function resortDependency() {
     "sorted-modules-list",
     isDependencySolved() ? sortedList : dependencyError
   );
+  return isDependencySolved() ? sortedList : dependencyError;
 }
 const allowedChars =
     "1234567890!@#$%^&*()qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM_.",
