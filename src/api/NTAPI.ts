@@ -13,10 +13,7 @@ import { getGM } from "../libs/native";
 import { coreModEval } from "../libs/codeload";
 import configpage from "../libs/configpage";
 const ML_VERSION = 1;
-var all: any;
-function setMods(list: any) {
-  all = list;
-}
+var all: any = GMGetValue("loader.all", {});
 
 function forkAPI(id: string) {
   return new MCBBSAPI(id);
@@ -114,4 +111,4 @@ function storeData(tag: string, data: any): void {
 function getData(tag: string, defaultVal: any): any {
   return GMGetValue("data-" + tag, defaultVal);
 }
-export { forkAPI, getAPIVersion, setMods };
+export { forkAPI, getAPIVersion };

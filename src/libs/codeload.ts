@@ -1,5 +1,5 @@
 import $ from "jquery";
-import { getAPIVersion, setMods } from "../api/NTAPI";
+import { getAPIVersion } from "../api/NTAPI";
 import { getAPIToken } from "./encrypt";
 import { setProperty } from "./native";
 import { GMDeleteValue, GMGetValue, GMSetValue } from "./usfunc";
@@ -35,7 +35,6 @@ function resortDependency() {
   var stack: any[] = [];
   var sortedList = [];
   var all = GMGetValue("loader.all", {});
-  setMods(all);
   for (var [id, enabled] of Object.entries(all)) {
     if (enabled) {
       dependencies.set(
