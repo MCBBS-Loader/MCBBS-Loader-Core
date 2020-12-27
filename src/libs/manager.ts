@@ -85,23 +85,52 @@ function dumpManager() {
 <button debug='false' type='button' id='debugmode' class='pn pnc'><strong>调试模式</strong></button>
 <br/>
 <textarea style="display:none;font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:90%;height:150px;overflow:auto;word-break:break-all;resize:vertical;" placeholder='BASE64 编码，URL 或 JavaScript 代码……' id='install_base64'></textarea>
+<br/>
 <input style='width:90%;font-family:"Fira Code","Courier New",monospace;' type='text' class='px' id='install_uno' placeholder='使用 ID 或 URL 安装……'/>
 <br/>
-<ul><li>访问 GitHub 资源可用 jsDelivr：https://cdn.jsdelivr.net/gh/你的用户名/你的仓库@分支（一般为 master 或 main）/仓库内文件路径</li></ul>
 <br/>
 <button class='pn pnc' type='button' id='install'><strong>安装</strong></button>
 <br/>
-<span id='install_state' style='font-size:1rem;color:#df307f;'></span>`
+<br/>
+<br/>
+<button class='pn pnc srcc' type='button' id='use_mloader'><strong>快速使用 MCBBS Loader 源（MCBBS-Loader）</strong></button>
+<span class='srcc'>MCBBS Loader 电池源，其中的模块是为用户专门设计的。</span>
+<br/>
+<br/>
+<button class='pn pnc srcc' type='button' id='use_cv'><strong>快速使用 洞穴夜莺 源（CaveNightingale）</strong></button>
+<span class='srcc'>洞穴夜莺的软件源中包含许多轻松使用模块。</span>
+<br/>
+<br/>
+<button class='pn pnc srcc' type='button' id='use_mext'><strong>快速使用 MExt 整合运动 源（MExt-IM）</strong></button>
+<span class='srcc'>MExt 整合运动的软件源中包括了许多适合老用户的 MExt 模块，该源已索引，<a id='preview_mext' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview' target='_blank'>前往查看</a>。</span>
+<br/>`
     );
+    $("#preview_mext").on("click", () => {
+      GMSetValue("tmp.preview", "MCBBS-Loader/Integration-Motion@main");
+    });
+    $("#use_mloader").on("click", () => {
+      $("#install_uno").val("MCBBS-Loader:仓库名:模块 ID:main");
+    });
+    $("#use_cv").on("click", () => {
+      $("#install_uno").val(
+        "CaveNightingale:CaveNightingale-MCBBS-Modules:模块 ID:master"
+      );
+    });
+    $("#use_mext").on("click", () => {
+      $("#install_uno").val("MCBBS-Loader:Integration-Motion:模块 ID:main");
+    });
+
     $("#debugmode").on("click", () => {
       if ($("#debugmode").attr("debug") == "false") {
         $("#debugmode").attr("debug", "true");
         $("#install_base64").show();
         $("#install_uno").hide();
+        $(".srcc").hide();
       } else {
         $("#debugmode").attr("debug", "false");
         $("#install_base64").hide();
         $("#install_uno").show();
+        $(".srcc").show();
       }
     });
 
@@ -378,4 +407,4 @@ function dumpManager() {
   });
 }
 
-export default { createBtn, createMenu, dumpManager };
+export default { createBtn, createMenu, dumpManager, onInstall, onFailure };

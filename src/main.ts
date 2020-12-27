@@ -20,6 +20,7 @@ import { loadNTEVT } from "./api/NTEVT";
 import { getAPIToken } from "./libs/encrypt";
 import { popinfo } from "./libs/popinfo";
 import { setup } from "./libs/setupbattery";
+import viewrepo from "./libs/viewrepo";
 (() => {
   loadNTEVT();
   jQuery(() => {
@@ -101,6 +102,11 @@ import { setup } from "./libs/setupbattery";
     // 这样可以在管理界面显示依赖关系是否满足
     manager.createBtn();
     manager.createMenu();
+    if (/bbsmod\=repopreview/i.test(String(window.location.search))) {
+      viewrepo.dumpPreview(
+        GMGetValue("tmp.preview", "MCBBS-Loader/examplemod@main")
+      );
+    }
     if (/bbsmod\=manager/i.test(String(window.location.search))) {
       $("title").html("MCBBS Loader - 自由的 MCBBS 模块管理器");
       manager.dumpManager();
