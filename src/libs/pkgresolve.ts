@@ -10,13 +10,13 @@ class PackageURL {
     switch (strs.length) {
       case 1:
         this.provider = "MCBBS-Loader";
-        this.version = "latest";
+        this.version = "main";
         this.id = str;
         break;
       case 2:
         this.provider = strs[0];
         this.id = strs[1];
-        this.version = "latest";
+        this.version = "main";
         break;
       case 3:
         this.provider = strs[0];

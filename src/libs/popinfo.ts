@@ -28,7 +28,8 @@ function popinfo(
   }, 200);
 }
 function closepop(move: number = 100, cb: () => void = () => {}) {
-  $("#_popbg").animate({ bottom: "-5%" }, move, "swing", () => {
+  $("#_popbg").animate({ bottom: "-10%" }, move, "swing", () => {
+    $("#_popbg").remove();
     cb();
   });
 }
@@ -56,10 +57,10 @@ function success(msg: string) {
 }
 function error(msg: string) {
   popinfo(
-    "exclamation-triangle",
+    "exclamation-circle",
     msg,
     false,
-    "background-color:#ff950085 !important;"
+    "background-color:#88272790!important;"
   );
 }
 export { popinfo, closepop, warn, error, registryTimer, success };

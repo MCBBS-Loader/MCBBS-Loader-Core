@@ -1,44 +1,92 @@
 import $ from "jquery";
 import { getAPIVersion } from "../api/NTAPI";
 import { parseMeta } from "./codeload";
+import { PackageURL } from "./pkgresolve";
 function checkUpdate(
   meta: any,
   callback: (state: string, ov?: string, nv?: string) => void
 ): void {
   var id = meta.id || "loader.nameless";
-  if (meta.updateURL) {
-    $.get(meta.updateURL, (data) => {
-      var ccode = data.toString();
 
-      var dataMap = new Map<string, string>();
-      parseMeta(ccode, dataMap);
-      if (dataMap.get("id") != id) {
-        callback("latest-diff-id");
-      } else {
-        if (typeof dataMap.get("version") == "string") {
-          var nversion = dataMap.get("version") || "1.0.0";
-          var oversion = meta.version || "1.0.0";
-          if (cmpVersion(nversion, oversion)) {
-            if (typeof dataMap.get("apiVersion") == "string") {
-              if (
-                dataMap.get("apiVersion") !=
-                new String(getAPIVersion()).toString()
-              ) {
-                callback("latest-api-too-early");
-                return;
+  var isUrlRegex = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g;
+  if (meta.updateURL && isUrlRegex.test(meta.updateURL)) {
+    try {
+      $.get(meta.updateURL, (data) => {
+        var ccode = data.toString();
+
+        var dataMap = new Map<string, string>();
+        parseMeta(ccode, dataMap);
+        if (dataMap.get("id") != id) {
+          callback("latest-diff-id");
+        } else {
+          if (typeof dataMap.get("version") == "string") {
+            var nversion = dataMap.get("version") || "1.0.0";
+            var oversion = meta.version || "1.0.0";
+            if (cmpVersion(nversion, oversion)) {
+              if (typeof dataMap.get("apiVersion") == "string") {
+                if (
+                  dataMap.get("apiVersion") !=
+                  new String(getAPIVersion()).toString()
+                ) {
+                  callback("latest-api-too-early");
+                  return;
+                }
               }
+              callback(meta.updateURL, oversion, nversion);
+              return;
+            } else {
+              callback("latest-version-equal-or-earlier");
+              return;
             }
-            callback(meta.updateURL, oversion, nversion);
-            return;
           } else {
-            callback("latest-version-equal-or-earlier");
+            callback("latest-no-version");
+          }
+        }
+      });
+    } catch {
+      callback("latest-no-update-url");
+    }
+  } else if (meta.updateURL) {
+    try {
+      var gurl = new PackageURL(meta.updateURL).getAsURL();
+
+      $.get(gurl, (data) => {
+        var ccode = data.toString();
+
+        var dataMap = new Map<string, string>();
+        parseMeta(ccode, dataMap);
+        if (dataMap.get("id") != id) {
+          callback("latest-diff-id");
+        } else {
+          if (typeof dataMap.get("version") == "string") {
+            var nversion = dataMap.get("version") || "1.0.0";
+            var oversion = meta.version || "1.0.0";
+            if (cmpVersion(nversion, oversion)) {
+              if (typeof dataMap.get("apiVersion") == "string") {
+                if (
+                  dataMap.get("apiVersion") !=
+                  new String(getAPIVersion()).toString()
+                ) {
+                  callback("latest-api-too-early");
+                  return;
+                }
+              }
+              callback(gurl, oversion, nversion);
+              return;
+            } else {
+              callback("latest-version-equal-or-earlier");
+              return;
+            }
+          } else {
+            callback("latest-no-version");
             return;
           }
-        } else {
-          callback("latest-no-version");
         }
-      }
-    });
+      });
+    } catch {
+      callback("latest-no-update-url");
+      return;
+    }
   } else {
     callback("latest-no-update-url");
   }

@@ -1,4 +1,4 @@
-import jQuery, { error } from "jquery";
+import jQuery from "jquery";
 import $ from "jquery";
 import { getAPIVersion } from "../api/NTAPI";
 import {
@@ -10,8 +10,10 @@ import {
   resortDependency,
   isDependencySolved,
   getDependencyError,
+  installFromGID,
 } from "./codeload";
-import { closepop, popinfo, registryTimer, success, warn } from "./popinfo";
+import { closepop, popinfo, registryTimer } from "./popinfo";
+import { warn, success, error } from "./popinfo2";
 import { checkUpdate } from "./updator";
 import { GMGetValue, GMSetValue, setWindowProperty } from "./usfunc";
 function createBtn(): void {
@@ -80,8 +82,10 @@ function dumpManager() {
 <div style='overflow:auto;'><ul id='all_modules'></ul></div>
 <hr/>
 <span style='font-size:1rem'>安装新模块</span>
+<button debug='false' type='button' id='debugmode' class='pn pnc'><strong>调试模式</strong></button>
 <br/>
-<textarea style="font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:90%;height:150px;overflow:auto;word-break:break-all;resize:vertical;" placeholder='BASE64 编码，URL 或 JavaScript 代码……' id='install_base64'></textarea>
+<textarea style="display:none;font-family:'Fira Code','Courier New',monospace;background-color:#fbf2db;width:90%;height:150px;overflow:auto;word-break:break-all;resize:vertical;" placeholder='BASE64 编码，URL 或 JavaScript 代码……' id='install_base64'></textarea>
+<input style='width:90%;font-family:"Fira Code","Courier New",monospace;' type='text' class='px' id='install_uno' placeholder='使用 ID 或 URL 安装……'/>
 <br/>
 <ul><li>访问 GitHub 资源可用 jsDelivr：https://cdn.jsdelivr.net/gh/你的用户名/你的仓库@分支（一般为 master 或 main）/仓库内文件路径</li></ul>
 <br/>
@@ -89,9 +93,18 @@ function dumpManager() {
 <br/>
 <span id='install_state' style='font-size:1rem;color:#df307f;'></span>`
     );
-    $("#install_base64").val(
-      "/* MCBBS Module\nid = com.example\n*/\n// https://cdn.jsdelivr.net/gh/用户名/仓库@分支/文件.js"
-    );
+    $("#debugmode").on("click", () => {
+      if ($("#debugmode").attr("debug") == "false") {
+        $("#debugmode").attr("debug", "true");
+        $("#install_base64").show();
+        $("#install_uno").hide();
+      } else {
+        $("#debugmode").attr("debug", "false");
+        $("#install_base64").hide();
+        $("#install_uno").show();
+      }
+    });
+
     setWindowProperty("notifyUninstall", (id: string) => {
       deleteModule(id, () => {
         resortDependency();
@@ -109,14 +122,73 @@ function dumpManager() {
       dumpManager();
     });
     $("#install").on("click", () => {
-      var str = $("#install_base64").val()?.toString() || "";
+      var src;
+      if ($("#debugmode").attr("debug") == "true") {
+        src = "#install_base64";
+      } else {
+        src = "#install_uno";
+      }
+      var str = $(src).val()?.toString() || "";
+
       try {
         var x = atob(str);
+
         var st = addModule(x);
         if (typeof st != "string") {
           onInstall(st);
         } else {
-          onFailure(st);
+          var isUrlRegex = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g;
+          if (isUrlRegex.test(str)) {
+            popinfo("cloud", "正在获取数据……");
+            try {
+              $.get(str, (dataIn) => {
+                try {
+                  var data = dataIn.toString();
+                  var st =
+                    typeof data === "string"
+                      ? addModule(data)
+                      : "接收了一个无效数据值";
+                  if (typeof st != "string") {
+                    onInstall(st);
+                  } else {
+                    onFailure(st);
+                  }
+                } catch {
+                  onFailure("接收了一个无效数据值");
+                }
+              });
+            } catch {
+              var st = addModule(str);
+              if (typeof st != "string") {
+                onInstall(st);
+              } else {
+                installFromGID(
+                  str,
+                  (st) => {
+                    onInstall(st);
+                  },
+                  (reason) => {
+                    onFailure(reason);
+                  }
+                );
+              }
+            }
+          } else {
+            var st = addModule(str);
+            if (typeof st != "string") {
+              onInstall(st);
+            } else {
+              installFromGID(
+                str,
+                (st) => {
+                  onInstall(st);
+                },
+                (reason) => {
+                  onFailure(`无效 ID 或网络错误，所有安装途径均失败`);
+                }
+              );
+            }
+          }
         }
       } catch {
         var isUrlRegex = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g;
@@ -140,14 +212,35 @@ function dumpManager() {
               }
             });
           } catch {
-            onFailure("接收了一个无效数据值");
+            var st = addModule(str);
+            if (typeof st != "string") {
+              onInstall(st);
+            } else {
+              installFromGID(
+                str,
+                (st) => {
+                  onInstall(st);
+                },
+                (reason) => {
+                  onFailure(`无效 ID 或网络错误，所有安装途径均失败`);
+                }
+              );
+            }
           }
         } else {
           var st = addModule(str);
           if (typeof st != "string") {
             onInstall(st);
           } else {
-            onFailure(st);
+            installFromGID(
+              str,
+              (st) => {
+                onInstall(st);
+              },
+              (reason) => {
+                onFailure(`无效 ID 或网络错误，所有安装途径均失败`);
+              }
+            );
           }
         }
       }
