@@ -98,15 +98,21 @@ function dumpManager() {
 <br/>
 <br/>
 <button class='pn pnc srcc' type='button' id='use_cv'><strong>快速使用 洞穴夜莺 源（CaveNightingale）</strong></button>
-<span class='srcc'>洞穴夜莺的软件源中包含许多轻松使用模块。</span>
+<span class='srcc'>洞穴夜莺的软件源中包含许多轻松使用模块，<a id='preview_cv' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview' target='_blank'>预览该软件源</a>。</span>
 <br/>
 <br/>
 <button class='pn pnc srcc' type='button' id='use_mext'><strong>快速使用 MExt 整合运动 源（MExt-IM）</strong></button>
-<span class='srcc'>MExt 整合运动的软件源中包括了许多适合老用户的 MExt 模块，该源已索引，<a id='preview_mext' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview' target='_blank'>前往查看</a>。</span>
+<span class='srcc'>MExt 整合运动的软件源中包括了许多适合老用户的 MExt 模块，<a id='preview_mext' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview' target='_blank'>预览该软件源</a>。</span>
 <br/>`
     );
     $("#preview_mext").on("click", () => {
       GMSetValue("tmp.preview", "MCBBS-Loader/Integration-Motion@main");
+    });
+    $("#preview_cv").on("click", () => {
+      GMSetValue(
+        "tmp.preview",
+        "CaveNightingale/CaveNightingale-MCBBS-Modules@master"
+      );
     });
     $("#use_mloader").on("click", () => {
       $("#install_uno").val("MCBBS-Loader:仓库名:模块 ID:main");

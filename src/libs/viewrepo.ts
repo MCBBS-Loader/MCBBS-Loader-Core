@@ -2,6 +2,7 @@ import { IMG_MCBBS, installFromGID } from "./codeload";
 import { getProperty } from "./native";
 import $ from "jquery";
 import manager from "./manager";
+import { GMGetValue } from "./usfunc";
 function getManifest(repo: string, cb: (data: any) => void) {
   var manifest = `https://cdn.jsdelivr.net/gh/${repo}/manifest.json`;
   try {
@@ -41,12 +42,23 @@ function dumpPreview(repo: string) {
         var meta = getProperty(data, m);
         var color = "";
         var isCore = false;
+        var isInstalled: boolean = false;
+        if (GMGetValue(`meta-${meta.id}`) != undefined) {
+          isInstalled = true;
+        }
         if (meta.permissions.search("loader:core") != -1) {
           color = "#ff0000";
           isCore = true;
         } else {
           color = "#5d2391";
         }
+        var installText = "";
+        if (isInstalled) {
+          color = "#575757";
+          installText =
+            "&nbsp;<span style='color:#575757'><b>[已安装]</b></span>";
+        }
+        console.log(installText);
         var ele = `<li id='${
           meta.id || "impossible"
         }'><div style='display:inline;'><img src='${
@@ -62,7 +74,8 @@ function dumpPreview(repo: string) {
           "1.0.0" +
             (isCore
               ? "&nbsp;<span style='color:#ff0000'><b>[COREMOD]</b></span>"
-              : "")
+              : "") +
+            installText
         }</span><br/>&nbsp;&nbsp;<span style='font-size:16px;color:#df307f;'>${
           meta.author || "Someone"
         }</span><br/>&nbsp;&nbsp;<span style='font-size:12px'>${

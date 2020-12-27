@@ -12,7 +12,7 @@ import { success } from "./popinfo2";
 function dumpConfigPage() {
   $("div[class='bm bw0']").html(
     "<span style='font-size:1.5rem'>设置中心</span>&nbsp;&nbsp;<button id='saveconfig' type='button' class='pn pnc'>" +
-      "<span>保存</span></button><div id='config_div'></div>"
+      "<span>保存</span></button>&nbsp;<span style='color:#df307f'>您的设置应当会自动保存，如果没有，单击此按钮来保存。</span><br/><div id='config_div'></div>"
   );
   $("#saveconfig").on("click", autoSave);
   renderAll();
@@ -140,6 +140,13 @@ function renderAll() {
     } else {
       $(e.target).attr("class", "chkbox fa fa-check-square");
     }
+    autoSave();
+  });
+  $("texrarea").on("blur", () => {
+    autoSave();
+  });
+  $("input").on("blur", () => {
+    autoSave();
   });
 }
 function createConfigItem(details: Map<string, string>) {
