@@ -3,6 +3,10 @@ import { getProperty } from "./native";
 import $ from "jquery";
 import manager from "./manager";
 import { GMGetValue } from "./usfunc";
+$.ajaxSetup({
+  timeout: 10000,
+  cache: false,
+});
 function getManifest(repo: string, cb: (data: any) => void) {
   var manifest = `https://cdn.jsdelivr.net/gh/${repo}/manifest.json`;
   try {

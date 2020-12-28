@@ -1,5 +1,9 @@
 import { installFromUrl } from "./codeload";
-
+import $ from "jquery";
+$.ajaxSetup({
+  timeout: 10000,
+  cache: false,
+});
 class PackageURL {
   service: string = "github";
   version: string = "";
@@ -39,7 +43,13 @@ class PackageURL {
       this.file = strs[2] + ".js";
       this.version = strs[3];
     }
+    try {
+      $.get(
+        `https://purge.jsdelivr.net/gh/${this.provider}/${this.id}@${this.version}/${this.file}`
+      );
+    } catch {}
   }
+
   getAsURL() {
     return `https://cdn.jsdelivr.net/gh/${this.provider}/${this.id}@${this.version}/${this.file}`;
   }

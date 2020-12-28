@@ -8,6 +8,10 @@ import { warn } from "./popinfo";
 const STRING_API_VERSION = String(getAPIVersion());
 var dirty: boolean = false,
   dependencyError: string = "";
+$.ajaxSetup({
+  timeout: 10000,
+  cache: false,
+});
 function getDependencyError(): string {
   return dependencyError;
 }

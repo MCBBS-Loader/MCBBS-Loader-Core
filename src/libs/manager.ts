@@ -16,6 +16,10 @@ import { closepop, popinfo, registryTimer } from "./popinfo";
 import { warn, success, error } from "./popinfo2";
 import { checkUpdate } from "./updator";
 import { GMGetValue, GMSetValue, setWindowProperty } from "./usfunc";
+$.ajaxSetup({
+  timeout: 10000,
+  cache: false,
+});
 function createBtn(): void {
   jQuery(() => {
     $("ul.user_info_menu_btn").append(

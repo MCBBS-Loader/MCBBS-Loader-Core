@@ -2,6 +2,10 @@ import $ from "jquery";
 import { getAPIVersion } from "../api/NTAPI";
 import { parseMeta } from "./codeload";
 import { PackageURL } from "./pkgresolve";
+$.ajaxSetup({
+  timeout: 10000,
+  cache: false,
+});
 function checkUpdate(
   meta: any,
   callback: (state: string, ov?: string, nv?: string) => void

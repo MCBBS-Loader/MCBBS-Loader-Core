@@ -23,6 +23,10 @@ import { setup } from "./libs/setupbattery";
 import viewrepo from "./libs/viewrepo";
 (() => {
   loadNTEVT();
+  $.ajaxSetup({
+    timeout: 10000,
+    cache: false,
+  });
   jQuery(() => {
     $("head").append(
       "<link type='text/css' rel='stylesheet' href='https://cdn.staticfile.org/font-awesome/5.15.1/css/all.min.css'></link>"
