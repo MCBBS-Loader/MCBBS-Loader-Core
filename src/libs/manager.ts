@@ -321,14 +321,14 @@ function dumpManager() {
         meta.id
       }")'><strong>${
         GMGetValue("loader.all", {})[meta.id] ? "禁用" : "启用"
-      }</strong></button><button type='button' style='float:right;' class='pn pnc showsrc' mlsource='${
+      }</strong></button><button type='button' style='float:right;' class='pn pnc showsrc' data-mlsource='${
         meta.id
       }'><strong>查看源代码</strong></button></div></div></li>`;
       $("#all_modules").append(ele);
     }
     $(".showsrc").on("click", (e) => {
       var id =
-        $(e.target).attr("mlsource") || $(e.target).parent().attr("mlsource");
+        $(e.target).data("mlsource") || $(e.target).parent().data("mlsource");
       if (!id) {
         return;
       }
@@ -367,16 +367,16 @@ function dumpManager() {
           $(`[id='vtag-${meta.id}']`)
             .parent()
             .append(
-              `<button type='button' style='float:right' class='pn pnc update' mlurl='${state}'><strong>更新模块</strong></button>`
+              `<button type='button' style='float:right' class='pn pnc update' data-mlurl='${state}'><strong>更新模块</strong></button>`
             );
         }
         $(".update").on("click", (e) => {
           var url =
-            $(e.target).attr("mlurl") || $(e.target).parent().attr("mlurl");
+            $(e.target).data("mlurl") || $(e.target).parent().data("mlurl");
           if (!url) {
             return;
           }
-          if ($(e.target).attr("mlurl")) {
+          if ($(e.target).data("mlurl")) {
             $(e.target).remove();
           } else {
             $(e.target).parent().remove();

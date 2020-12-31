@@ -62,12 +62,11 @@ function dumpPreview(repo: string) {
           installText =
             "&nbsp;<span style='color:#575757'><b>[已安装]</b></span>";
         }
-        console.log(installText);
         var ele = `<li id='${
           meta.id || "impossible"
         }'><div style='display:inline;'><img src='${
           meta.icon || IMG_MCBBS
-        }' width='50' height='50' style="vertical-align:middle;float:left;"></img><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:${color}'><strong>${
+        }' width='50' height='50' style="vertical-align:middle;float:left;"/><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:${color}'><strong>${
           meta.name || "Nameless"
         }</strong></span>&nbsp;&nbsp;&nbsp;<span id='vtag-${
           meta.id
@@ -84,20 +83,20 @@ function dumpPreview(repo: string) {
           meta.author || "Someone"
         }</span><br/>&nbsp;&nbsp;<span style='font-size:12px'>${
           meta.description
-        }</span><button class='pn pnc insremote' style='float:right;' gtar='${
+        }</span><button class='pn pnc insremote' style='float:right;' data-gtar='${
           meta.gid
         }'><strong>安装/更新</strong></button></div></div></li>`;
         $("#all_modules").append(ele);
       }
       $(".insremote").on("click", (e) => {
         var ele;
-        if ($(e.target).attr("gtar") != undefined) {
+        if ($(e.target).data("gtar") != undefined) {
           ele = $(e.target);
         } else {
           ele = $(e.target).parent();
         }
         installFromGID(
-          ele.attr("gtar") || "MCBBS-Loader:examplemod:examplemod:main",
+          ele.data("gtar") || "MCBBS-Loader:examplemod:examplemod:main",
           (st) => {
             manager.onInstall(st);
           },

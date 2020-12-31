@@ -7,7 +7,6 @@ import {
 import $ from "jquery";
 import jQuery from "jquery";
 import { getProperty, setProperty } from "./native";
-import { popinfo } from "./popinfo";
 import { success } from "./popinfo2";
 function dumpConfigPage() {
   $("div[class='bm bw0']").html(
