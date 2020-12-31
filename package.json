@@ -3,11 +3,8 @@
   "version": "1.0.0",
   "description": "Load custom modules into MCBBS!",
   "scripts": {
-    "stable": "npx webpack --progress --config webpack.config.prod.js&&node build.js stable",
-    "dev": "npx webpack --progress --config webpack.config.prod.js&&node build.js dev",
-    "nightly": "npx webpack --progress --config webpack.config.prod.js&&node build.js nightly",
-    "build": "npx webpack --progress --config webpack.config.prod.js&&node build.js nightly&&node build.js stable&&node build.js dev",
-    "debugbuild": "npx webpack --progress --config webpack.config.dev.js&&node builddev.js nightly&&node builddev.js stable&&node builddev.js dev"
+    "build": "npx webpack --progress --config webpack.config.prod.js&&node build.js nightly",
+    "debugbuild": "npx webpack --progress --config webpack.config.dev.js&&node builddev.js nightly"
   },
   "repository": {
     "type": "git",
