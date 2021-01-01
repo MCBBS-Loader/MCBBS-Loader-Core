@@ -35,23 +35,23 @@ class PackageURL {
         this.provider = strs[0];
         this.id = strs[1];
         this.file = strs[2] + ".js";
-        this.version = strs[3];
+        this.version = "@" + strs[3];
     }
     if (strs.length > 4) {
       this.provider = strs[0];
       this.id = strs[1];
       this.file = strs[2] + ".js";
-      this.version = strs[3];
+      this.version = "@" + strs[3];
     }
     try {
       $.get(
-        `https://purge.jsdelivr.net/gh/${this.provider}/${this.id}@${this.version}/${this.file}`
+        `https://purge.jsdelivr.net/gh/${this.provider}/${this.id}${this.version}/${this.file}`
       );
     } catch {}
   }
 
   getAsURL() {
-    return `https://cdn.jsdelivr.net/gh/${this.provider}/${this.id}@${this.version}/${this.file}`;
+    return `https://cdn.jsdelivr.net/gh/${this.provider}/${this.id}${this.version}/${this.file}`;
   }
 }
 function installDependenciesStrict(
