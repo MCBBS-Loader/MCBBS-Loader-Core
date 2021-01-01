@@ -18,28 +18,35 @@ import { getUnsafeWindow, setLockedProperty } from "./libs/native";
 import { forkAPI, getAPIVersion } from "./api/NTAPI";
 import { loadNTEVT } from "./api/NTEVT";
 import { getAPIToken } from "./libs/encrypt";
-import { popinfo } from "./libs/popinfo";
 import { setup } from "./libs/setupbattery";
 import viewrepo from "./libs/viewrepo";
-(() => {
+import { error } from "./libs/popinfo2";
+const isManagerRegex = /bbsmod=manager/i;
+main();
+// verify(() => {});
+function main() {
   loadNTEVT();
   $.ajaxSetup({
     timeout: 10000,
     cache: false,
   });
   jQuery(() => {
-    $("head").append(
-      "<link type='text/css' rel='stylesheet' href='https://cdn.staticfile.org/font-awesome/5.15.1/css/all.min.css'></link>"
-    );
-
-    $("head").append(
-      "<link type='text/css' rel='stylesheet' href='https://cdn.staticfile.org/font-awesome/5.15.1/css/v4-shims.min.css'></link>"
+    $("head")
+      .append(
+        "<link type='text/css' rel='stylesheet' href='https://cdn.staticfile.org/font-awesome/5.15.1/css/all.min.css'/>"
+      )
+      .append(
+        "<link type='text/css' rel='stylesheet' href='https://cdn.staticfile.org/font-awesome/5.15.1/css/v4-shims.min.css'/>"
+      );
+    $("#debuginfo").after(
+      `<br/><span>With MCBBS Loader Version ${getAPIVersion()}.<br/>MCBBS Loader 是独立的项目，与我的世界中文论坛没有从属关系</span>`
     );
   });
   if (GMGetValue("loader.ibatteries", true)) {
     setup(() => {});
     GMSetValue("loader.ibatteries", false);
   }
+
   GMLog(`[MCBBS Loader] 加载器和 API 版本：${getAPIVersion()}`);
   const RESET_TOKEN = Math.floor(
     Math.random() * 1048576 * 1048576 * 1048576 * 1048576
@@ -67,58 +74,53 @@ import viewrepo from "./libs/viewrepo";
   setWindowProperty("CDT", []);
   jQuery(() => {
     // 用户可能是从老版本升级上来的，因此需要立即补全排序好的依赖信息
-    var sortedList = GMGetValue("sorted-modules-list") || resortDependency();
+    let sortedList = GMGetValue("sorted-modules-list") || resortDependency();
     if (sortedList instanceof Array) {
-      for (var id of sortedList) {
+      for (let id of sortedList) {
         mountCode(id, GMGetValue("code-" + id));
-        checkUpdate(GMGetValue("meta-" + id, ""), (state, ov, nv) => {
-          if (!state.startsWith("latest")) {
-            // installFromUrl(state);
-            console.log(
-              `[MCBBS Loader] 有更新可用，模块 ${id} 具有新版本 ${nv}，当前安装的版本为 ${ov}。`
-            );
-          }
-        });
+        ((id) => {
+          checkUpdate(GMGetValue("meta-" + id, ""), (state, ov, nv) => {
+            if (!state.startsWith("latest")) {
+              console.log(
+                `[MCBBS Loader] 有更新可用，模块 ${id} 具有新版本 ${nv}，当前安装的版本为 ${ov}。`
+              );
+            }
+          });
+        })(id);
       }
     } else {
       GMLog(`[MCBBS Loader] ${sortedList}`);
-      GMLog(
-        "[MCBBS Loader] 所有模块均未成功加载，请到管理页面修复依赖关系错误"
-      );
-      var isManagerRegex = /bbsmod\=manager/i;
+      GMLog("[MCBBS Loader] 所有模块均未加载，请到管理页面修复依赖关系错误");
+
       if (isManagerRegex.test(String(window.location.search))) {
-        popinfo(
-          "exclamation-circle",
-          "<b>ECONFLICT！</b>自动加载模块失败，你现在正在模块管理页面，请解决依赖冲突。",
-          true,
-          "background-color:#88272790!important;"
+        error(
+          "<b>ECONFLICT！</b>自动加载模块失败，你现在正在模块管理页面，请解决依赖冲突。"
         );
       } else {
-        popinfo(
-          "exclamation-circle",
-          "<b>ECONFLICT！</b>自动加载模块失败，请求人工管理模块，查看控制台信息并尝试解决依赖错误。",
-          true,
-          "background-color:#88272790!important;"
+        error(
+          "<b>ECONFLICT！</b>自动加载模块失败，请求人工管理模块，查看控制台信息并尝试解决依赖错误。"
         );
       }
       setDependencyError(sortedList);
     }
+
     // 这样可以在管理界面显示依赖关系是否满足
     manager.createBtn();
     manager.createMenu();
-    if (/bbsmod\=repopreview/i.test(String(window.location.search))) {
+    if (/bbsmod=repopreview/i.test(String(window.location.search))) {
       viewrepo.dumpPreview(
         GMGetValue("tmp.preview", "MCBBS-Loader/examplemod@main")
       );
     }
-    if (/bbsmod\=manager/i.test(String(window.location.search))) {
+    if (/bbsmod=manager/i.test(String(window.location.search))) {
       $("title").html("MCBBS Loader - 自由的 MCBBS 模块管理器");
       manager.dumpManager();
       configpage.createMenu(); // config菜单只能从模块管理页面见到似乎更加合理
+      // localconf.dumpLocalMenu();
     }
     if (GMGetValue("temp.loadcfg", false)) {
       GMSetValue("temp.loadcfg", false);
       configpage.dumpConfigPage();
     }
   });
-})();
+}

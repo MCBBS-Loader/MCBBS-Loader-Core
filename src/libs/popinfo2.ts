@@ -44,7 +44,7 @@ class PopMsg {
   style: string = "";
   msg: string = "";
   show(next: () => void) {
-    var data = `<div id='_popbg' style='user-select:none;cursor:default;width:100%;height:50px;background-color:#02020275;position:fixed;bottom:-100px;text-align:center;color:#ffffff;${this.style}'><i style='font-size:${this.size};vertical-align:middle;' id='_popicon' class='fa fa-${this.icon}'></i><span style='padding-top:2px;display:inline-block;vertical-align:middle;line-height:50px;'>&nbsp;&nbsp;&nbsp;${this.msg}</span></div>`;
+    let data = `<div id='_popbg' style='z-index:100;user-select:none;cursor:default;width:100%;height:50px;background-color:#02020275;position:fixed;bottom:-100px;text-align:center;color:#ffffff;${this.style}'><i style='font-size:${this.size};vertical-align:middle;' id='_popicon' class='fa fa-${this.icon}'></i><span style='padding-top:2px;display:inline-block;vertical-align:middle;line-height:50px;'>&nbsp;&nbsp;&nbsp;${this.msg}</span></div>`;
     $("body").append(data);
     if (this.spark) {
       spark($("#_popicon"), 500);

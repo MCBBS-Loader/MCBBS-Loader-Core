@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MCBBS Loader
 // @namespace    https://mcbbs-loader.xuogroup.top
-// @version      0.9.4
+// @version      1.0.0
 // @description  Load custom modules into MCBBS!
 // @author       mcbbs-loader
 // @match        http*://www.mcbbs.net/*

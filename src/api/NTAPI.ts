@@ -7,11 +7,12 @@ import {
   setWindowProperty,
 } from "../libs/usfunc";
 import $ from "jquery";
-import { closepop, popinfo } from "../libs/popinfo";
 import { hasPermission } from "../libs/permissions";
 import { getGM } from "../libs/native";
 import { coreModEval } from "../libs/codeload";
 import configpage from "../libs/configpage";
+import { info } from "../libs/popinfo2";
+
 const ML_VERSION = 1;
 var all: any = GMGetValue("loader.all", {});
 
@@ -24,9 +25,9 @@ setWindowProperty("MIDT", {});
 
 class MCBBSAPI {
   private id: string;
+  public local: Object = {};
   constructor(id: string) {
     this.id = id;
-
     if (hasPermission(id, "loader:core")) {
       this.eval = coreModEval;
       this.GM = getGM();
@@ -63,8 +64,9 @@ class MCBBSAPI {
   public mountJS(src: string) {
     $("head").append(`<script src='${src}'></script>`);
   }
-  public popStatus = popinfo;
-  public closeStatus = closepop;
+  public popInfo = (msg: string) => {
+    info(`[ ${this.id} ] ` + msg);
+  };
   public sysNotification = GMNotification;
   public GM;
   public eval;
@@ -85,11 +87,10 @@ function moduleImport(id: string, callback: (arg: any) => void): boolean {
   } else {
     var origin = getWindowProperty("MIDT")[id];
     if (origin) {
-      var nc = (obj: any) => {
+      getWindowProperty("MIDT")[id] = (obj: any) => {
         origin(obj);
         callback(obj);
       };
-      getWindowProperty("MIDT")[id] = nc;
     } else {
       getWindowProperty("MIDT")[id] = callback;
     }

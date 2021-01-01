@@ -2,7 +2,7 @@ import { IMG_MCBBS, installFromGID } from "./codeload";
 import { getProperty } from "./native";
 import $ from "jquery";
 import manager from "./manager";
-import { GMGetValue } from "./usfunc";
+import { GMGetValue, GMSetValue } from "./usfunc";
 $.ajaxSetup({
   timeout: 10000,
   cache: false,
@@ -16,6 +16,8 @@ function getManifest(repo: string, cb: (data: any) => void) {
       } else {
         cb(data);
       }
+    }).catch(() => {
+      $("#all_modules").html("无法显示该软件源的预览。");
     });
   } catch {
     cb(undefined);
@@ -24,7 +26,9 @@ function getManifest(repo: string, cb: (data: any) => void) {
 function dumpPreview(repo: string) {
   $("div[class='bm bw0']").css("user-select", "none");
   $("div[class='bm bw0']").html(
-    `<span style='font-size:1.5rem'>正在预览软件源 ${repo}</span>
+    `<span style='font-size:1.5rem'>正在预览软件源 ${repo}</span>&nbsp;&nbsp;
+<input class="px" id="viewsrc" type="text" style="width: 50%" placeholder="输入新的软件源地址来加载预览"/>
+&nbsp;<button type="button" id="loadview" class="pn pnc"><strong>加载预览</strong></button>
 <br/>
 <hr/>
 <span style='font-size:1rem'>该软件源中的模块</span>
@@ -32,6 +36,11 @@ function dumpPreview(repo: string) {
 <div style='overflow:auto;'><ul id='all_modules'></ul></div>
 <hr/>`
   );
+  $("#viewsrc").val(repo);
+  $("#loadview").on("click", () => {
+    GMSetValue("tmp.preview", $("#viewsrc").val() || repo);
+    open(window.location.href, "_self");
+  });
   getManifest(repo, (data) => {
     if (data == undefined) {
       $("#all_modules").html("无法显示该软件源的预览。");
@@ -43,7 +52,6 @@ function dumpPreview(repo: string) {
         meta.author = meta.author || "Someone";
         meta.description = meta.description || "No description provided.";
         meta.permissions = meta.permissions || "";
-        var meta = getProperty(data, m);
         var color = "";
         var isCore = false;
         var isInstalled: boolean = false;

@@ -5,6 +5,7 @@ import { setProperty } from "./native";
 import { GMDeleteValue, GMGetValue, GMSetValue } from "./usfunc";
 import { installDependenciesStrict, PackageURL } from "./pkgresolve";
 import { warn } from "./popinfo";
+
 const STRING_API_VERSION = String(getAPIVersion());
 var dirty: boolean = false,
   dependencyError: string = "";
@@ -39,6 +40,7 @@ function resortDependency(): string | string[] {
   var stack: any[] = [];
   var sortedList = [];
   var all = GMGetValue("loader.all", {});
+
   for (var [id, enabled] of Object.entries(all)) {
     if (enabled) {
       dependencies.set(

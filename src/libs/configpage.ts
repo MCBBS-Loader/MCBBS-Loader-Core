@@ -141,7 +141,7 @@ function renderAll() {
     }
     autoSave();
   });
-  $("texrarea").on("blur", () => {
+  $("textarea").on("blur", () => {
     autoSave();
   });
   $("input").on("blur", () => {

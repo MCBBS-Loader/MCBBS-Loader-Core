@@ -98,7 +98,7 @@ function dumpManager() {
 <br/>
 <br/>
 <button class='pn pnc srcc' type='button' id='use_mloader'><strong>快速使用 MCBBS Loader 源（MCBBS-Loader）</strong></button>
-<span class='srcc'>MCBBS Loader 电池源，其中的模块是为用户专门设计的。</span>
+<span class='srcc'>MCBBS Loader 电池源，其中的模块是为用户专门设计的，<a id='preview_ml' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview' target='_blank'>预览该软件源</a>。</span>
 <br/>
 <br/>
 <button class='pn pnc srcc' type='button' id='use_cv'><strong>快速使用 洞穴夜莺 源（CaveNightingale）</strong></button>
@@ -111,6 +111,9 @@ function dumpManager() {
     );
     $("#preview_mext").on("click", () => {
       GMSetValue("tmp.preview", "MCBBS-Loader/Integration-Motion@main");
+    });
+    $("#preview_ml").on("click", () => {
+      GMSetValue("tmp.preview", "MCBBS-Loader/MCBBS-Loader-Batteries@main");
     });
     $("#preview_cv").on("click", () => {
       GMSetValue(
@@ -299,7 +302,7 @@ function dumpManager() {
         meta.id || "impossible"
       }'><div style='display:inline;'><img src='${
         meta.icon || ""
-      }' width='50' height='50' style="vertical-align:middle;float:left;"></img><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:${color}'><strong>${
+      }' width='50' height='50' style="vertical-align:middle;float:left;"/><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:${color}'><strong>${
         meta.name || "Nameless"
       }</strong></span>&nbsp;&nbsp;&nbsp;<span id='vtag-${
         meta.id
@@ -327,6 +330,12 @@ function dumpManager() {
       $("#all_modules").append(ele);
     }
     $(".showsrc").on("click", (e) => {
+      if ($("#debugmode").attr("debug") == "false") {
+        $("#debugmode").attr("debug", "true");
+        $("#install_base64").show();
+        $("#install_uno").hide();
+        $(".srcc").hide();
+      }
       var id =
         $(e.target).data("mlsource") || $(e.target).parent().data("mlsource");
       if (!id) {
@@ -385,9 +394,8 @@ function dumpManager() {
           installFromUrl(
             url,
             () => {
-              if (/bbsmod\=manager/i.test(String(window.location.search))) {
-                dumpManager();
-              }
+              dumpManager();
+
               var oh = $(`[id='vtag-${meta.id}']`).html();
 
               oh = oh.replace(
