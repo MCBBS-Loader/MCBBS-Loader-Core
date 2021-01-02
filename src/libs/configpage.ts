@@ -48,6 +48,9 @@ function autoSave() {
 function getConfigVal(idIn: string, storageIdIn: string, defaultValue: any) {
   return GMGetValue(`configstore-${idIn}-${storageIdIn}`, defaultValue);
 }
+function setConfigVal(idIn: string, storageIdIn: string, value: any) {
+  GMGetValue(`configstore-${idIn}-${storageIdIn}`, value);
+}
 function renderAll() {
   for (var c of getWindowProperty("CDT")) {
     var ele = `<label style='font-size:14px' for='confval-${getProperty(
@@ -179,4 +182,4 @@ function createMenu(): void {
     $("#manage_config").on("click", dumpConfigPage);
   });
 }
-export default { createMenu, dumpConfigPage, createConfigItem, getConfigVal };
+export default { createMenu, dumpConfigPage, createConfigItem, getConfigVal, setConfigVal };

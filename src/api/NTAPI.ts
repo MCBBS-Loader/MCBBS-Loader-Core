@@ -58,6 +58,9 @@ class MCBBSAPI {
   public getConfigVal(stgid: string, dval?: any) {
     return configpage.getConfigVal(this.id, stgid, dval); // 之前的检查方法会造成默认值为false或者""时失败
   }
+  public setConfigVal(stgid: string, value: any) {
+    configpage.setConfigVal(this.id, stgid, value);
+  }
   public getData(k: string, dv: any) {
     return getData(this.id + "-" + k, dv);
   }
