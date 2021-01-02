@@ -42,10 +42,11 @@ function main() {
       `<br/><span>With MCBBS Loader Version ${getAPIVersion()}.<br/>MCBBS Loader 是独立的项目，与我的世界中文论坛没有从属关系</span>`
     );
   });
+  /*
   if (GMGetValue("loader.ibatteries", true)) {
     setup(() => {});
     GMSetValue("loader.ibatteries", false);
-  }
+  }*/
 
   GMLog(`[MCBBS Loader] 加载器和 API 版本：${getAPIVersion()}`);
   const RESET_TOKEN = Math.floor(
