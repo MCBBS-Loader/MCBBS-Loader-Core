@@ -65,12 +65,12 @@ function dumpManager() {
     $("div[class='bm bw0']").css("user-select", "none");
     $("div[class='bm bw0']").html(
       `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}&nbsp
-<font size="2em" color="red">${
+<span style="font-size: 2em;color:red" >${
         !isDependencySolved() ? "依赖关系未解决" : ""
-      }</font></span>&nbsp&nbsp&nbsp&nbsp
-<font size="2em" color="brown">${
+      }</span></span>&nbsp&nbsp&nbsp&nbsp
+<span style="font-size: 2em;color: brown" >${
         isDirty() ? "当前的设置需要刷新才能生效" : ""
-      }</font>
+      }</span>
 <br/>
 <hr/>
 <span style='${

@@ -26,6 +26,7 @@ setWindowProperty("MIDT", {});
 class MCBBSAPI {
   private id: string;
   public local: Object = {};
+
   constructor(id: string) {
     this.id = id;
     if (hasPermission(id, "loader:core")) {
@@ -36,6 +37,7 @@ class MCBBSAPI {
       this.GM = undefined;
     }
   }
+
   public getAPIVersion = getAPIVersion;
   public download = GMDownload;
   public export_ = (obj: any) => {
@@ -43,9 +45,11 @@ class MCBBSAPI {
   };
   public import_ = moduleImport;
   public $ = $;
+
   public storeData(k: string, v: any) {
     storeData(this.id + "-" + k, v);
   }
+
   public createConfig(stgid: string, name: string, type: string, desc: string) {
     var map = new Map();
     map.set("storageId", stgid);
@@ -55,21 +59,31 @@ class MCBBSAPI {
     map.set("type", type);
     configpage.createConfigItem(map);
   }
+
   public getConfigVal(stgid: string, dval?: any) {
     return configpage.getConfigVal(this.id, stgid, dval); // 之前的检查方法会造成默认值为false或者""时失败
   }
+
   public setConfigVal(stgid: string, value: any) {
     configpage.setConfigVal(this.id, stgid, value);
   }
+
   public getData(k: string, dv: any) {
     return getData(this.id + "-" + k, dv);
   }
+
   public mountJS(src: string) {
     $("head").append(`<script src='${src}'></script>`);
   }
+
   public popInfo = (msg: string) => {
     info(`[ ${this.id} ] ` + msg);
   };
+
+  public isModRunning(id: string) {
+    return !!GMGetValue("all_modules")[id];
+  }
+
   public sysNotification = GMNotification;
   public GM;
   public eval;
@@ -84,6 +98,7 @@ function moduleExport(idIn: string, obj: any) {
   setWindowProperty(`module-export-${idIn}`, obj);
   notifyExport(idIn);
 }
+
 function moduleImport(id: string, callback: (arg: any) => void): boolean {
   if (getWindowProperty(`module-export-${id}`)) {
     callback(getWindowProperty(`module-export-${id}`));
@@ -115,7 +130,9 @@ function notifyExport(id: string) {
 function storeData(tag: string, data: any): void {
   GMSetValue("data-" + tag, data);
 }
+
 function getData(tag: string, defaultVal: any): any {
   return GMGetValue("data-" + tag, defaultVal);
 }
+
 export { forkAPI, getAPIVersion };
