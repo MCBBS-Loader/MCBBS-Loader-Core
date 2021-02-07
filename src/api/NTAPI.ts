@@ -50,13 +50,15 @@ class MCBBSAPI {
     storeData(this.id + "-" + k, v);
   }
 
-  public createConfig(stgid: string, name: string, type: string, desc: string) {
+  public createConfig(stgid: string, name: string, type: string, desc: string,
+      check: (arg: string) => string | undefined = (arg) => undefined) {
     var map = new Map();
     map.set("storageId", stgid);
     map.set("name", name);
     map.set("desc", desc);
     map.set("id", this.id);
     map.set("type", type);
+    map.set("check", check);
     configpage.createConfigItem(map);
   }
 

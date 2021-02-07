@@ -91,13 +91,19 @@ function renderAll() {
         "id"
       )}-${getProperty(c, "storageId")}' style="width: 99%;"></textarea><br/>`;
     } else {
-      ele += `<input type='text' class='px' id='confval-${getProperty(
+      ele += `<div style='height: 17px;'><input type='text' class='px' id='confval-${getProperty(
         c,
         "id"
       )}-${getProperty(
         c,
         "storageId"
-      )}' style="background-color: white; float: right; width:50%;"/><br/>`;
+      )}' style="background-color: white; float: right; width:50%;"/><div id='conferr-${getProperty(
+        c,
+        "id"
+      )}-${getProperty(
+        c,
+        "storageId"
+      )}'></div><br/>`;
     }
     $("#config_div").append(ele);
     if (getProperty(c, "type") == "checkbox") {
@@ -132,6 +138,16 @@ function renderAll() {
         )!.oninput = function () {
           (this as any).rows = (this as any).value.split("\n").length;
         };
+      } else if (getProperty(c, "type") != "textarea" && getProperty(c, "type") != "checkbox") {
+        var element = document.getElementById(
+          `confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}`
+        ) as any;
+        element.oninput = function () {
+          console.log($(this.id.replace(/^confval/, "#conferr").replace(/\./g, "\\.")));
+          $(this.id.replace(/^confval/, "#conferr").replace(/\./g, "\\."))
+            .html(this.check((this as any).value) || "");
+        };
+        element.check = getProperty(c, "check"); 
       }
     }
   }
@@ -160,6 +176,7 @@ function createConfigItem(details: Map<string, string>) {
   var desc = details.get("desc") || "";
   var storageId = details.get("storageId") || "impossible";
   var name = details.get("name") || "Nameless";
+  var check = details.get("check") || ((str: string) => true);
   var CDT = getWindowProperty("CDT") as any[];
   CDT.push({
     id: id,
@@ -167,6 +184,7 @@ function createConfigItem(details: Map<string, string>) {
     storageId: storageId,
     name: name,
     desc: desc,
+    check: check
   });
   setWindowProperty("CDT", CDT);
 }
