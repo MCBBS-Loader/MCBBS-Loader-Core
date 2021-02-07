@@ -346,7 +346,7 @@ function dumpManager() {
     $("#all_modules > li").each((i, e) => {
       var id = $(e).attr("id") || "loader.impossible";
       var meta = GMGetValue(`meta-${id}`);
-
+      
       checkUpdate(meta, (state, ov, nv) => {
         var gtxt;
         var shouldUpdate = false;

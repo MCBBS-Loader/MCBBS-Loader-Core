@@ -1,8 +1,8 @@
-import { IMG_MCBBS, installFromGID } from "./codeload";
-import { getProperty } from "./native";
+import { IMG_MCBBS, installFromGID, resortDependency } from "./codeload";
 import $ from "jquery";
 import manager from "./manager";
 import { GMGetValue, GMSetValue } from "./usfunc";
+import { getUnsafeWindow } from "./native";
 $.ajaxSetup({
   timeout: 10000,
   cache: false,
@@ -24,6 +24,7 @@ function getManifest(repo: string, cb: (data: any) => void) {
   }
 }
 function dumpPreview(repo: string) {
+  var toApply: Set<string> = new Set();
   $("div[class='bm bw0']").css("user-select", "none");
   $("div[class='bm bw0']").html(
     `<span style='font-size:1.5rem'>正在预览软件源 ${repo}</span>&nbsp;&nbsp;
@@ -32,6 +33,8 @@ function dumpPreview(repo: string) {
 <br/>
 <hr/>
 <span style='font-size:1rem'>该软件源中的模块</span>
+<span style='float: right;'><a href='javascript:;' style='color: #524229;' id='select-all-btn'>反选</a>
+<a href='javascript:;' style='color: #524229;' id='apply-changes-btn'>应用</a></span>
 <br/>
 <div style='overflow:auto;'><ul id='all_modules'></ul></div>
 <hr/>`
@@ -91,7 +94,9 @@ function dumpPreview(repo: string) {
           meta.author || "Someone"
         }</span><br/>&nbsp;&nbsp;<span style='font-size:12px'>${
           meta.description
-        }</span><button class='pn pnc insremote' style='float:right;' data-gtar='${
+        }</span><input type='checkbox' class='fast-install-chk' style='float: right;' gtar=${
+          meta.gid
+        }/><button class='pn pnc insremote' style='float:right;' data-gtar='${
           meta.gid
         }'><strong>安装/更新</strong></button></div></div></li>`;
         $("#all_modules").append(ele);
@@ -105,14 +110,57 @@ function dumpPreview(repo: string) {
         }
         installFromGID(
           ele.data("gtar") || "MCBBS-Loader:examplemod:examplemod:main",
-          (st) => {
-            manager.onInstall(st);
-          },
-          (r) => {
-            manager.onFailure(r);
-          }
+          st => manager.onInstall(st), r => manager.onFailure(r)
         );
       });
+      var working = false;
+      $(".fast-install-chk").on("click", (e: any) => {
+        if(working){
+          e.preventDefault();
+        } else if(e.target.checked) {
+          toApply.add(e.target.getAttribute("gtar"));
+        } else {
+          toApply.delete(e.target.getAttribute("gtar"));
+        }
+      });
+      $("#apply-changes-btn").on("click", () => {
+        if(!toApply.size)
+          return;
+        if(working)
+          return;
+        working = true;
+        var succeed: any = [], fail: any = [], update = () => {
+          resortDependency();
+          if(succeed.length + fail.length == toApply.size) {
+            var msg = `成功安装了 ${succeed.length} 个模块:`
+            for(var x of succeed)
+              msg += `<br>&nbsp;&nbsp;&nbsp;&nbsp;${x.get("name")}`;
+            if(fail.length) {
+              msg += `<br>未能安装 ${fail.length} 个模块:`;
+              for(var [id, err] of fail)
+                msg += `<br>&nbsp;&nbsp;&nbsp;&nbsp;${id}&nbsp;&nbsp;&nbsp;&nbsp${err}`;
+                getUnsafeWindow().showDialog(msg, "alert", "安装失败");
+            }
+            getUnsafeWindow().showDialog(msg, "right", "安装成功");
+            working = false;
+          }
+        };
+        toApply.forEach((v) => {
+          installFromGID(v, st => {
+            succeed.push(st);
+            update();
+          }, r => {
+            fail.push([v, r]);
+            update();
+          });
+        });
+        getUnsafeWindow().showError("安装中，请稍后");
+      });
+      $("#select-all-btn").on("click", e => {
+        if(working)
+          return;
+        $(".fast-install-chk").each(HTMLLinkElement.prototype.click);
+      })
     }
   });
 }
