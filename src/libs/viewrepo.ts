@@ -139,9 +139,9 @@ function dumpPreview(repo: string) {
               msg += `<br>未能安装 ${fail.length} 个模块:`;
               for(var [id, err] of fail)
                 msg += `<br>&nbsp;&nbsp;&nbsp;&nbsp;${id}&nbsp;&nbsp;&nbsp;&nbsp${err}`;
-                getUnsafeWindow().showDialog(msg, "alert", "安装失败");
+                getUnsafeWindow().showDialog(msg, "alert", "安装失败", () => manager.dumpManager());
             }
-            getUnsafeWindow().showDialog(msg, "right", "安装成功");
+            getUnsafeWindow().showDialog(msg, "right", "安装成功", () => manager.dumpManager());
             working = false;
           }
         };

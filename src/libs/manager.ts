@@ -318,15 +318,15 @@ function dumpManager() {
         meta.author || "Someone"
       }</span><br/>&nbsp;&nbsp;<span style='font-size:12px'>${
         meta.description
-      }</span><button style='float:right;' type='button' class='pn pnc remove' onclick='window.notifyUninstall("${
+      }</span><div style="float: right;"><button type='button' class='pn pnc remove' onclick='window.notifyUninstall("${
         meta.id
-      }")'><strong>删除模块</strong></button>&nbsp;&nbsp;<button style='float:right;' type='button' class='pn pnc onoff' onclick='window.notifyOnOff("${
+      }")'><strong>删除模块</strong></button>&nbsp;&nbsp;<button type='button' class='pn pnc onoff' onclick='window.notifyOnOff("${
         meta.id
       }")'><strong>${
         GMGetValue("loader.all", {})[meta.id] ? "禁用" : "启用"
-      }</strong></button><button type='button' style='float:right;' class='pn pnc showsrc' data-mlsource='${
+      }</strong></button><button type='button' class='pn pnc showsrc' data-mlsource='${
         meta.id
-      }'><strong>查看源代码</strong></button></div></div></li>`;
+      }'><strong>查看源代码</strong></button></div></div></div></li>`;
       $("#all_modules").append(ele);
     }
     $(".showsrc").on("click", (e) => {
@@ -346,7 +346,7 @@ function dumpManager() {
     $("#all_modules > li").each((i, e) => {
       var id = $(e).attr("id") || "loader.impossible";
       var meta = GMGetValue(`meta-${id}`);
-      
+
       checkUpdate(meta, (state, ov, nv) => {
         var gtxt;
         var shouldUpdate = false;
