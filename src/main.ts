@@ -24,6 +24,24 @@ import { error } from "./libs/popinfo2";
 const isManagerRegex = /bbsmod=manager/i;
 main();
 // verify(() => {});
+function fixMuteScreen() {
+  if($("#ct").hasClass("wp cl w")) {// 禁言用户无法打开设置界面，这里是对用户是否被禁言的判断
+    $("#ct").remove();
+    $("#wp").html(`<div id="pt" class="bm cl">
+    <div class="z">
+    <a href="./" class="nvhm" title="首页">Minecraft(我的世界)中文论坛</a> <em>›</em>
+    <a href="home.php?mod=spacecp">设置</a> <em>›</em>个人资料
+    </div>
+    </div><div id="ct" class="ct2_a wp cl">
+    <div class="mn">
+    <div class="bm bw0" style="user-select: none;"></div>
+    </div>
+    <div class="appl"><div class="tbn">
+    <h2 class="mt bbda">设置</h2>
+    <ul>`);
+  }
+}
+
 function main() {
   loadNTEVT();
   $.ajaxSetup({
@@ -108,12 +126,14 @@ function main() {
     // 这样可以在管理界面显示依赖关系是否满足
     manager.createBtn();
     manager.createMenu();
-    if (/bbsmod=repopreview/i.test(String(window.location.search))) {
-      viewrepo.dumpPreview(
-        GMGetValue("tmp.preview", "MCBBS-Loader/examplemod@main")
-      );
+    var url = String(window.location.search);
+    if (/bbsmod=repopreview/i.test(url)) {
+      fixMuteScreen();
+      var sharp = window.location.hash.indexOf("#");
+      viewrepo.dumpPreview(sharp != -1 ? decodeURIComponent(window.location.hash.substring(1)) : "MCBBS-Loader/examplemod@main");
     }
-    if (/bbsmod=manager/i.test(String(window.location.search))) {
+    if (/bbsmod=manager/i.test(url)) {
+      fixMuteScreen();
       $("title").html("MCBBS Loader - 自由的 MCBBS 模块管理器");
       manager.dumpManager();
       configpage.createMenu(); // config菜单只能从模块管理页面见到似乎更加合理
