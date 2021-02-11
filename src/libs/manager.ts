@@ -11,6 +11,7 @@ import {
   isDependencySolved,
   getDependencyError,
   installFromGID,
+  getTmpDisabled,
 } from "./codeload";
 import { closepop, popinfo, registryTimer } from "./popinfo";
 import { warn, success, error } from "./popinfo2";
@@ -64,13 +65,13 @@ function dumpManager() {
   jQuery(() => {
     $("div[class='bm bw0']").css("user-select", "none");
     $("div[class='bm bw0']").html(
-      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}&nbsp
-<span style="font-size: 2em;color:red" >${
-        !isDependencySolved() ? "依赖关系未解决" : ""
-      }</span></span>&nbsp&nbsp&nbsp&nbsp
-<span style="font-size: 2em;color: brown" >${
-        isDirty() ? "当前的设置需要刷新才能生效" : ""
+      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}
+<span style="font-size: 0.8em;color:red" >${// 这个大字太吓人了，改小点
+        !isDependencySolved() ? "<br>依赖关系未解决" : ""
       }</span>
+<span style="font-size: 0.8em;color: brown" >${
+        isDirty() ? "<br>当前的设置需要刷新才能生效" : ""
+      }</span></span>
 <br/>
 <hr/>
 <span style='${
@@ -98,29 +99,17 @@ function dumpManager() {
 <br/>
 <br/>
 <button class='pn pnc srcc' type='button' id='use_mloader'><strong>快速使用 MCBBS Loader 源（MCBBS-Loader）</strong></button>
-<span class='srcc'>MCBBS Loader 电池源，其中的模块是为用户专门设计的，<a id='preview_ml' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview' target='_blank'>预览该软件源</a>。</span>
+<span class='srcc'>MCBBS Loader 电池源，其中的模块是为用户专门设计的，<a id='preview_ml' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#MCBBS-Loader%2FMCBBS-Loader-Batteries%40main' target='_blank'>预览该软件源</a>。</span>
 <br/>
 <br/>
 <button class='pn pnc srcc' type='button' id='use_cv'><strong>快速使用 洞穴夜莺 源（CaveNightingale）</strong></button>
-<span class='srcc'>洞穴夜莺的软件源中包含许多轻松使用模块，<a id='preview_cv' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview' target='_blank'>预览该软件源</a>。</span>
+<span class='srcc'>洞穴夜莺的软件源中包含许多轻松使用模块，<a id='preview_cv' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#CaveNightingale%2FCaveNightingale-MCBBS-Modules%40master' target='_blank'>预览该软件源</a>。</span>
 <br/>
 <br/>
 <button class='pn pnc srcc' type='button' id='use_mext'><strong>快速使用 MExt 整合运动 源（MExt-IM）</strong></button>
-<span class='srcc'>MExt 整合运动的软件源中包括了许多适合老用户的 MExt 模块，<a id='preview_mext' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview' target='_blank'>预览该软件源</a>。</span>
+<span class='srcc'>MExt 整合运动的软件源中包括了许多适合老用户的 MExt 模块，<a id='preview_mext' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#MCBBS-Loader%2FIntegration-Motion%40main' target='_blank'>预览该软件源</a>。</span>
 <br/>`
     );
-    $("#preview_mext").on("click", () => {
-      GMSetValue("tmp.preview", "MCBBS-Loader/Integration-Motion@main");
-    });
-    $("#preview_ml").on("click", () => {
-      GMSetValue("tmp.preview", "MCBBS-Loader/MCBBS-Loader-Batteries@main");
-    });
-    $("#preview_cv").on("click", () => {
-      GMSetValue(
-        "tmp.preview",
-        "CaveNightingale/CaveNightingale-MCBBS-Modules@master"
-      );
-    });
     $("#use_mloader").on("click", () => {
       $("#install_uno").val("MCBBS-Loader:仓库名:模块 ID:main");
     });
@@ -314,7 +303,9 @@ function dumpManager() {
           (isCore
             ? "&nbsp;<span style='color:#ff0000'><b>[COREMOD]</b></span>"
             : "")
-      }</span><br/>&nbsp;&nbsp;<span style='font-size:16px;color:#df307f;'>${
+      }<span style='color:#df307f;${
+        getTmpDisabled().includes(meta.id) ? "" : "display: none;"
+      }'>[依赖关系原因停用]</span></span><br/>&nbsp;&nbsp;<span style='font-size:16px;color:#df307f;'>${
         meta.author || "Someone"
       }</span><br/>&nbsp;&nbsp;<span style='font-size:12px'>${
         meta.description

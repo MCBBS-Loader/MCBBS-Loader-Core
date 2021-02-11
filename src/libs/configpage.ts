@@ -83,10 +83,22 @@ function renderAll() {
       )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
         c,
         "desc"
-      )}</span></span>
+      )}</span><div id='conferr-${getProperty(
+        c,
+        "id"
+      )}-${getProperty(
+        c,
+        "storageId"
+      )}'></div></span>
         <br/>`;
     } else if (getProperty(c, "type") == "textarea") {
-      ele += `</label><br><textarea id='confval-${getProperty(
+      ele += `</label><br><div id='conferr-${getProperty(
+        c,
+        "id"
+      )}-${getProperty(
+        c,
+        "storageId"
+      )}'></div><textarea id='confval-${getProperty(
         c,
         "id"
       )}-${getProperty(c, "storageId")}' style="width: 99%;"></textarea><br/>`;
@@ -120,36 +132,23 @@ function renderAll() {
         "className",
         faclass
       );
-    } else {
-      var value = getConfigVal(
-        getProperty(c, "id"),
-        getProperty(c, "storageId"),
-        ""
-      );
-      var fld = $(
-        `[id='confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}']`
-      ).val(value);
-      if (getProperty(c, "type") == "textarea") {
-        // 使得textarea的行数动态增长，这样就可以避免滚动
-        fld.prop("rows", value.split("\n").length);
-        // jq似乎没有合适的api绑定这个事件？
-        document.getElementById(
-          `confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}`
-        )!.oninput = function () {
-          (this as any).rows = (this as any).value.split("\n").length;
-        };
-      } else if (getProperty(c, "type") != "textarea" && getProperty(c, "type") != "checkbox") {
-        var element = document.getElementById(
-          `confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}`
-        ) as any;
-        element.oninput = function () {
-          console.log($(this.id.replace(/^confval/, "#conferr").replace(/\./g, "\\.")));
-          $(this.id.replace(/^confval/, "#conferr").replace(/\./g, "\\."))
-            .html(this.check((this as any).value) || "");
-        };
-        element.check = getProperty(c, "check"); 
-      }
     }
+    var element = document.getElementById(
+      `confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}`
+    ) as any;
+    element.oninput = function () {
+      var t = this as any;
+      $(this.id.replace(/^confval/, "#conferr").replace(/\./g, "\\."))
+        .html(this.verifyInput(
+          t.conftype != "checkbox" ? t.value : t.className == "chkbox fa fa-check-square"
+        ) || "");
+      if(t.conftype == "textarea") {
+        t.rows = t.value.split("\n").length;
+      }
+    };
+    element.verifyInput = getProperty(c, "check");
+    element.conftype = getProperty(c, "type");
+    element.oninput();
   }
   $(".chkbox").on("click", (e) => {
     var oclass = $(e.target).attr("class");
@@ -158,6 +157,7 @@ function renderAll() {
     } else {
       $(e.target).attr("class", "chkbox fa fa-check-square");
     }
+    (e.target.oninput as any)();
     autoSave();
   });
   $("textarea").on("blur", () => {

@@ -41,8 +41,8 @@ function dumpPreview(repo: string) {
   );
   $("#viewsrc").val(repo);
   $("#loadview").on("click", () => {
-    GMSetValue("tmp.preview", $("#viewsrc").val() || repo);
-    open(window.location.href, "_self");
+    open("https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#" + 
+      encodeURIComponent($("#viewsrc").val() as string), "_self");
   });
   getManifest(repo, (data) => {
     if (data == undefined) {
