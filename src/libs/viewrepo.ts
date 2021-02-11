@@ -1,12 +1,14 @@
 import { IMG_MCBBS, installFromGID, resortDependency } from "./codeload";
 import $ from "jquery";
 import manager from "./manager";
-import { GMGetValue, GMSetValue } from "./usfunc";
-import { getUnsafeWindow } from "./native";
+import { GMGetValue } from "./usfunc";
+import { showAlert, showPopper, showSuccess } from "../craftmcbbs/craft-ui";
+
 $.ajaxSetup({
   timeout: 10000,
   cache: false,
 });
+
 function getManifest(repo: string, cb: (data: any) => void) {
   var manifest = `https://cdn.jsdelivr.net/gh/${repo}/manifest.json`;
   try {
@@ -23,10 +25,10 @@ function getManifest(repo: string, cb: (data: any) => void) {
     cb(undefined);
   }
 }
+
 function dumpPreview(repo: string) {
   var toApply: Set<string> = new Set();
-  $("div[class='bm bw0']").css("user-select", "none");
-  $("div[class='bm bw0']").html(
+  $("div[class='bm bw0']").css("user-select", "none").html(
     `<span style='font-size:1.5rem'>正在预览软件源 ${repo}</span>&nbsp;&nbsp;
 <input class="px" id="viewsrc" type="text" style="width: 50%" placeholder="输入新的软件源地址来加载预览"/>
 &nbsp;<button type="button" id="loadview" class="pn pnc"><strong>加载预览</strong></button>
@@ -41,8 +43,11 @@ function dumpPreview(repo: string) {
   );
   $("#viewsrc").val(repo);
   $("#loadview").on("click", () => {
-    open("https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#" + 
-      encodeURIComponent($("#viewsrc").val() as string), "_self");
+    open(
+      "https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#" +
+        encodeURIComponent($("#viewsrc").val() as string),
+      "_self"
+    );
   });
   getManifest(repo, (data) => {
     if (data == undefined) {
@@ -110,58 +115,64 @@ function dumpPreview(repo: string) {
         }
         installFromGID(
           ele.data("gtar") || "MCBBS-Loader:examplemod:examplemod:main",
-          st => manager.onInstall(st), r => manager.onFailure(r)
+          (st) => manager.onInstall(st),
+          (r) => manager.onFailure(r)
         );
       });
       var working = false;
       $(".fast-install-chk").on("click", (e: any) => {
-        if(working){
+        if (working) {
           e.preventDefault();
-        } else if(e.target.checked) {
+        } else if (e.target.checked) {
           toApply.add(e.target.getAttribute("gtar"));
         } else {
           toApply.delete(e.target.getAttribute("gtar"));
         }
       });
       $("#apply-changes-btn").on("click", () => {
-        if(!toApply.size)
-          return;
-        if(working)
-          return;
+        if (!toApply.size) return;
+        if (working) return;
         working = true;
-        var succeed: any = [], fail: any = [], update = () => {
-          resortDependency();
-          if(succeed.length + fail.length == toApply.size) {
-            var msg = `成功安装了 ${succeed.length} 个模块:`
-            for(var x of succeed)
-              msg += `<br>&nbsp;&nbsp;&nbsp;&nbsp;${x.get("name")}`;
-            if(fail.length) {
-              msg += `<br>未能安装 ${fail.length} 个模块:`;
-              for(var [id, err] of fail)
-                msg += `<br>&nbsp;&nbsp;&nbsp;&nbsp;${id}&nbsp;&nbsp;&nbsp;&nbsp${err}`;
-                getUnsafeWindow().showDialog(msg, "alert", "安装失败", () => manager.dumpManager());
+        var succeed: any = [],
+          fail: any = [],
+          update = () => {
+            resortDependency();
+            if (succeed.length + fail.length == toApply.size) {
+              var msg = `成功安装了 ${succeed.length} 个模块:`;
+              for (var x of succeed)
+                msg += `<br>&nbsp;&nbsp;&nbsp;&nbsp;${x.get("name")}`;
+              if (fail.length) {
+                msg += `<br>未能安装 ${fail.length} 个模块:`;
+                for (var [id, err] of fail)
+                  msg += `<br>&nbsp;&nbsp;&nbsp;&nbsp;${id}&nbsp;&nbsp;&nbsp;&nbsp${err}`;
+
+                showAlert(msg, "安装失败", () => manager.dumpManager());
+              }
+              showSuccess(msg, "安装成功", () => manager.dumpManager());
+              working = false;
             }
-            getUnsafeWindow().showDialog(msg, "right", "安装成功", () => manager.dumpManager());
-            working = false;
-          }
-        };
+          };
         toApply.forEach((v) => {
-          installFromGID(v, st => {
-            succeed.push(st);
-            update();
-          }, r => {
-            fail.push([v, r]);
-            update();
-          });
+          installFromGID(
+            v,
+            (st) => {
+              succeed.push(st);
+              update();
+            },
+            (r) => {
+              fail.push([v, r]);
+              update();
+            }
+          );
         });
-        getUnsafeWindow().showError("安装中，请稍后");
+        showPopper("安装中，请稍后");
       });
-      $("#select-all-btn").on("click", e => {
-        if(working)
-          return;
+      $("#select-all-btn").on("click", (e) => {
+        if (working) return;
         $(".fast-install-chk").each(HTMLLinkElement.prototype.click);
-      })
+      });
     }
   });
 }
+
 export default { dumpPreview };
