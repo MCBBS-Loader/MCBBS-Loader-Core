@@ -11,6 +11,7 @@ import {
   isDependencySolved,
   getDependencyError,
   installFromGID,
+  getTmpDisabled,
 } from "./codeload";
 import { closepop, popinfo, registryTimer } from "./popinfo";
 import { warn, success, error } from "./popinfo2";
@@ -64,13 +65,13 @@ function dumpManager() {
   jQuery(() => {
     $("div[class='bm bw0']").css("user-select", "none");
     $("div[class='bm bw0']").html(
-      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}&nbsp
-<span style="font-size: 2em;color:red" >${
-        !isDependencySolved() ? "依赖关系未解决" : ""
-      }</span></span>&nbsp&nbsp&nbsp&nbsp
-<span style="font-size: 2em;color: brown" >${
-        isDirty() ? "当前的设置需要刷新才能生效" : ""
+      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}
+<span style="font-size: 0.8em;color:red" >${// 这个大字太吓人了，改小点
+        !isDependencySolved() ? "<br>依赖关系未解决" : ""
       }</span>
+<span style="font-size: 0.8em;color: brown" >${
+        isDirty() ? "<br>当前的设置需要刷新才能生效" : ""
+      }</span></span>
 <br/>
 <hr/>
 <span style='${
@@ -302,7 +303,9 @@ function dumpManager() {
           (isCore
             ? "&nbsp;<span style='color:#ff0000'><b>[COREMOD]</b></span>"
             : "")
-      }</span><br/>&nbsp;&nbsp;<span style='font-size:16px;color:#df307f;'>${
+      }<span style='color:#df307f;${
+        getTmpDisabled().includes(meta.id) ? "" : "display: none;"
+      }'>[依赖关系原因停用]</span></span><br/>&nbsp;&nbsp;<span style='font-size:16px;color:#df307f;'>${
         meta.author || "Someone"
       }</span><br/>&nbsp;&nbsp;<span style='font-size:12px'>${
         meta.description

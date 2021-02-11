@@ -1,7 +1,7 @@
 import {
+  getDependencyError,
   mountCode,
   resortDependency,
-  setDependencyError,
 } from "./libs/codeload";
 import manager from "./libs/manager";
 import configpage from "./libs/configpage";
@@ -18,7 +18,6 @@ import { getUnsafeWindow, setLockedProperty } from "./libs/native";
 import { forkAPI, getAPIVersion } from "./api/NTAPI";
 import { loadNTEVT } from "./api/NTEVT";
 import { getAPIToken } from "./libs/encrypt";
-import { setup } from "./libs/setupbattery";
 import viewrepo from "./libs/viewrepo";
 import { error } from "./libs/popinfo2";
 const isManagerRegex = /bbsmod=manager/i;
@@ -93,34 +92,28 @@ function main() {
   setWindowProperty("CDT", []);
   jQuery(() => {
     // 用户可能是从老版本升级上来的，因此需要立即补全排序好的依赖信息
-    let sortedList = GMGetValue("sorted-modules-list") || resortDependency();
-    if (sortedList instanceof Array) {
-      for (let id of sortedList) {
-        mountCode(id, GMGetValue("code-" + id));
-        ((id) => {
-          checkUpdate(GMGetValue("meta-" + id, ""), (state, ov, nv) => {
-            if (!state.startsWith("latest")) {
-              console.log(
-                `[MCBBS Loader] 有更新可用，模块 ${id} 具有新版本 ${nv}，当前安装的版本为 ${ov}。`
-              );
-            }
-          });
-        })(id);
-      }
-    } else {
-      GMLog(`[MCBBS Loader] ${sortedList}`);
-      GMLog("[MCBBS Loader] 所有模块均未加载，请到管理页面修复依赖关系错误");
+    let sortedList = GMGetValue("loader.sortedModuleList") || resortDependency();
+    for (let id of sortedList) {
+      mountCode(id, GMGetValue("code-" + id));
+      ((id) => {
+        checkUpdate(GMGetValue("meta-" + id, ""), (state, ov, nv) => {
+          if (!state.startsWith("latest")) {
+            console.log(
+              `[MCBBS Loader] 有更新可用，模块 ${id} 具有新版本 ${nv}，当前安装的版本为 ${ov}。`
+            );
+          }
+        });
+      })(id);
+    }
+    var errmsg = getDependencyError();
+    if(errmsg.length) {
+      GMLog("[MCBBS Loader] 部分模块未加载，请到管理页面修复依赖关系错误");
 
       if (isManagerRegex.test(String(window.location.search))) {
         error(
           "<b>ECONFLICT！</b>自动加载模块失败，你现在正在模块管理页面，请解决依赖冲突。"
         );
-      } else {
-        error(
-          "<b>ECONFLICT！</b>自动加载模块失败，请求人工管理模块，查看控制台信息并尝试解决依赖错误。"
-        );
       }
-      setDependencyError(sortedList);
     }
 
     // 这样可以在管理界面显示依赖关系是否满足

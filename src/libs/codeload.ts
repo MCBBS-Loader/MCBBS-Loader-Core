@@ -8,27 +8,31 @@ import { warn } from "./popinfo";
 
 const STRING_API_VERSION = String(getAPIVersion());
 var dirty: boolean = false,
-  dependencyError: string = "";
+  globalDependencyError: string | null = null, globalTmpDisabled: string[] | null = null;
 $.ajaxSetup({
   timeout: 10000,
   cache: false,
 });
-function getDependencyError(): string {
-  return dependencyError;
+function getTmpDisabled(): string[] {
+  return globalTmpDisabled == null ? globalTmpDisabled = GMGetValue("loader.tmpDisabled", []) : globalTmpDisabled;
 }
 
-function setDependencyError(error: string) {
-  dependencyError = error;
+function getDependencyError(): string {
+  return globalDependencyError == null ? globalDependencyError = GMGetValue("loader.dependencyError", "") : globalDependencyError;
 }
 
 function isDependencySolved(): boolean {
-  return !dependencyError.length;
+  return !getDependencyError().length;
 }
 
 function resortDependency(): string | string[] {
+  var rval =  resortDependencyInternal(GMGetValue("loader.all", {}), "", []);
+  return rval;
+}
+
+function resortDependencyInternal(all: any, dependencyError: string, tmpDisabled: string[]): string[] {
   // 哨兵节点，用于标记链表末尾，只写不读，初始化全undefined
   const mapNil = {};
-  dependencyError = "";
   var fixRaw = (id: string, raw: any) => {
     raw.beforeHead = mapNil;
     raw.afterHead = mapNil;
@@ -39,7 +43,7 @@ function resortDependency(): string | string[] {
   var dependencies = new Map<string, object>();
   var stack: any[] = [];
   var sortedList = [];
-  var all = GMGetValue("loader.all", {});
+  var toDisabled: Set<string> = new Set();
 
   for (var [id, enabled] of Object.entries(all)) {
     if (enabled) {
@@ -101,6 +105,7 @@ function resortDependency(): string | string[] {
       depend.forEach((e) => {
         if (!dependencies.get(e)) {
           dependencyError += `${k}依赖${e}，但是后者未安装或未启用。\n`;
+          toDisabled.add(k);
         }
       });
     }
@@ -139,6 +144,7 @@ function resortDependency(): string | string[] {
   // 如果排序已经结束了还有插件没有进入到序列里来，那么排序一定无解，但是相同一个模块的错误只需要输出一次
   dependencies.forEach((v) => {
     if ((v as any).beforeHead != mapNil) {
+      toDisabled.add((v as any).id);
       dependencyError += (v as any).id + "要求在";
       var node: any = (v as any).beforeHead;
       while (node != mapNil) {
@@ -149,11 +155,23 @@ function resortDependency(): string | string[] {
       dependencyError += "之前加载，然而此要求无法满足。\n";
     }
   });
-  GMSetValue(
-    "sorted-modules-list",
-    isDependencySolved() ? sortedList : dependencyError
-  );
-  return isDependencySolved() ? sortedList : dependencyError;
+
+  var toSerialize: any[] = [];
+  toDisabled.forEach((v) => {
+    toSerialize.push(v);
+    delete all[v];
+  });
+  if(toSerialize.length){
+    dependencyError += "已临时停用" + toSerialize.toString() + "\n";
+    return resortDependencyInternal(all, dependencyError, tmpDisabled.concat(toSerialize));
+  } else {
+    globalTmpDisabled = tmpDisabled;
+    globalDependencyError = dependencyError;
+    GMSetValue("loader.sortedModuleList", sortedList);
+    GMSetValue("loader.dependencyError", dependencyError);
+    GMSetValue("loader.tmpDisabled", tmpDisabled);
+    return sortedList;
+  };
 }
 const allowedChars =
     "1234567890!@#$%^&*()qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM_.",
@@ -392,7 +410,7 @@ export {
   markDirty,
   coreModEval,
   resortDependency,
-  setDependencyError,
+  getTmpDisabled,
   getDependencyError,
   isDependencySolved,
   installFromGID,
