@@ -46,12 +46,23 @@ class MCBBSAPI {
   public import_ = moduleImport;
   public $ = $;
 
+  // Polyfills
+  public GM_download = GMDownload;
+  public GM_setValue = this.storeData;
+  public GM_getValue = this.getData;
+  public unsafeWindow = window;
+
   public storeData(k: string, v: any) {
     storeData(this.id + "-" + k, v);
   }
 
-  public createConfig(stgid: string, name: string, type: string, desc: string,
-      check: (arg: string) => string | undefined = (arg) => undefined) {
+  public createConfig(
+    stgid: string,
+    name: string,
+    type: string,
+    desc: string,
+    check: (arg: string) => string | undefined = (arg) => undefined
+  ) {
     var map = new Map();
     map.set("storageId", stgid);
     map.set("name", name);
