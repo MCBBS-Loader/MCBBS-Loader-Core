@@ -4,23 +4,26 @@ import { getAPIVersion } from "../api/NTAPI";
 import {
   addModule,
   deleteModule,
+  getDependencyError,
+  getTmpDisabled,
+  installFromGID,
   installFromUrl,
+  isDependencySolved,
   isDirty,
   markDirty,
   resortDependency,
-  isDependencySolved,
-  getDependencyError,
-  installFromGID,
-  getTmpDisabled,
 } from "./codeload";
 import { closepop, popinfo, registryTimer } from "./popinfo";
-import { warn, success, error } from "./popinfo2";
+import { success, warn } from "./popinfo2";
 import { checkUpdate } from "./updator";
 import { GMGetValue, GMSetValue, setWindowProperty } from "./usfunc";
+import { showAlert, showDialogFull } from "../craftmcbbs/craft-ui";
+
 $.ajaxSetup({
   timeout: 10000,
   cache: false,
 });
+
 function createBtn(): void {
   jQuery(() => {
     $("ul.user_info_menu_btn").append(
@@ -28,6 +31,7 @@ function createBtn(): void {
     );
   });
 }
+
 function createMenu(): void {
   if (
     String(window.location).startsWith(
@@ -41,46 +45,72 @@ function createMenu(): void {
     });
   }
 }
+
+const isCoreModWarn: string =
+  "这是一个 CoreMod，它拥有和 MCBBS Loader 一样的权限，在使用时，请注意安全。";
+
 function onInstall(st: Map<string, string>) {
   resortDependency();
   dumpManager();
   $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
-
+  let isCore = false;
   if ((st.get("permissions")?.search("loader:core") as any) >= 0) {
+    isCore = true;
     warn(
       "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
         st.get("id") +
         "。"
     );
   } else {
+    showDialogFull({
+      msg: `${st.get("name")}
+          已成功安装在您的 MCBBS 上。
+          
+          以下是有关本次安装的详情：
+          
+          软件包类型：Mod
+          软件包 ID：${st.get("id") || "未知"}
+          作者：${st.get("author") || "未知"}${
+        isCore ? "\n" + isCoreModWarn : ""
+      }
+          版本：${st.get("version")}
+          
+          `,
+      title: "安装简报",
+      mode: "right",
+    });
     success("成功安装了模块");
   }
 }
+
 // 安装失败时的动作
 function onFailure(st: string) {
-  error("安装失败：" + st);
+  showAlert(st, "安装失败", () => {});
 }
+
 function dumpManager() {
   var emsg = getDependencyError().replace(/\n/g, "<br>");
   jQuery(() => {
-    $("div[class='bm bw0']").css("user-select", "none");
-    $("div[class='bm bw0']").html(
-      `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}
-<span style="font-size: 0.8em;color:red" >${// 这个大字太吓人了，改小点
-        !isDependencySolved() ? "<br>依赖关系未解决" : ""
-      }</span>
+    $("div[class='bm bw0']")
+      .css("user-select", "none")
+      .html(
+        `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}
+<span style="font-size: 0.8em;color:red" >${
+          // 这个大字太吓人了，改小点
+          !isDependencySolved() ? "<br>依赖关系未解决" : ""
+        }</span>
 <span style="font-size: 0.8em;color: brown" >${
-        isDirty() ? "<br>当前的设置需要刷新才能生效" : ""
-      }</span></span>
+          isDirty() ? "<br>当前的设置需要刷新才能生效" : ""
+        }</span></span>
 <br/>
 <hr/>
 <span style='${
-        !isDependencySolved() ? "" : "display:none;"
-      }font-size:1rem;'>错误</span>
+          !isDependencySolved() ? "" : "display:none;"
+        }font-size:1rem;'>错误</span>
 
 <div id='deperr' style='overflow:auto;color:#ff0000;${
-        !isDependencySolved() ? "" : "display:none;"
-      }'>${emsg}</div>
+          !isDependencySolved() ? "" : "display:none;"
+        }'>${emsg}</div>
 <hr style='${!isDependencySolved() ? "" : "display:none;"}'/>
 <span style='font-size:1rem'>已安装的模块</span>
 <br/>
@@ -109,7 +139,7 @@ function dumpManager() {
 <button class='pn pnc srcc' type='button' id='use_mext'><strong>快速使用 MExt 整合运动 源（MExt-IM）</strong></button>
 <span class='srcc'>MExt 整合运动的软件源中包括了许多适合老用户的 MExt 模块，<a id='preview_mext' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#MCBBS-Loader%2FIntegration-Motion%40main' target='_blank'>预览该软件源</a>。</span>
 <br/>`
-    );
+      );
     $("#use_mloader").on("click", () => {
       $("#install_uno").val("MCBBS-Loader:仓库名:模块 ID:main");
     });

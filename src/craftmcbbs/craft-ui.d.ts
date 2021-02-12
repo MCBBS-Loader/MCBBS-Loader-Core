@@ -12,4 +12,6 @@ declare function showAlert(
 
 declare function showPopper(msg: string): void;
 
-export { showPopper, showAlert, showSuccess };
+declare function showDialogFull(config: any): void;
+
+export { showPopper, showAlert, showSuccess, showDialogFull };
