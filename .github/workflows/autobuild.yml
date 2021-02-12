@@ -36,7 +36,7 @@ jobs:
         git config --local user.email "Twilight_Princess_Sparkle@outlook.com"
         git config --local user.name "Sparklight's Bot"
         git add .
-        git commit -m "build(bot): 你又忘记构建了！"
+        git commit -m "build(bot): 自动构建"
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
