@@ -90,11 +90,11 @@ function spark(jq: JQuery<HTMLElement>, time: number) {
     });
   });
 }
-var MDT_EMERGENCY = new Queue();
-var MDT_HIGH = new Queue();
-var MDT_NORMAL = new Queue();
+let MDT_EMERGENCY = new Queue();
+let MDT_HIGH = new Queue();
+let MDT_NORMAL = new Queue();
 function warn(msg: string) {
-  var pobj = new PopMsg();
+  let pobj = new PopMsg();
   pobj.icon = "exclamation-triangle";
   pobj.msg = msg;
   pobj.style = "background-color:#ff950085 !important;";
@@ -102,7 +102,7 @@ function warn(msg: string) {
   addTask(pobj, "high");
 }
 function error(msg: string) {
-  var pobj = new PopMsg();
+  let pobj = new PopMsg();
   pobj.icon = "exclamation-circle";
   pobj.msg = msg;
   pobj.spark = true;
@@ -111,7 +111,7 @@ function error(msg: string) {
   addTask(pobj, "emergency");
 }
 function info(msg: string) {
-  var pobj = new PopMsg();
+  let pobj = new PopMsg();
   pobj.icon = "info-circle";
   pobj.msg = msg;
 
@@ -119,7 +119,7 @@ function info(msg: string) {
   addTask(pobj, "normal");
 }
 function success(msg: string) {
-  var pobj = new PopMsg();
+  let pobj = new PopMsg();
   pobj.icon = "check";
   pobj.msg = msg;
 

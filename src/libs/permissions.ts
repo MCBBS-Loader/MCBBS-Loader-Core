@@ -4,10 +4,10 @@ function cachePermission(id: string) {
   if (cachedPermission[id]) {
     return cachedPermission[id];
   }
-  var permissions: any = (cachedPermission[id] = {});
-  var meta = GMGetValue("meta-" + id, {});
+  let permissions: any = (cachedPermission[id] = {});
+  let meta = GMGetValue("meta-" + id, {});
   if (meta.permissions) {
-    for (var perm of meta.permissions.split(",")) {
+    for (let perm of meta.permissions.split(",")) {
       permissions[perm.trim()] = true;
     }
   }

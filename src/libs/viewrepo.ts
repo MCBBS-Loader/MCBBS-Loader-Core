@@ -1,16 +1,17 @@
-import { IMG_MCBBS, installFromGID, resortDependency } from "./codeload";
+import { installFromGID, resortDependency } from "./codeload";
 import $ from "jquery";
 import manager from "./manager";
 import { GMGetValue } from "./usfunc";
 import { showAlert, showPopper, showSuccess } from "../craftmcbbs/craft-ui";
-
-$.ajaxSetup({
-  timeout: 10000,
-  cache: false,
-});
-
+import { HTML_VIEWREPO_BODY, IMG_MCBBS } from "./static";
 function getManifest(repo: string, cb: (data: any) => void) {
-  var manifest = `https://cdn.jsdelivr.net/gh/${repo}/manifest.json`;
+  var manifest;
+  if(repo.startsWith("gitee:")) {
+    var parse = repo.substring("gitee:".length).split("@");
+    manifest = `https://gitee.com/${parse[0]}/raw/${parse[1]}`;
+  } else {
+    manifest = `https://cdn.jsdelivr.net/gh/${repo}/manifest.json`;
+  }
   try {
     $.get(manifest, (data) => {
       if (typeof data == "string") {
@@ -29,17 +30,8 @@ function getManifest(repo: string, cb: (data: any) => void) {
 function dumpPreview(repo: string) {
   var toApply: Set<string> = new Set();
   $("div[class='bm bw0']").css("user-select", "none").html(
-    `<span style='font-size:1.5rem'>正在预览软件源 ${repo}</span>&nbsp;&nbsp;
-<input class="px" id="viewsrc" type="text" style="width: 50%" placeholder="输入新的软件源地址来加载预览"/>
-&nbsp;<button type="button" id="loadview" class="pn pnc"><strong>加载预览</strong></button>
-<br/>
-<hr/>
-<span style='font-size:1rem'>该软件源中的模块</span>
-<span style='float: right;'><a href='javascript:;' style='color: #524229;' id='select-all-btn'>反选</a>
-<a href='javascript:;' style='color: #524229;' id='apply-changes-btn'>应用</a></span>
-<br/>
-<div style='overflow:auto;'><ul id='all_modules'></ul></div>
-<hr/>`
+    `<span style='font-size:1.5rem'>正在预览软件源 ${repo}</span>` +
+    HTML_VIEWREPO_BODY
   );
   $("#viewsrc").val(repo);
   $("#loadview").on("click", () => {
@@ -78,32 +70,38 @@ function dumpPreview(repo: string) {
           installText =
             "&nbsp;<span style='color:#575757'><b>[已安装]</b></span>";
         }
-        var ele = `<li id='${
-          meta.id || "impossible"
-        }'><div style='display:inline;'><img src='${
-          meta.icon || IMG_MCBBS
-        }' width='50' height='50' style="vertical-align:middle;float:left;"/><div style="height: 8em">&nbsp;&nbsp;<span style='font-size:18px;color:${color}'><strong>${
-          meta.name || "Nameless"
-        }</strong></span>&nbsp;&nbsp;&nbsp;<span id='vtag-${
-          meta.id
-        }' style='font-size:12px;color:#150029;'>${
-          meta.id || "loader.nameless"
-        }@${
-          meta.version ||
-          "1.0.0" +
-            (isCore
-              ? "&nbsp;<span style='color:#ff0000'><b>[COREMOD]</b></span>"
-              : "") +
-            installText
-        }</span><br/>&nbsp;&nbsp;<span style='font-size:16px;color:#df307f;'>${
-          meta.author || "Someone"
-        }</span><br/>&nbsp;&nbsp;<span style='font-size:12px'>${
-          meta.description
-        }</span><input type='checkbox' class='fast-install-chk' style='float: right;' gtar=${
-          meta.gid
-        }/><button class='pn pnc insremote' style='float:right;' data-gtar='${
-          meta.gid
-        }'><strong>安装/更新</strong></button></div></div></li>`;
+        var ele =
+          `<li id='${meta.id}'>
+          <div style='display:inline;'>
+            <img src='${meta.icon || IMG_MCBBS}' width='50' height='50' style="vertical-align:middle;float:left;"/>
+            <div style="height: 8em">
+              &nbsp;&nbsp;
+              <span style='font-size:18px;color:${color}'>
+                <strong>${meta.name || "Nameless"}</strong>
+              </span>
+              &nbsp;&nbsp;&nbsp;
+              <span id='vtag-${meta.id}' style='font-size:12px;color:#150029;'>
+                ${meta.id}@${(meta.version || "1.0.0") +
+                (isCore ? "&nbsp;<span style='color:#ff0000'><b>[COREMOD]</b></span>": "") +
+                installText}
+              </span>
+              <br/>
+              &nbsp;&nbsp;
+              <span style='font-size:16px;color:#df307f;'>
+                ${meta.author || "Someone"}
+              </span>
+              <br/>
+              &nbsp;&nbsp;
+              <span style='font-size:12px'>
+                ${meta.description}
+              </span>
+              <input type='checkbox' class='fast-install-chk' style='float: right;' gtar=${meta.gid}/>
+              <button class='pn pnc insremote' style='float:right;' data-gtar='${meta.gid}'>
+                <strong>安装/更新</strong>
+              </button>
+            </div>
+          </div>
+        </li>`;
         $("#all_modules").append(ele);
       }
       $(".insremote").on("click", (e) => {

@@ -1,5 +1,5 @@
 import $ from "jquery";
-var timer: Set<number> = new Set();
+let timer: Set<number> = new Set();
 function popinfo(
   icon: string,
   msg: string,
@@ -9,17 +9,23 @@ function popinfo(
   time: number = 500,
   size: string = "28px"
 ) {
-  for (var i of timer.values()) {
+  for (let i of timer.values()) {
     clearTimeout(i);
   }
   // 避免 Set 迭代器混乱
-  for (var i of timer.values()) {
+  for (let i of timer.values()) {
     timer.delete(i);
   }
   closepop();
   $("#_popbg").stop(true).remove();
   setTimeout(() => {
-    var data = `<div id='_popbg' style='user-select:none;cursor:default;width:100%;height:50px;background-color:#02020275;position:fixed;bottom:-50px;text-align:center;color:#ffffff;${style}'><i style='font-size:${size};vertical-align:middle;' id='_popicon' class='fa fa-${icon}'></i><span style='padding-top:2px;display:inline-block;vertical-align:middle;line-height:50px;'>&nbsp;&nbsp;&nbsp;${msg}</span></div>`;
+    let data =
+      `<div id='_popbg' style='${style}'>
+        <i style='font-size:${size};vertical-align:middle;' id='_popicon' class='fa fa-${icon}'></i>
+        <span style='padding-top:2px;display:inline-block;vertical-align:middle;line-height:50px;'>
+          &nbsp;&nbsp;&nbsp;${msg}
+        </span>
+      </div>`;
     $("body").append(data);
     if (doSpark) {
       spark($("#_popicon"), time);

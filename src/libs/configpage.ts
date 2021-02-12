@@ -6,7 +6,7 @@ import {
 } from "./usfunc";
 import $ from "jquery";
 import jQuery from "jquery";
-import { getProperty, setProperty } from "./native";
+import { getProperty } from "./native";
 import { success } from "./popinfo2";
 function dumpConfigPage() {
   $("div[class='bm bw0']").html(
@@ -17,31 +17,24 @@ function dumpConfigPage() {
   renderAll();
 }
 
-function autoSave() {
-  for (var c of getWindowProperty("CDT")) {
-    var val;
-    if (getProperty(c, "type") === "checkbox") {
-      var tval = getProperty(
-        document.getElementById(
-          `confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}`
-        ),
-        "className"
-      );
-      if (tval.includes("check-square")) {
-        val = true;
-      } else {
-        val = false;
-      }
-    } else {
-      val = $(
-        `[id='confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}']`
-      ).val();
-    }
+interface ConfigItem {
+  id: string;
+  type: string;
+  storageId: string;
+  name: string;
+  desc: string;
+  check: (value: string) => string | undefined;
+}
 
-    GMSetValue(
-      `configstore-${getProperty(c, "id")}-${getProperty(c, "storageId")}`,
-      val
-    );
+function autoSave() {
+  for (let c of getWindowProperty("CDT") as ConfigItem[]) {
+    let val;
+    if (c.type === "checkbox") {
+      val = document.getElementById(`confval-${c.id}-${c.storageId}`)!.classList.contains("check-square");
+    } else {
+      val = $(`[id='confval-${c.id}-${c.storageId}']`).val();
+    }
+    GMSetValue(`configstore-${c.id}-${c.storageId}`, val);
   }
   success("设置保存成功！");
 }
@@ -52,143 +45,89 @@ function setConfigVal(idIn: string, storageIdIn: string, value: any) {
   GMGetValue(`configstore-${idIn}-${storageIdIn}`, value);
 }
 function renderAll() {
-  for (var c of getWindowProperty("CDT")) {
-    var ele = `<label style='font-size:14px' for='confval-${getProperty(
-      c,
-      "id"
-    )}-${getProperty(
-      c,
-      "storageId"
-    )}'><span style='font-size:18px;color:#5d2391'><b>${getProperty(
-      c,
-      "name"
-    )} </b></span>(${getProperty(c, "id")}:${getProperty(
-      c,
-      "storageId"
-    )})<br/><span style='color:#df307f'>${getProperty(c, "desc")}</span>`;
-    if (getProperty(c, "type") == "checkbox") {
-      ele = `
-        <span style='font-size:14px'><span style='font-size:18px;color:#5d2391'><i id='confval-${getProperty(
-          c,
-          "id"
-        )}-${getProperty(
-        c,
-        "storageId"
-      )}' class='chkbox fa fa-check-square'></i>&nbsp;<b>${getProperty(
-        c,
-        "name"
-      )} </b></span>(${getProperty(c, "id")}:${getProperty(
-        c,
-        "storageId"
-      )})<br/><span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${getProperty(
-        c,
-        "desc"
-      )}</span><div id='conferr-${getProperty(
-        c,
-        "id"
-      )}-${getProperty(
-        c,
-        "storageId"
-      )}'></div></span>
+  for (let c of getWindowProperty("CDT") as ConfigItem[]) {
+    let ele =
+      `<label style='font-size:14px' for='confval-${c.id}-${c.storageId}'>
+        <span style='font-size:18px;color:#5d2391'>
+          <b>${c.name} </b>
+        </span>
+        (${c.id}:${c.storageId})
+        <br/>
+        <span style='color:#df307f'>${c.desc}</span>
+      </label>`;
+    if (c.type == "checkbox") {
+      ele =
+        `<span style='font-size:14px'>
+          <span style='font-size:18px;color:#5d2391'>
+            <i id='confval-${c.id}-${c.storageId}' class='chkbox fa fa-check-square'></i>
+            &nbsp;
+            <b>${c.name}</b>
+          </span>
+          (${c.id}:${c.storageId})
+          <br/>
+          <span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${c.desc}</span>
+          <div id='conferr-${c.id}-${c.storageId}'></div></span>
+          <br/>
+        </span>`;
+    } else if (c.type == "textarea") {
+      ele +=
+        `<br/>
+        <div id='conferr-${c.id}-${c.storageId}'></div>
+        <textarea id='confval-${c.id}-${c.storageId}' style="width: 99%;" class="loadertextconf"></textarea>
         <br/>`;
-    } else if (getProperty(c, "type") == "textarea") {
-      ele += `</label><br><div id='conferr-${getProperty(
-        c,
-        "id"
-      )}-${getProperty(
-        c,
-        "storageId"
-      )}'></div><textarea id='confval-${getProperty(
-        c,
-        "id"
-      )}-${getProperty(c, "storageId")}' style="width: 99%;"></textarea><br/>`;
     } else {
-      ele += `<div style='height: 17px;'><input type='text' class='px' id='confval-${getProperty(
-        c,
-        "id"
-      )}-${getProperty(
-        c,
-        "storageId"
-      )}' style="background-color: white; float: right; width:50%;"/><div id='conferr-${getProperty(
-        c,
-        "id"
-      )}-${getProperty(
-        c,
-        "storageId"
-      )}'></div><br/>`;
+      ele +=
+        `<div style='height: 17px;'>
+          <input type='text' class='px loadertextconf' id='confval-${c.id}-${c.storageId}'/>
+          <div id='conferr-${c.id}-${c.storageId}'></div>
+          <br/>
+        </div>`;
     }
     $("#config_div").append(ele);
-    if (getProperty(c, "type") == "checkbox") {
-      var faclass = "chkbox fa fa-square";
-      if (
-        getConfigVal(getProperty(c, "id"), getProperty(c, "storageId"), false)
-      ) {
-        faclass = "chkbox fa fa-check-square";
-      }
-      setProperty(
-        document.getElementById(
-          `confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}`
-        ),
-        "className",
-        faclass
-      );
+    if (c.type == "checkbox") {
+      let faclass = getConfigVal(c.id, c.storageId, false) ? "chkbox fa fa-check-square" : "chkbox fa fa-square";
+      document.getElementById(`confval-${c.id}-${c.storageId}`)!.className = faclass;
     } else {
-      var value = getConfigVal(
-        getProperty(c, "id"),
-        getProperty(c, "storageId"),
-        ""
-      );
-      $(`[id='confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}']`).val(value);
+      let value = getConfigVal(c.id, c.storageId,"");
+      $(`[id='confval-${c.id}-${c.storageId}']`).val(value);
     }
-    var element = document.getElementById(
-      `confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}`
-    ) as any;
+    let element = document.getElementById(`confval-${c.id}-${c.storageId}`) as any;
     element.oninput = function () {
-      var t = this as any;
-      $(this.id.replace(/^confval/, "#conferr").replace(/\./g, "\\."))
-        .html(this.verifyInput(
-          t.conftype != "checkbox" ? t.value : t.className == "chkbox fa fa-check-square"
-        ) || "");
-      if(t.conftype == "textarea") {
+      let t = this as any;
+      $(`#conferr-${c.id}-${c.storageId}`).html(
+        c.check(c.type != "checkbox" ? t.value : t.className == "chkbox fa fa-check-square") || ""
+      );
+      if(c.type == "textarea") {
         t.rows = t.value.split("\n").length;
       }
     };
-    element.verifyInput = getProperty(c, "check");
-    element.conftype = getProperty(c, "type");
     element.oninput();
   }
   $(".chkbox").on("click", (e) => {
-    var oclass = $(e.target).attr("class");
+    let oclass = e.target.className;
     if (oclass?.includes("check-square")) {
-      $(e.target).attr("class", "chkbox fa fa-square");
+      e.target.className = "chkbox fa fa-square";
     } else {
-      $(e.target).attr("class", "chkbox fa fa-check-square");
+      e.target.className = "chkbox fa fa-check-square";
     }
     (e.target.oninput as any)();
     autoSave();
   });
-  $("textarea").on("blur", () => {
-    autoSave();
-  });
-  $("input").on("blur", () => {
-    autoSave();
-  });
+  $(".loadertextconf").on("blur", autoSave);
 }
-function createConfigItem(details: Map<string, string>) {
-  var type = details.get("type") || "text";
-  var id = details.get("id");
-  if (!id) {
-    return;
-  }
-  var desc = details.get("desc") || "";
-  var storageId = details.get("storageId") || "impossible";
-  var name = details.get("name") || "Nameless";
-  var check = details.get("check") || ((str: string) => true);
-  var CDT = getWindowProperty("CDT") as any[];
+function createConfigItem(
+  id: string,
+  stgid: string,
+  name: string,
+  type: string,
+  desc: string,
+  check: (arg: string) => string | undefined = (arg) => undefined
+) {
+  let CDT = getWindowProperty("CDT") as ConfigItem[];
   CDT.push({
     id: id,
     type: type,
-    storageId: storageId,
+    storageId: stgid,
     name: name,
     desc: desc,
     check: check

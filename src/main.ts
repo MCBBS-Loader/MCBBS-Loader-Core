@@ -20,6 +20,7 @@ import { loadNTEVT } from "./api/NTEVT";
 import { getAPIToken } from "./libs/encrypt";
 import viewrepo from "./libs/viewrepo";
 import { error } from "./libs/popinfo2";
+import { COMMON_CSS } from "./libs/static";
 const isManagerRegex = /bbsmod=manager/i;
 main();
 // verify(() => {});
@@ -48,32 +49,27 @@ function main() {
     cache: false,
   });
   jQuery(() => {
-    $("head")
-      .append(
-        "<link type='text/css' rel='stylesheet' href='https://cdn.staticfile.org/font-awesome/5.15.1/css/all.min.css'/>"
-      )
-      .append(
-        "<link type='text/css' rel='stylesheet' href='https://cdn.staticfile.org/font-awesome/5.15.1/css/v4-shims.min.css'/>"
-      );
+    $("head").append(
+        `<link type='text/css' rel='stylesheet'
+          href='https://cdn.staticfile.org/font-awesome/5.15.1/css/all.min.css'/>`
+      ).append(
+        `<link type='text/css' rel='stylesheet'
+          href='https://cdn.staticfile.org/font-awesome/5.15.1/css/v4-shims.min.css'/>`
+      ).append(`<style id="mcbbs-loader-common-css">${COMMON_CSS}</style>`);
     $("#debuginfo").after(
       `<br/><span>With MCBBS Loader Version ${getAPIVersion()}.<br/>MCBBS Loader 是独立的项目，与我的世界中文论坛没有从属关系</span>`
     );
   });
-  /*
-  if (GMGetValue("loader.ibatteries", true)) {
-    setup(() => {});
-    GMSetValue("loader.ibatteries", false);
-  }*/
 
   GMLog(`[MCBBS Loader] 加载器和 API 版本：${getAPIVersion()}`);
   const RESET_TOKEN = Math.floor(
     Math.random() * 1048576 * 1048576 * 1048576 * 1048576
   ).toString(16);
-  var sureToReset = false;
+  let sureToReset = false;
   setLockedProperty(getUnsafeWindow(), "reset_" + RESET_TOKEN, () => {
     if (sureToReset) {
-      var all = GMGetValue("loader.all", {});
-      for (var c of Object.entries(all)) {
+      let all = GMGetValue("loader.all", {});
+      for (let c of Object.entries(all)) {
         all[c[0]] = false;
       }
       GMSetValue("loader.all", all);
@@ -81,9 +77,7 @@ function main() {
       GMLog("[MCBBS Loader] 重置完成，下次别安装不可靠模块了~");
     } else {
       sureToReset = true;
-      GMLog(
-        "[MCBBS Loader] 确定要重置吗？这将禁用所有模块！\n如果确定重置，请再调用一次该函数。"
-      );
+      GMLog("[MCBBS Loader] 确定要重置吗？这将禁用所有模块！\n如果确定重置，请再调用一次该函数。");
     }
   });
 
@@ -105,7 +99,7 @@ function main() {
         });
       })(id);
     }
-    var errmsg = getDependencyError();
+    let errmsg = getDependencyError();
     if(errmsg.length) {
       GMLog("[MCBBS Loader] 部分模块未加载，请到管理页面修复依赖关系错误");
 
@@ -119,10 +113,10 @@ function main() {
     // 这样可以在管理界面显示依赖关系是否满足
     manager.createBtn();
     manager.createMenu();
-    var url = String(window.location.search);
+    let url = String(window.location.search);
     if (/bbsmod=repopreview/i.test(url)) {
       fixMuteScreen();
-      var sharp = window.location.hash.indexOf("#");
+      let sharp = window.location.hash.indexOf("#");
       viewrepo.dumpPreview(sharp != -1 ? decodeURIComponent(window.location.hash.substring(1)) : "MCBBS-Loader/examplemod@main");
     }
     if (/bbsmod=manager/i.test(url)) {
