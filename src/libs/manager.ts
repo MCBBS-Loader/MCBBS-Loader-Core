@@ -4,20 +4,22 @@ import { getAPIVersion } from "../api/NTAPI";
 import {
   addModule,
   deleteModule,
+  getDependencyError,
+  getTmpDisabled,
+  installFromGID,
   installFromUrl,
+  isDependencySolved,
   isDirty,
   markDirty,
   resortDependency,
-  isDependencySolved,
-  getDependencyError,
-  installFromGID,
-  getTmpDisabled,
 } from "./codeload";
 import { closepop, popinfo, registryTimer } from "./popinfo";
 import { warn, success, error } from "./popinfo2";
 import { HTML_MANAGER_FOOTER } from "./static";
 import { checkUpdate } from "./updator";
 import { GMGetValue, GMSetValue, setWindowProperty } from "./usfunc";
+import { showAlert, showDialogFull } from "../craftmcbbs/craft-ui";
+
 $.ajaxSetup({
   timeout: 10000,
   cache: false,
@@ -84,26 +86,50 @@ function createMenu(): void {
     });
   }
 }
+
+const isCoreModWarn: string =
+  "这是一个 CoreMod，它拥有和 MCBBS Loader 一样的权限，在使用时，请注意安全。";
+
 function onInstall(st: Map<string, string>) {
   activeChecking.delete(st.get("id")!);
   resortDependency();
   dumpManager();
   $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
-
+  let isCore = false;
   if ((st.get("permissions")?.search("loader:core") as any) >= 0) {
+    isCore = true;
     warn(
       "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
         st.get("id") +
         "。"
     );
   } else {
+    showDialogFull({
+      msg: `${st.get("name")}
+          已成功安装在您的 MCBBS 上。
+          
+          以下是有关本次安装的详情：
+          
+          软件包类型：Mod
+          软件包 ID：${st.get("id") || "未知"}
+          作者：${st.get("author") || "未知"}${
+        isCore ? "\n" + isCoreModWarn : ""
+      }
+          版本：${st.get("version")}
+          
+          `,
+      title: "安装简报",
+      mode: "right",
+    });
     success("成功安装了模块");
   }
 }
+
 // 安装失败时的动作
 function onFailure(st: string) {
-  error("安装失败：" + st);
+  showAlert(st, "安装失败", () => {});
 }
+
 function dumpManager() {
   let emsg = getDependencyError().replace(/\n/g, "<br>");
   jQuery(() => {
