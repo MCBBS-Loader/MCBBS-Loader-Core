@@ -132,6 +132,13 @@ function renderAll() {
         "className",
         faclass
       );
+    } else {
+      var value = getConfigVal(
+        getProperty(c, "id"),
+        getProperty(c, "storageId"),
+        ""
+      );
+      $(`[id='confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}']`).val(value);
     }
     var element = document.getElementById(
       `confval-${getProperty(c, "id")}-${getProperty(c, "storageId")}`

@@ -1,5 +1,7 @@
 # MCBBS-Loader-Core
 
+![Webpack Build CI](https://github.com/MCBBS-Loader/MCBBS-Loader-Core/workflows/Webpack%20Build%20CI/badge.svg)
+
 <span style='font-size:1.5rem;color:#df307f'><strong>MCBBS Loader Core 是 MCBBS 模块加载器</strong></span>
 
 ---
