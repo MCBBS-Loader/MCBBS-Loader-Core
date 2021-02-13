@@ -14,16 +14,13 @@ import {
   resortDependency,
 } from "./codeload";
 import { closepop, popinfo, registryTimer } from "./popinfo";
-import { warn, success, error } from "./popinfo2";
+import { warn, success } from "./popinfo2";
 import { HTML_MANAGER_FOOTER } from "./static";
 import { checkUpdate } from "./updator";
 import { GMGetValue, GMSetValue, setWindowProperty } from "./usfunc";
 import { showAlert, showDialogFull } from "../craftmcbbs/craft-ui";
+import { getCrossOriginData } from "./crossorigin";
 
-$.ajaxSetup({
-  timeout: 10000,
-  cache: false,
-});
 const activeChecking: Map<string, string> = new Map();
 function createManageHtml(meta: any, isCore: boolean, color: string) {
   return `<li id='${meta.id}'>
@@ -95,32 +92,31 @@ function onInstall(st: Map<string, string>) {
   resortDependency();
   dumpManager();
   $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
-  let isCore = false;
-  if ((st.get("permissions")?.search("loader:core") as any) >= 0) {
-    isCore = true;
+  let isCore = (st.get("permissions")?.search("loader:core") as any) >= 0;
+  showDialogFull({
+    msg:
+      `${st.get("name")}已成功安装在您的 MCBBS 上。
+      <br/>  
+      以下是有关本次安装的详情：
+      <br/>  
+      &nbsp;&nbsp;软件包类型：Mod
+      <br/>
+      &nbsp;&nbsp;软件包 ID：${st.get("id") || "未知"}
+      <br/>
+      &nbsp;作者：${st.get("author") || "未知"}
+      ${isCore ? "<br/>" + isCoreModWarn : ""}
+      <br/>
+      &nbsp;&nbsp版本：${st.get("version")}`,
+    title: "安装简报",
+    mode: "right",
+  });
+  if (isCore) {
     warn(
       "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
         st.get("id") +
         "。"
     );
   } else {
-    showDialogFull({
-      msg: `${st.get("name")}
-          已成功安装在您的 MCBBS 上。
-          
-          以下是有关本次安装的详情：
-          
-          软件包类型：Mod
-          软件包 ID：${st.get("id") || "未知"}
-          作者：${st.get("author") || "未知"}${
-        isCore ? "\n" + isCoreModWarn : ""
-      }
-          版本：${st.get("version")}
-          
-          `,
-      title: "安装简报",
-      mode: "right",
-    });
     success("成功安装了模块");
   }
 }
@@ -201,20 +197,12 @@ function dumpManager() {
           if (isUrlRegex.test(str)) {
             popinfo("cloud", "正在获取数据……");
             try {
-              $.get(str, (dataIn) => {
-                try {
-                  let data = dataIn.toString();
-                  let st =
-                    typeof data === "string"
-                      ? addModule(data)
-                      : "接收了一个无效数据值";
-                  if (typeof st != "string") {
-                    onInstall(st);
-                  } else {
-                    onFailure(st);
-                  }
-                } catch {
-                  onFailure("接收了一个无效数据值");
+              getCrossOriginData(str, onFailure, (data: any) => {
+                let st = addModule(data);
+                if(typeof st != "string") {
+                  onInstall(st);
+                } else {
+                  onFailure(st);
                 }
               });
             } catch {
@@ -239,20 +227,12 @@ function dumpManager() {
         if (isUrlRegex.test(str)) {
           popinfo("cloud", "正在获取数据……");
           try {
-            $.get(str, (dataIn) => {
-              try {
-                let data = dataIn.toString();
-                let st =
-                  typeof data === "string"
-                    ? addModule(data)
-                    : "接收了一个无效数据值";
-                if (typeof st != "string") {
-                  onInstall(st);
-                } else {
-                  onFailure(st);
-                }
-              } catch {
-                onFailure("接收了一个无效数据值");
+            getCrossOriginData(str, onFailure, (data: any) => {
+              let st = addModule(data);
+              if(typeof st != "string") {
+                onInstall(st);
+              } else {
+                onFailure(st);
               }
             });
           } catch {

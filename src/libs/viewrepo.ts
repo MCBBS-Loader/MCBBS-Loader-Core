@@ -4,27 +4,18 @@ import manager from "./manager";
 import { GMGetValue } from "./usfunc";
 import { showAlert, showPopper, showSuccess } from "../craftmcbbs/craft-ui";
 import { HTML_VIEWREPO_BODY, IMG_MCBBS } from "./static";
+import { getCrossOriginData } from "./crossorigin";
 function getManifest(repo: string, cb: (data: any) => void) {
   var manifest;
   if(repo.startsWith("gitee:")) {
     var parse = repo.substring("gitee:".length).split("@");
-    manifest = `https://gitee.com/${parse[0]}/raw/${parse[1]}`;
+    manifest = `https://gitee.com/${parse[0]}/raw/${parse[1]}/manifest.json`;
   } else {
     manifest = `https://cdn.jsdelivr.net/gh/${repo}/manifest.json`;
   }
-  try {
-    $.get(manifest, (data) => {
-      if (typeof data == "string") {
-        cb(JSON.parse(data));
-      } else {
-        cb(data);
-      }
-    }).catch(() => {
-      $("#all_modules").html("无法显示该软件源的预览。");
-    });
-  } catch {
-    cb(undefined);
-  }
+  getCrossOriginData(manifest, msg => {
+    $("#all_modules").html("无法显示该软件源的预览。<br/>" + msg);
+  }, cb, "json");
 }
 
 function dumpPreview(repo: string) {
@@ -40,10 +31,11 @@ function dumpPreview(repo: string) {
         encodeURIComponent($("#viewsrc").val() as string),
       "_self"
     );
+    dumpPreview($("#viewsrc").val() as string);
   });
   getManifest(repo, (data) => {
-    if (data == undefined) {
-      $("#all_modules").html("无法显示该软件源的预览。");
+    if (typeof data != "object") {
+      $("#all_modules").html("无法显示该软件源的预览。<br/>无效的JSON");
     } else {
       for (var [m, x] of Object.entries(data)) {
         var meta = data[m];

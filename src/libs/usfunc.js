@@ -16,11 +16,15 @@ function setWindowProperty(key, value) {
 function getWindowProperty(key) {
   return unsafeWindow[key];
 }
+function GMXmlhttpRequest(details) {
+  return GM_xmlhttpRequest(details);
+}
 export {
   GMDeleteValue,
   GMSetValue,
   GMGetValue,
   GMLog,
+  GMXmlhttpRequest,
   setWindowProperty,
   getWindowProperty,
 };

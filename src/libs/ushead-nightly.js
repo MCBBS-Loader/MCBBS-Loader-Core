@@ -4,7 +4,7 @@
 // @version      1.1.0
 // @description  Load custom modules into MCBBS!
 // @author       mcbbs-loader
-// @match        http*://www.mcbbs.net/*
+// @match        https://www.mcbbs.net/*
 // @run-at       document-start
 // @updateURL    https://cdn.jsdelivr.net/gh/MCBBS-Loader/MCBBS-Loader-Core@main/dist/nightly.bundle.prod.user.js
 // @grant        unsafeWindow
@@ -19,4 +19,10 @@
 // @grant        GM_download
 // @grant        GM_notification
 // @grant        GM_setClipboard
+// @grant        GM_xmlhttpRequest
+// @connect      gitee.com
+// @connect      github.com
+// @connect      cdn.jsdelivr.net
+// @connect      mcbbs.net
+// @connect      *
 // ==/UserScript==

@@ -1,6 +1,7 @@
 import $ from "jquery";
 import { getAPIVersion } from "../api/NTAPI";
 import { parseMeta, PackageURL } from "./codeload";
+import { getCrossOriginData } from "./crossorigin";
 function checkUpdate(
   meta: any,
   callback: (state: string, ov?: string, nv?: string) => void
@@ -10,36 +11,30 @@ function checkUpdate(
   let isUrlRegex = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g;
   if (meta.updateURL) {
     let url = isUrlRegex.test(meta.updateURL) ? meta.updateURL : new PackageURL(meta.updateURL).getAsURL();
-    try {
-      $.get(url, (data) => {
-        let ccode = data.toString();
-  
-        let dataMap = new Map<string, string>();
-        parseMeta(ccode, dataMap);
-        if (dataMap.get("id") != id) {
-          callback("latest-diff-id");
-        } else {
-          if (typeof dataMap.get("version") == "string") {
-            let nversion = dataMap.get("version") || "1.0.0";
-            let oversion = meta.version || "1.0.0";
-            if (cmpVersion(nversion, oversion)) {
-              let napiv = dataMap.get("apiVersion");
-              if (typeof napiv == "string" && napiv != String(getAPIVersion())) {
-                callback("latest-api-too-early");
-              } else {
-                callback(meta.updateURL, oversion, nversion);
-              }
+    getCrossOriginData(url, () => callback("latest-network-err"), data => {
+      let dataMap = new Map<string, string>();
+      parseMeta(data, dataMap);
+      if (dataMap.get("id") != id) {
+        callback("latest-diff-id");
+      } else {
+        if (typeof dataMap.get("version") == "string") {
+          let nversion = dataMap.get("version") || "1.0.0";
+          let oversion = meta.version || "1.0.0";
+          if (cmpVersion(nversion, oversion)) {
+            let napiv = dataMap.get("apiVersion");
+            if (typeof napiv == "string" && napiv != String(getAPIVersion())) {
+              callback("latest-api-too-early");
             } else {
-              callback("latest-version-equal-or-earlier");
+              callback(meta.updateURL, oversion, nversion);
             }
           } else {
-            callback("latest-no-version");
+            callback("latest-version-equal-or-earlier");
           }
+        } else {
+          callback("latest-no-version");
         }
-      });
-    } catch {
-      callback("latest-no-update-url");
-    }
+      }
+    });
   } else {
     callback("latest-no-update-url");
   }

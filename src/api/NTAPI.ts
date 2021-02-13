@@ -2,6 +2,7 @@ import {
   getWindowProperty,
   GMGetValue,
   GMSetValue,
+  GMXmlhttpRequest,
   setWindowProperty,
 } from "../libs/usfunc";
 import $ from "jquery";
@@ -72,7 +73,7 @@ class MCBBSAPI {
     assert(typeof name == "string");
     assert(typeof type == "string");
     assert(typeof desc == "string");
-    assert(typeof desc == "function");
+    assert(typeof check == "function");
     configpage.createConfigItem(this.id, stgid, name, type, desc, check);
   }
 
@@ -104,6 +105,10 @@ class MCBBSAPI {
   public isModRunning(id: string) {
     assert(typeof id == "string");
     return !!GMGetValue("all_modules")[id];
+  }
+
+  public crossOriginRequest(details: any): {abort: () => void} {
+    return GMXmlhttpRequest(details);
   }
 
   public sysNotification = GM.GM_notification;

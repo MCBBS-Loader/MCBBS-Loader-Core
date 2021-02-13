@@ -6,6 +6,7 @@ import { GMDeleteValue, GMGetValue, GMSetValue } from "./usfunc";
 import { warn } from "./popinfo";
 import manager from "./manager";
 import { IMG_MCBBS } from "./static";
+import { getCrossOriginData } from "./crossorigin";
 
 // 解析 GID
 class PackageURL {
@@ -53,7 +54,7 @@ class PackageURL {
     }
     if(this.service == "github") {
       try {
-        $.get(`https://purge.jsdelivr.net/gh/${this.provider}/${this.repo}${this.version}/${this.file}`);
+        getCrossOriginData(`https://purge.jsdelivr.net/gh/${this.provider}/${this.repo}${this.version}/${this.file}`);
       } catch {}
     }
   }
@@ -415,28 +416,15 @@ function installFromUrl(
   onsuccess: (st: Map<string, string>) => void = () => {},
   onerror: (reason: string) => void = () => {}
 ) {
-  try {
-    $.get(url, (dataIn) => {
-      try {
-        let data = dataIn.toString();
-        if (typeof data === "string") {
-          let st = addModule(data);
-          if (typeof st == "string") {
-            onerror(st);
-          } else {
-            onsuccess(st);
-          }
-          resortDependency();
-        }
-      } catch {
-        onerror("安装失败，网络请求失败");
-      }
-    }).catch(() => {
-      onerror("安装失败，网络请求失败");
-    });
-  } catch {
-    onerror("安装失败，网络请求失败");
-  }
+  getCrossOriginData(url, () => onerror("安装失败，网络请求失败"), data => {
+    let st = addModule(data);
+    if (typeof st == "string") {
+      onerror(st);
+    } else {
+      onsuccess(st);
+    }
+    resortDependency();
+  });
 }
 // 判断是否操作过
 function isDirty() {
