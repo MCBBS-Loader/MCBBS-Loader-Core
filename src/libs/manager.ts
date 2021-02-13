@@ -59,7 +59,7 @@ function createManageHtml(meta: any, isCore: boolean, color: string) {
         </div>
       </div>
     </div>
-  </li>`
+  </li>`;
 }
 
 function createBtn(): void {
@@ -72,7 +72,7 @@ function createBtn(): void {
 
 function createMenu(): void {
   if (
-    String(window.location).startsWith(
+    window.location.href.startsWith(
       "https://www.mcbbs.net/home.php?mod=spacecp"
     )
   ) {

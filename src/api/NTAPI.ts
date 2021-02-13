@@ -104,7 +104,7 @@ class MCBBSAPI {
 
   public isModRunning(id: string) {
     assert(typeof id == "string");
-    return !!GMGetValue("all_modules")[id];
+    return GMGetValue("loader.sortedModuleList").indexOf(id) >= 0;
   }
 
   public crossOriginRequest(details: any): {abort: () => void} {
@@ -140,7 +140,7 @@ function moduleImport(id: string, callback: (arg: any) => void): boolean {
       getWindowProperty("MIDT")[id] = callback;
     }
   }
-  return !!all[id]; // 让被调用者知道是否import到
+  return GMGetValue("loader.sortedModuleList").indexOf(id) >= 0; // 让被调用者知道是否import到
 }
 
 function notifyExport(id: string) {
