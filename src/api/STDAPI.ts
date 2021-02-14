@@ -11,6 +11,7 @@ import { getGM } from "../libs/native";
 import { coreModEval } from "../libs/codeload";
 import configpage from "../libs/configpage";
 import { info } from "../libs/popinfo2";
+import { LoaderEvent } from "./STDEVT";
 
 const ML_VERSION = 1;
 const GM: any = getGM();
@@ -32,6 +33,7 @@ setWindowProperty("MIDT", {});
 class MCBBSAPI {
   private id: string;
   public local: Object = {};
+  public LoaderEvent = LoaderEvent;
 
   constructor(id: string) {
     this.id = id;
@@ -56,7 +58,6 @@ class MCBBSAPI {
   public GM_download = GM.GM_download;
   public GM_setValue = this.storeData;
   public GM_getValue = this.getData;
-  public unsafeWindow = window;
 
   public storeData(k: string, v: any) {
     storeData(this.id + "-" + k, v);

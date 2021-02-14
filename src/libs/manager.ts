@@ -1,6 +1,6 @@
 import jQuery from "jquery";
 import $ from "jquery";
-import { getAPIVersion } from "../api/NTAPI";
+import { getAPIVersion } from "../api/STDAPI";
 import {
   addModule,
   deleteModule,

@@ -1,5 +1,5 @@
 import $ from "jquery";
-import { getAPIVersion } from "../api/NTAPI";
+import { getAPIVersion } from "../api/STDAPI";
 import { getAPIToken } from "./encrypt";
 import { setProperty } from "./native";
 import { GMDeleteValue, GMGetValue, GMSetValue } from "./usfunc";

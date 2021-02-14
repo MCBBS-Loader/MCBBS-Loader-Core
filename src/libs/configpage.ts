@@ -7,6 +7,7 @@ import {
 import $ from "jquery";
 import jQuery from "jquery";
 import { success } from "./popinfo2";
+import { LoaderEvent } from "../api/STDEVT";
 function dumpConfigPage() {
   $("div[class='bm bw0']").html(
     "<span style='font-size:1.5rem'>设置中心</span>&nbsp;&nbsp;<button id='saveconfig' type='button' class='pn pnc'>" +
@@ -44,6 +45,9 @@ function setConfigVal(idIn: string, storageIdIn: string, value: any) {
   GMGetValue(`configstore-${idIn}-${storageIdIn}`, value);
 }
 function renderAll() {
+  if(LoaderEvent.emitCancelable("ConfigPagePreRender")) {
+    return;
+  }
   for (let c of getWindowProperty("CDT") as ConfigItem[]) {
     let ele =
       `<label style='font-size:14px' for='confval-${c.id}-${c.storageId}'>
@@ -113,6 +117,7 @@ function renderAll() {
     autoSave();
   });
   $(".loadertextconf").on("blur", autoSave);
+  LoaderEvent.emit("ConfigPagePostRender");
 }
 function createConfigItem(
   id: string,

@@ -1,5 +1,5 @@
 import $ from "jquery";
-import { getAPIVersion } from "../api/NTAPI";
+import { getAPIVersion } from "../api/STDAPI";
 import { parseMeta, PackageURL } from "./codeload";
 import { getCrossOriginData } from "./crossorigin";
 function checkUpdate(

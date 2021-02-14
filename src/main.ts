@@ -15,12 +15,13 @@ import {
 import jQuery from "jquery";
 import $ from "jquery";
 import { getUnsafeWindow, setLockedProperty } from "./libs/native";
-import { forkAPI, getAPIVersion } from "./api/NTAPI";
+import { forkAPI, getAPIVersion } from "./api/STDAPI";
 import { loadNTEVT } from "./api/NTEVT";
 import { getAPIToken } from "./libs/encrypt";
 import viewrepo from "./libs/viewrepo";
 import { error } from "./libs/popinfo2";
 import { COMMON_CSS } from "./libs/static";
+import { loadEvents } from "./api/STDEVT";
 const isManagerRegex = /bbsmod=manager/i;
 main();
 // verify(() => {});
@@ -43,7 +44,8 @@ function fixMuteScreen() {
 }
 
 function main() {
-  loadNTEVT();
+  $(loadNTEVT);
+  $(loadEvents);
   $.ajaxSetup({
     timeout: 10000,
     cache: false,
