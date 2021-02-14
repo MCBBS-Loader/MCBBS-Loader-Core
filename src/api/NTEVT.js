@@ -1,3 +1,4 @@
+
 function loadNTEVT() {
   (async () => {
     const removeHandler = (r) => {
@@ -181,43 +182,14 @@ function loadNTEVT() {
       }
     });
     document.addEventListener("DOMContentLoaded", () => {
-      O.observe(document.body, { childList: true, subtree: true });
+      if(!unsafeWindow.MExt) {
+        O.observe(document.body, { childList: true, subtree: true });
+      }
     });
-    const __ajaxpost = window.ajaxpost;
-    window.ajaxpost = (
-      formid,
-      showid,
-      waitid,
-      showidclass,
-      submitbtn,
-      recall
-    ) => {
-      let relfunc = () => {
-        if (typeof recall == "function") {
-          recall();
-        } else {
-          eval(recall);
-        }
-        this.dispatchEvent(
-          new CustomEvent("DiscuzAjaxPostFinished", { bubbles: true })
-        );
-      };
-      __ajaxpost(formid, showid, waitid, showidclass, submitbtn, relfunc);
-    };
-    const __ajaxget = window.ajaxget;
-    window.ajaxget = (url, showid, waitid, loading, display, recall) => {
-      let relfunc = () => {
-        if (typeof recall == "function") {
-          recall();
-        } else {
-          eval(recall);
-        }
-        this.dispatchEvent(
-          new CustomEvent("DiscuzAjaxGetFinished", { bubbles: true })
-        );
-      };
-      __ajaxget(url, showid, waitid, loading, display, relfunc);
-    };
+    addEventListener("DiscuzAjaxPostPost", () => 
+      document.dispatchEvent(new CustomEvent("DiscuzAjaxPostFinished", { bubbles: true })));
+    addEventListener("DiscuzAjaxPostGet", () => 
+      document.dispatchEvent(new CustomEvent("DiscuzAjaxGetFinished", { bubbles: true })));
   })();
 }
 export { loadNTEVT };
