@@ -30,7 +30,7 @@ function autoSave() {
   for (let c of getWindowProperty("CDT") as ConfigItem[]) {
     let val;
     if (c.type === "checkbox") {
-      val = document.getElementById(`confval-${c.id}-${c.storageId}`)!.classList.contains("check-square");
+      val = document.getElementById(`confval-${c.id}-${c.storageId}`)!.classList.contains("fa-check-square");
     } else {
       val = $(`[id='confval-${c.id}-${c.storageId}']`).val();
     }

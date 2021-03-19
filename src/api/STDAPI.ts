@@ -8,7 +8,7 @@ import {
 import $ from "jquery";
 import { hasPermission } from "../libs/permissions";
 import { getGM } from "../libs/native";
-import { coreModEval } from "../libs/codeload";
+import { coreModEval, GIDURL } from "../libs/codeload";
 import configpage from "../libs/configpage";
 import { info } from "../libs/popinfo2";
 import { LoaderEvent } from "./STDEVT";
@@ -37,6 +37,8 @@ class MCBBSAPI {
 
   constructor(id: string) {
     this.id = id;
+    let gid = GMGetValue("loader.all").gid;
+    this.gid = gid ? Object.freeze(GIDURL.fromString(gid)) : null;
     if (hasPermission(id, "loader:core")) {
       this.eval = coreModEval;
       this.GM = getGM();
@@ -115,6 +117,8 @@ class MCBBSAPI {
   public sysNotification = GM.GM_notification;
   public GM;
   public eval;
+  public GIDURL = GIDURL;
+  public gid: GIDURL | null;
 }
 
 // 实现部分

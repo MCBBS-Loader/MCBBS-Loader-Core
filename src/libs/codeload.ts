@@ -9,61 +9,46 @@ import { IMG_MCBBS } from "./static";
 import { getCrossOriginData } from "./crossorigin";
 
 // 解析 GID
-class PackageURL {
+class GIDURL {
+  static NIL = null;
   service: string = "github";
   version: string = "";
   repo: string = "";
   file: string = "";
   provider: string = "";
-  constructor(str: string) {
+
+  constructor(service: string, version: string, repo: string, file: string, provider: string) {
+    this.service = service;
+    this.version = version;
+    this.repo = repo;
+    this.file = file;
+    this.provider = provider;
+  }
+
+  static fromString(str: string) {
+    let service = "github";
     if(str.startsWith("gitee:")) {
       str = str.substring("gitee:".length);
-      this.service = "gitee";
+      service = "gitee";
     }
     let strs = str.split(":");
     switch (strs.length) {
       case 1:
-        this.provider = "MCBBS-Loader";
-        this.version = "";
-        this.file = str + ".js";
-        this.repo = str;
-        break;
+        return new GIDURL(service, "", str, str, "MCBBS-Loader");
       case 2:
-        this.provider = strs[0];
-        this.repo = strs[1];
-        this.file = this.repo + ".js";
-        this.version = "";
-        break;
+        return new GIDURL(service, "", strs[1], strs[1], strs[0]);
       case 3:
-        this.provider = strs[0];
-        this.repo = strs[1];
-        this.version = "";
-        this.file = strs[2] + ".js";
-        break;
-      case 4:
-        this.provider = strs[0];
-        this.repo = strs[1];
-        this.file = strs[2] + ".js";
-        this.version = "@" + strs[3];
-        break;
+        return new GIDURL(service, "", strs[1], strs[2], strs[0]);
       default:
-        this.provider = strs[0];
-        this.repo = strs[1];
-        this.file = strs[2] + ".js";
-        this.version = "@" + strs[3];
-    }
-    if(this.service == "github") {
-      try {
-        getCrossOriginData(`https://purge.jsdelivr.net/gh/${this.provider}/${this.repo}${this.version}/${this.file}`);
-      } catch {}
+        return new GIDURL(service, "@" + strs[3], strs[1], strs[2], strs[0]);
     }
   }
 
-  getAsURL() {
+  getAsURL(extname: string = ".js") {
     return this.service == "github" ? 
-          `https://cdn.jsdelivr.net/gh/${this.provider}/${this.repo}${this.version}/${this.file}` :
+          `https://cdn.jsdelivr.net/gh/${this.provider}/${this.repo}${this.version}/${this.file}${extname}` :
         this.service == "gitee" ?
-          `https://gitee.com/${this.provider}/${this.repo}/raw/${this.version.substring(1)}/${this.file}` : "";
+          `https://gitee.com/${this.provider}/${this.repo}/raw/${this.version.substring(1)}/${this.file}${extname}` : "";
   }
 }
 
@@ -236,7 +221,7 @@ function verifyId(id: string): boolean {
   return /^[0-9|a-z|A-Z|\.|_]+$/.test(id);// 好了现在什么符号都不让用了
 }
 // 安装一个模块
-function addModule(code: string): Map<string, string> | string {
+function addModule(code: string, gid?: string): Map<string, string> | string {
   let isModuleRegex = /\/\*( )*MCBBS[ -]*Module/;
   let ccode = code.trim();
   if (!isModuleRegex.test(ccode)) {
@@ -300,6 +285,7 @@ function addModule(code: string): Map<string, string> | string {
       updateURL: dataMap.get("updateURL"),
       apiVersion: (apiVersion = dataMap.get("apiVersion")),
       version: dataMap.get("version"),
+      gid: gid || dataMap.get("gid")
     };
     if ((apiVersion || STRING_API_VERSION) != STRING_API_VERSION) {
       return "不支持的 API 版本：" + apiVersion;
@@ -322,15 +308,15 @@ function addModule(code: string): Map<string, string> | string {
             if(deplocMap[dep] && !deplocMap[dep].pending && deplocMap[dep].length) {
               deplocMap[dep].pending = true;
               let loc = deplocMap[dep].shift();
-              let instF = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g.test(loc) ? installFromUrl : installFromGID;
-              instF(loc, (st) => {
+              let instF: any = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g.test(loc) ? installFromUrl : installFromGID;
+              instF(loc, (st: any) => {
                 manager.onInstall(st);
                 deplocMap[dep].pending = false;
-              }, (reason) => {
+              }, (reason: any) => {
                 manager.onFailure(reason);
                 deplocMap[dep].pending = false;
                 tryInstall();
-              });
+              }, gid!);
             }
           }
           tryInstall();
@@ -408,16 +394,17 @@ function installFromGID(
   onsuccess: (st: Map<string, string>) => void,
   onerror: (reason: string) => void
 ) {
-  installFromUrl(new PackageURL(gid).getAsURL(), onsuccess, onerror);
+  installFromUrl(GIDURL.fromString(gid).getAsURL(), onsuccess, onerror, gid);
 }
 // 从URL安装
 function installFromUrl(
   url: string,
   onsuccess: (st: Map<string, string>) => void = () => {},
-  onerror: (reason: string) => void = () => {}
+  onerror: (reason: string) => void = () => {},
+  gid?: string
 ) {
   getCrossOriginData(url, () => onerror("安装失败，网络请求失败"), data => {
-    let st = addModule(data);
+    let st = addModule(data, gid);
     if (typeof st == "string") {
       onerror(st);
     } else {
@@ -444,7 +431,7 @@ function coreModEval(code: string) {
   });
 }
 export {
-  PackageURL,
+  GIDURL,
   addModule,
   mountCode,
   deleteModule,

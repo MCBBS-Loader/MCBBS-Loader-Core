@@ -1,6 +1,6 @@
 import $ from "jquery";
 import { getAPIVersion } from "../api/STDAPI";
-import { parseMeta, PackageURL } from "./codeload";
+import { parseMeta, GIDURL } from "./codeload";
 import { getCrossOriginData } from "./crossorigin";
 function checkUpdate(
   meta: any,
@@ -10,7 +10,7 @@ function checkUpdate(
 
   let isUrlRegex = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g;
   if (meta.updateURL) {
-    let url = isUrlRegex.test(meta.updateURL) ? meta.updateURL : new PackageURL(meta.updateURL).getAsURL();
+    let url = isUrlRegex.test(meta.updateURL) ? meta.updateURL : GIDURL.fromString(meta.updateURL).getAsURL();
     getCrossOriginData(url, () => callback("latest-network-err"), data => {
       let dataMap = new Map<string, string>();
       parseMeta(data, dataMap);
