@@ -19,6 +19,7 @@ function getManifest(repo: string, cb: (data: any) => void) {
 }
 
 function dumpPreview(repo: string) {
+  $(".a").removeClass("a");
   var toApply: Set<string> = new Set();
   $("div[class='bm bw0']").css("user-select", "none").html(
     `<span style='font-size:1.5rem'>正在预览软件源 ${repo}</span>` +

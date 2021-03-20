@@ -78,7 +78,7 @@ function createMenu(): void {
   ) {
     jQuery(() => {
       $("div.appl > div.tbn > ul").prepend(
-        "<li><a href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager' style='cursor:pointer;'>模块管理</a></li>"
+        "<li><a id='loader_manager' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager' style='cursor:pointer;'>模块管理</a></li>"
       );
     });
   }
@@ -127,6 +127,8 @@ function onFailure(st: string) {
 }
 
 function dumpManager() {
+  $(".a").removeClass("a");
+  setTimeout(() => $("#loader_manager").parent().addClass("a"), 50);
   let emsg = getDependencyError().replace(/\n/g, "<br>");
   jQuery(() => {
     $("div[class='bm bw0']").css("user-select", "none");

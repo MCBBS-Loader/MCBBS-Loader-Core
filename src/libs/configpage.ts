@@ -45,6 +45,8 @@ function setConfigVal(idIn: string, storageIdIn: string, value: any) {
   GMGetValue(`configstore-${idIn}-${storageIdIn}`, value);
 }
 function renderAll() {
+  $(".a").removeClass("a");
+  $("#manage_config").parent().addClass("a");
   if(LoaderEvent.emitCancelable("ConfigPagePreRender")) {
     return;
   }

@@ -60,6 +60,10 @@ console.log("This is a module!");
 
 有关更多信息，请访问我们的 [Wiki](https://github.com/MCBBS-Loader/MCBBS-Loader-Core/wiki/) 或 [网站](https://mcbbs-loader.xuogroup.top/)
 
+## 构建软件源
+将你的所有模块文件（有效的模块文件应当大写驼峰命名）塞进一个文件夹，然后在该目录下运行本仓库根目录下的`buildsrc.js`，用法为`node buildsrc.js -g <gid格式化字符串，当中%basename%会被替换成无后缀的文件名>`
+之后上传至合适位置即可，还有疑问建议阅读`node buildsrc.js -h`
+
 ## 许可证
 
 本产品是自由软件，采用 [GNU General Public License (Version 3)](https://www.gnu.org/licenses/gpl-3.0.html) 授权。
