@@ -9,13 +9,11 @@ function popinfo(
   time: number = 500,
   size: string = "28px"
 ) {
-  for (let i of timer.values()) {
+  for (let i of timer.values())
     clearTimeout(i);
-  }
   // 避免 Set 迭代器混乱
-  for (let i of timer.values()) {
+  for (let i of timer.values())
     timer.delete(i);
-  }
   closepop();
   $("#_popbg").stop(true).remove();
   setTimeout(() => {
@@ -27,46 +25,37 @@ function popinfo(
         </span>
       </div>`;
     $("body").append(data);
-    if (doSpark) {
+    if (doSpark)
       spark($("#_popicon"), time);
-    }
     $("#_popbg").animate({ bottom: "0" }, move, "swing");
   }, 200);
 }
-function closepop(move: number = 100, cb: () => void = () => {}) {
+
+function closepop(move: number = 100, cb: () => void = () => { }) {
   $("#_popbg").animate({ bottom: "-10%" }, move, "swing", () => {
     $("#_popbg").remove();
     cb();
   });
 }
+
 function registryTimer(t: number) {
   timer.add(t);
 }
+
 function spark(jq: JQuery<HTMLElement>, time: number) {
-  jq.fadeOut(time, () => {
-    jq.fadeIn(time, () => {
-      spark(jq, time);
-    });
-  });
+  jq.fadeOut(time, () => jq.fadeIn(time, () => spark(jq, time)));
 }
+
 function warn(msg: string) {
-  popinfo(
-    "exclamation-triangle",
-    msg,
-    false,
-    "background-color:#ff950085 !important;"
-  );
+  popinfo("exclamation-triangle", msg, false, "background-color:#ff950085 !important;");
 }
+
 function success(msg: string) {
   popinfo("check", msg, false);
   registryTimer(setTimeout(closepop, 4000));
 }
+
 function error(msg: string) {
-  popinfo(
-    "exclamation-circle",
-    msg,
-    false,
-    "background-color:#88272790!important;"
-  );
+  popinfo("exclamation-circle", msg, false, "background-color:#88272790!important;");
 }
 export { popinfo, closepop, warn, error, registryTimer, success };

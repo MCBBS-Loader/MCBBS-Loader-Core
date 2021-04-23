@@ -9,8 +9,10 @@ function checkUpdate(
   let id = meta.id || "loader.nameless";
 
   let isUrlRegex = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g;
-  if (meta.updateURL) {
-    let url = isUrlRegex.test(meta.updateURL) ? meta.updateURL : GIDURL.fromString(meta.updateURL).getAsURL();
+  if (meta.updateURL || meta.gid) {
+    let url = meta.updateURL ? isUrlRegex.test(meta.updateURL) ?
+      meta.updateURL : GIDURL.fromString(meta.updateURL, GIDURL.fromString(meta.gid)).getAsURL() :
+      GIDURL.fromString(meta.gid).getAsURL();
     getCrossOriginData(url, () => callback("latest-network-err"), data => {
       let dataMap = new Map<string, string>();
       parseMeta(data, dataMap);
@@ -22,11 +24,10 @@ function checkUpdate(
           let oversion = meta.version || "1.0.0";
           if (cmpVersion(nversion, oversion)) {
             let napiv = dataMap.get("apiVersion");
-            if (typeof napiv == "string" && napiv != String(getAPIVersion())) {
+            if (typeof napiv == "string" && napiv != String(getAPIVersion()))
               callback("latest-api-too-early");
-            } else {
+            else
               callback(meta.updateURL, oversion, nversion);
-            }
           } else {
             callback("latest-version-equal-or-earlier");
           }
@@ -42,17 +43,13 @@ function checkUpdate(
 function cmpVersion(nv: string, ov: string): boolean {
   let nvl = nv.split(".");
   let ovl = ov.split(".");
-  if (nvl.length == 1) {
+  if (nvl.length == 1)
     return parseInt(nvl[0]) > parseInt(ovl[0] || "0");
-  } else {
-    for (let i = 0; i < nvl.length; i++) {
-      if (parseInt(nvl[i]) > parseInt(ovl[i] || "0")) {
-        return true;
-      } else if (parseInt(nvl[i]) < parseInt(ovl[i] || "0")) {
-        return false;
-      }
-    }
-    return false;
-  }
+  for (let i = 0; i < nvl.length; i++)
+    if (parseInt(nvl[i]) > parseInt(ovl[i] || "0"))
+      return true;
+    else if (parseInt(nvl[i]) < parseInt(ovl[i] || "0"))
+      return false;
+  return false;
 }
 export { checkUpdate, cmpVersion };

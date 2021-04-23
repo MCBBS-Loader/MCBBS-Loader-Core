@@ -8,55 +8,47 @@ import $ from "jquery";
 import jQuery from "jquery";
 import { success } from "./popinfo2";
 import { LoaderEvent } from "../api/STDEVT";
+import { InternalConfig } from "../api/STDAPI";
 function dumpConfigPage() {
+  $("title").html("MCBBS Loader - 配置页面");
   $("div[class='bm bw0']").html(
-    "<span style='font-size:1.5rem'>设置中心</span>&nbsp;&nbsp;<button id='saveconfig' type='button' class='pn pnc'>" +
-      "<span>保存</span></button>&nbsp;<span style='color:#df307f'>您的设置应当会自动保存，如果没有，单击此按钮来保存。</span><br/><div id='config_div'></div>"
+    "<span style='font-size:1.5rem'>设置中心</span>&nbsp;&nbsp;" + 
+    "<button id='saveconfig' type='button' class='pn pnc'>" +
+    "<span>保存</span></button>&nbsp;<span style='color:#df307f'>您的设置应当会自动保存，如果没有，单击此按钮来保存。</span> " + 
+    "<br/><div id='config_div'></div>"
   );
   $("#saveconfig").on("click", autoSave);
   renderAll();
 }
 
-interface ConfigItem {
-  id: string;
-  type: string;
-  storageId: string;
-  name: string;
-  desc: string;
-  check: (value: string) => string | undefined;
-}
-
 function autoSave() {
-  for (let c of getWindowProperty("CDT") as ConfigItem[]) {
-    let val;
-    if (c.type === "checkbox") {
-      val = document.getElementById(`confval-${c.id}-${c.storageId}`)!.classList.contains("fa-check-square");
-    } else {
-      val = $(`[id='confval-${c.id}-${c.storageId}']`).val();
-    }
-    GMSetValue(`configstore-${c.id}-${c.storageId}`, val);
-  }
+  for (let c of getWindowProperty("CDT") as InternalConfig[])
+    GMSetValue(`configstore-${c.id}-${c.stgid}`, c.type === "checkbox" ?
+      document.getElementById(`confval-${c.id}-${c.stgid}`)!.classList.contains("fa-check-square") :
+      $(`[id='confval-${c.id}-${c.stgid}']`).val());
   success("设置保存成功！");
 }
+
 function getConfigVal(idIn: string, storageIdIn: string, defaultValue: any) {
   return GMGetValue(`configstore-${idIn}-${storageIdIn}`, defaultValue);
 }
+
 function setConfigVal(idIn: string, storageIdIn: string, value: any) {
   GMGetValue(`configstore-${idIn}-${storageIdIn}`, value);
 }
+
 function renderAll() {
   $(".a").removeClass("a");
   $("#manage_config").parent().addClass("a");
-  if(LoaderEvent.emitCancelable("ConfigPagePreRender")) {
+  if (LoaderEvent.emitCancelable("ConfigPagePreRender"))
     return;
-  }
-  for (let c of getWindowProperty("CDT") as ConfigItem[]) {
+  for (let c of getWindowProperty("CDT") as InternalConfig[]) {
     let ele =
-      `<label style='font-size:14px' for='confval-${c.id}-${c.storageId}'>
+      `<label style='font-size:14px' for='confval-${c.id}-${c.stgid}'>
         <span style='font-size:18px;color:#5d2391'>
           <b>${c.name} </b>
         </span>
-        (${c.id}:${c.storageId})
+        (${c.id}:${c.stgid})
         <br/>
         <span style='color:#df307f'>${c.desc}</span>
       </label>`;
@@ -64,57 +56,61 @@ function renderAll() {
       ele =
         `<span style='font-size:14px'>
           <span style='font-size:18px;color:#5d2391'>
-            <i id='confval-${c.id}-${c.storageId}' class='chkbox fa fa-check-square'></i>
+            <i id='confval-${c.id}-${c.stgid}' class='chkbox fa fa-check-square'></i>
             &nbsp;
             <b>${c.name}</b>
           </span>
-          (${c.id}:${c.storageId})
+          (${c.id}:${c.stgid})
           <br/>
           <span style='color:#df307f'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${c.desc}</span>
-          <div id='conferr-${c.id}-${c.storageId}'></div></span>
+          <div id='conferr-${c.id}-${c.stgid}'></div></span>
           <br/>
         </span>`;
     } else if (c.type == "textarea") {
       ele +=
         `<br/>
-        <div id='conferr-${c.id}-${c.storageId}'></div>
-        <textarea id='confval-${c.id}-${c.storageId}' style="width: 99%;" class="loadertextconf"></textarea>
+        <div id='conferr-${c.id}-${c.stgid}'></div>
+        <textarea id='confval-${c.id}-${c.stgid}' style="width: 99%;" class="loadertextconf"></textarea>
         <br/>`;
+    } else if (c.type == "button") {
+      ele +=
+        `<br/>
+        <div id='conferr-${c.id}-${c.stgid}'></div>
+        <button style='float: right;' class='pn pnc' id='confval-${c.id}-${c.stgid}'>${c.value}</button>
+        <br/>`
     } else {
       ele +=
         `<div style='height: 17px;'>
-          <input type='text' class='px loadertextconf' id='confval-${c.id}-${c.storageId}'/>
-          <div id='conferr-${c.id}-${c.storageId}'></div>
+          <input type='text' class='px loadertextconf' id='confval-${c.id}-${c.stgid}'/>
+          <div id='conferr-${c.id}-${c.stgid}'></div>
           <br/>
         </div>`;
     }
     $("#config_div").append(ele);
     if (c.type == "checkbox") {
-      let faclass = getConfigVal(c.id, c.storageId, false) ? "chkbox fa fa-check-square" : "chkbox fa fa-square";
-      document.getElementById(`confval-${c.id}-${c.storageId}`)!.className = faclass;
+      let faclass = getConfigVal(c.id, c.stgid, false) ? "chkbox fa fa-check-square" : "chkbox fa fa-square";
+      document.getElementById(`confval-${c.id}-${c.stgid}`)!.className = faclass;
     } else {
-      let value = getConfigVal(c.id, c.storageId,"");
-      $(`[id='confval-${c.id}-${c.storageId}']`).val(value);
+      let value = getConfigVal(c.id, c.stgid, "");
+      $(`[id='confval-${c.id}-${c.stgid}']`).val(value);
     }
-    let element = document.getElementById(`confval-${c.id}-${c.storageId}`) as any;
-    element.oninput = function () {
-      let t = this as any;
-      $(`#conferr-${c.id}-${c.storageId}`).html(
-        c.check(c.type != "checkbox" ? t.value : t.className == "chkbox fa fa-check-square") || ""
-      );
-      if(c.type == "textarea") {
-        t.rows = t.value.split("\n").length;
-      }
-    };
-    element.oninput();
+    let element = document.getElementById(`confval-${c.id}-${c.stgid}`) as any;
+    if (c.type == "button") {
+      element.onclick = c.check;
+    } else {
+      element.oninput = function () {
+        let t = this;
+        $(`#conferr-${c.id}-${c.stgid}`).html(
+          c.check(c.type != "checkbox" ? t.value : t.className == "chkbox fa fa-check-square") || ""
+        );
+        if (c.type == "textarea")
+          t.rows = t.value.split("\n").length;
+      };
+      element.oninput();
+    }
   }
-  $(".chkbox").on("click", (e) => {
-    let oclass = e.target.className;
-    if (oclass?.includes("check-square")) {
-      e.target.className = "chkbox fa fa-square";
-    } else {
-      e.target.className = "chkbox fa fa-check-square";
-    }
+  $(".chkbox").on("click", e => {
+    e.target.className = "chkbox fa fa-" + (e.target.className?.includes("check-square") ? "check-" : "") + "square";
     (e.target.oninput as any)();
     autoSave();
   });
@@ -127,19 +123,15 @@ function createConfigItem(
   name: string,
   type: string,
   desc: string,
-  check: (arg: string) => string | undefined = (arg) => undefined
+  check: (arg: string) => string | undefined = (arg) => undefined,
+  value: string
 ) {
-  let CDT = getWindowProperty("CDT") as ConfigItem[];
-  CDT.push({
-    id: id,
-    type: type,
-    storageId: stgid,
-    name: name,
-    desc: desc,
-    check: check
-  });
+  let CDT = getWindowProperty("CDT") as InternalConfig[], rval = { id, type, stgid, name, desc, check, value };
+  CDT.push(rval);
   setWindowProperty("CDT", CDT);
+  return rval;
 }
+
 function createMenu(): void {
   setWindowProperty("getConfig", function (id: string, sid: string) {
     return getConfigVal(id, sid, undefined);
@@ -147,9 +139,15 @@ function createMenu(): void {
 
   jQuery(() => {
     $("div.appl > div.tbn > ul").prepend(
-      "<li><a id='manage_config' style='cursor:pointer;'>模块选项中心</a></li>"
+      "<li><a id='manage_config' style='cursor:pointer;' " +
+      "href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=config'>模块选项中心</a></li>"
     );
-    $("#manage_config").on("click", dumpConfigPage);
+    $("#manage_config").on("click", e => {
+      e.preventDefault();
+      dumpConfigPage();
+      history.replaceState(null, null!, "https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=config");
+    });
   });
 }
+
 export default { createMenu, dumpConfigPage, createConfigItem, getConfigVal, setConfigVal };

@@ -1,9 +1,11 @@
 function setProperty(obj, key, val) {
   obj[key] = val;
 }
+
 function getProperty(obj, key) {
   return obj[key];
 }
+
 function setLockedProperty(a, tag, val) {
   Object.defineProperty(a, tag, {
     value: val,
@@ -12,9 +14,11 @@ function setLockedProperty(a, tag, val) {
     configurable: false,
   });
 }
+
 function getUnsafeWindow() {
   return unsafeWindow || window;
 }
+
 function getGM() {
   return {
     GM_addStyle,
@@ -30,4 +34,5 @@ function getGM() {
     GM_setValue,
   };
 }
+
 export { setProperty, getProperty, getUnsafeWindow, setLockedProperty, getGM };

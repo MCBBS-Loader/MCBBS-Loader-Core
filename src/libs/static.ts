@@ -29,7 +29,7 @@ const HTML_MANAGER_FOOTER =
   </button>
   <span class='srcc'>
     MCBBS Loader 电池源，其中的模块是为用户专门设计的，
-    <a id='preview_ml' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#MCBBS-Loader%2FMCBBS-Loader-Batteries%40main' target='_blank'>
+    <a id='preview_ml' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#MCBBS-Loader%3AMCBBS-Loader-Batteries%3Amanifest%3Amain' target='_blank'>
       预览该软件源
     </a>
     。
@@ -41,7 +41,7 @@ const HTML_MANAGER_FOOTER =
   </button>
   <span class='srcc'>
     洞穴夜莺的软件源中包含许多轻松使用模块，
-    <a id='preview_cv' style='color:#df307f'href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#CaveNightingale%2FCaveNightingale-MCBBS-Modules%40master' target='_blank'>
+    <a id='preview_cv' style='color:#df307f'href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#CaveNightingale%3ACaveNightingale-MCBBS-Modules%3Amanifest%3Amaster' target='_blank'>
       预览该软件源
     </a>
     。
@@ -53,7 +53,7 @@ const HTML_MANAGER_FOOTER =
   </button>
   <span class='srcc'>
     MExt 整合运动的软件源中包括了许多适合老用户的 MExt 模块，
-    <a id='preview_mext' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#MCBBS-Loader%2FIntegration-Motion%40main' target='_blank'>
+    <a id='preview_mext' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#MCBBS-Loader%3AIntegration-Motion%3Amanifest%3Amain' target='_blank'>
       预览该软件源
     </a>。
   </span>

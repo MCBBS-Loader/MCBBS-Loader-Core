@@ -4,33 +4,27 @@ class Queue {
   press(ele: any) {
     this.dataStore.push(ele);
   }
+
   release() {
-    if (this.isEmpty()) {
-      return undefined;
-    } else {
-      return this.dataStore.shift();
-    }
+    return this.dataStore.shift();
   }
+
   front() {
-    if (this.isEmpty()) {
-      return undefined;
-    } else {
-      return this.dataStore[0];
-    }
+    return this.dataStore[0];
   }
+
   back() {
-    if (this.isEmpty()) {
-      return undefined;
-    } else {
-      return this.dataStore[this.dataStore.length - 1];
-    }
+    return this.dataStore[this.dataStore.length - 1];
   }
+
   toString() {
     return this.dataStore.toString();
   }
+
   clear() {
     this.dataStore = [];
   }
+
   isEmpty(): boolean {
     return this.dataStore.length == 0;
   }
@@ -52,27 +46,25 @@ class PopMsg {
         </span>
       </div>`;
     $("body").append(data);
-    if (this.spark) {
+    if (this.spark)
       spark($("#_popicon"), 500);
-    }
     $("#_popbg").animate({ bottom: "0" }, 300, "swing");
-    setTimeout(() => {
-      $("#_popbg").animate({ bottom: "-100px" }, 300, "swing", () => {
-        $("#_popbg").remove();
-        next();
-      });
-    }, this.time);
+    setTimeout(() => $("#_popbg").animate({ bottom: "-100px" }, 300, "swing", () => {
+      $("#_popbg").remove();
+      next();
+    }), this.time);
   }
 }
+
 function next() {
-  if (MDT_EMERGENCY.front() != undefined) {
+  if (MDT_EMERGENCY.front() != undefined)
     MDT_EMERGENCY.release().show(next);
-  } else if (MDT_HIGH.front() != undefined) {
+  else if (MDT_HIGH.front() != undefined)
     MDT_HIGH.release().show(next);
-  } else if (MDT_NORMAL.front() != undefined) {
+  else if (MDT_NORMAL.front() != undefined)
     MDT_NORMAL.release().show(next);
-  }
 }
+
 function addTask(ele: PopMsg, level: string) {
   switch (level.toLocaleLowerCase()) {
     case "emergency":
@@ -90,12 +82,9 @@ function addTask(ele: PopMsg, level: string) {
 }
 
 function spark(jq: JQuery<HTMLElement>, time: number) {
-  jq.fadeOut(time, () => {
-    jq.fadeIn(time, () => {
-      spark(jq, time);
-    });
-  });
+  jq.fadeOut(time, () => jq.fadeIn(time, () => spark(jq, time)));
 }
+
 let MDT_EMERGENCY = new Queue();
 let MDT_HIGH = new Queue();
 let MDT_NORMAL = new Queue();
@@ -107,6 +96,7 @@ function warn(msg: string) {
   pobj.time = 5000;
   addTask(pobj, "high");
 }
+
 function error(msg: string) {
   let pobj = new PopMsg();
   pobj.icon = "exclamation-circle";
@@ -116,6 +106,7 @@ function error(msg: string) {
   pobj.time = 10000;
   addTask(pobj, "emergency");
 }
+
 function info(msg: string) {
   let pobj = new PopMsg();
   pobj.icon = "info-circle";
@@ -124,6 +115,7 @@ function info(msg: string) {
   pobj.time = 3000;
   addTask(pobj, "normal");
 }
+
 function success(msg: string) {
   let pobj = new PopMsg();
   pobj.icon = "check";
@@ -132,4 +124,5 @@ function success(msg: string) {
   pobj.time = 3000;
   addTask(pobj, "normal");
 }
+
 export { addTask, PopMsg, warn, error, info, success };

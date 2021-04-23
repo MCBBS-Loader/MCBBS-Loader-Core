@@ -26,7 +26,7 @@ const isManagerRegex = /bbsmod=manager/i;
 main();
 // verify(() => {});
 function fixMuteScreen() {
-  if($("#ct").hasClass("wp cl w")) {// 禁言用户无法打开设置界面，这里是对用户是否被禁言的判断
+  if ($("#ct").hasClass("wp cl w")) {// 禁言用户无法打开设置界面，这里是对用户是否被禁言的判断
     $("#ct").remove();
     $("#wp").html(`<div id="pt" class="bm cl">
     <div class="z">
@@ -44,6 +44,7 @@ function fixMuteScreen() {
 }
 
 function main() {
+  setWindowProperty("__onExtraScriptLoaded", (cb: () => any) => cb());
   $(loadNTEVT);
   $(loadEvents);
   $.ajaxSetup({
@@ -52,12 +53,12 @@ function main() {
   });
   jQuery(() => {
     $("head").append(
-        `<link type='text/css' rel='stylesheet'
+      `<link type='text/css' rel='stylesheet'
           href='https://cdn.staticfile.org/font-awesome/5.15.1/css/all.min.css'/>`
-      ).append(
-        `<link type='text/css' rel='stylesheet'
+    ).append(
+      `<link type='text/css' rel='stylesheet'
           href='https://cdn.staticfile.org/font-awesome/5.15.1/css/v4-shims.min.css'/>`
-      ).append(`<style id="mcbbs-loader-common-css">${COMMON_CSS}</style>`);
+    ).append(`<style id="mcbbs-loader-common-css">${COMMON_CSS}</style>`);
     $("#debuginfo").after(
       `<br/><span>With MCBBS Loader Version ${getAPIVersion()}.<br/>MCBBS Loader 是独立的项目，与我的世界中文论坛没有从属关系</span>`
     );
@@ -71,9 +72,8 @@ function main() {
   setLockedProperty(getUnsafeWindow(), "reset_" + RESET_TOKEN, () => {
     if (sureToReset) {
       let all = GMGetValue("loader.all", {});
-      for (let c of Object.entries(all)) {
+      for (let c of Object.entries(all))
         all[c[0]] = false;
-      }
       GMSetValue("loader.all", all);
       setWindowProperty("loader.all", all);
       GMLog("[MCBBS Loader] 重置完成，下次别安装不可靠模块了~");
@@ -86,30 +86,32 @@ function main() {
   GMLog("[MCBBS Loader] 重置令牌：reset_" + RESET_TOKEN);
   setLockedProperty(getUnsafeWindow(), "forkAPI_" + getAPIToken(), forkAPI);
   setWindowProperty("CDT", []);
+  let all = GMGetValue("loader.all");
+  for (let [id, enabled] of Object.entries(all))
+    if (enabled && GMGetValue("meta-" + id, {}).permissions.indexOf("loader:earlyload") != -1)
+      try {
+        eval(`(() => {let MCBBS = null; ${GMGetValue("code-" + id)}})()`);
+      } catch (ex) {
+        console.error(ex);// 不要殃及其他部分
+      }
   jQuery(() => {
     // 用户可能是从老版本升级上来的，因此需要立即补全排序好的依赖信息
     let sortedList = GMGetValue("loader.sortedModuleList") || resortDependency();
     for (let id of sortedList) {
       mountCode(id, GMGetValue("code-" + id));
-      ((id) => {
+      (id => {
         checkUpdate(GMGetValue("meta-" + id, ""), (state, ov, nv) => {
-          if (!state.startsWith("latest")) {
-            console.log(
-              `[MCBBS Loader] 有更新可用，模块 ${id} 具有新版本 ${nv}，当前安装的版本为 ${ov}。`
-            );
-          }
+          if (!state.startsWith("latest"))
+            console.log(`[MCBBS Loader] 有更新可用，模块 ${id} 具有新版本 ${nv}，当前安装的版本为 ${ov}。`);
         });
       })(id);
     }
     let errmsg = getDependencyError();
-    if(errmsg.length) {
+    if (errmsg.length) {
       GMLog("[MCBBS Loader] 部分模块未加载，请到管理页面修复依赖关系错误");
 
-      if (isManagerRegex.test(String(window.location.search))) {
-        error(
-          "<b>ECONFLICT！</b>自动加载模块失败，你现在正在模块管理页面，请解决依赖冲突。"
-        );
-      }
+      if (isManagerRegex.test(String(window.location.search)))
+        error("<b>ECONFLICT！</b>自动加载模块失败，你现在正在模块管理页面，请解决依赖冲突。");
     }
 
     // 这样可以在管理界面显示依赖关系是否满足
@@ -120,17 +122,12 @@ function main() {
       fixMuteScreen();
       let sharp = window.location.hash.indexOf("#");
       viewrepo.dumpPreview(sharp != -1 ? decodeURIComponent(window.location.hash.substring(1)) : "MCBBS-Loader/examplemod@main");
-    }
-    if (/bbsmod=manager/i.test(url)) {
+    } else if (/bbsmod=manager/i.test(url)) {
       fixMuteScreen();
-      $("title").html("MCBBS Loader - 自由的 MCBBS 模块管理器");
       manager.dumpManager();
-      configpage.createMenu(); // config菜单只能从模块管理页面见到似乎更加合理
-      // localconf.dumpLocalMenu();
-    }
-    if (GMGetValue("temp.loadcfg", false)) {
-      GMSetValue("temp.loadcfg", false);
-      configpage.dumpConfigPage();
+    } else if (/bbsmod=config/i.test(url)) {
+      fixMuteScreen();
+      setTimeout(() => configpage.dumpConfigPage(), 0);// 这里必须要timeout，因为要等模块注册config
     }
   });
 }

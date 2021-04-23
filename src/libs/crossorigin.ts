@@ -10,17 +10,13 @@ function getCrossOriginData(
     method: "GET",
     url: url,
     timeout: 5000,
-    ontimeout: () => {
-      onerror("网络错误：连接超时")
-    },
-    onerror: () => {
-      onerror("网络错误：没有更多信息");
-    },
+    ontimeout: () => onerror("网络错误：连接超时"),
+    onerror: () => onerror("网络错误：没有更多信息"),
     onload: (details: any) => {
       if(details.status != 200) {
         onerror(`错误：${details.status} ${details.statusText}`)
       } else {
-        if(type == "json"){
+        if(type == "json") {
           try {
             onsuccess(JSON.parse(details.responseText));
           } catch (ex) {

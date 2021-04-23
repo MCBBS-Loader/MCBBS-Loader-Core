@@ -1,7 +1,7 @@
 #!/usr/bin/node
 // 默认设置
 // 本文件和LoaderCore一同发布
-let genGid = name => `${name}`;
+let genGid = name => `~:~:~:${name}:~`;
 let targetFile = "manifest.json";
 let sourceDir = process.cwd();
 

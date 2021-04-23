@@ -6,6 +6,7 @@ import {
   deleteModule,
   getDependencyError,
   getTmpDisabled,
+  GIDURL,
   installFromGID,
   installFromUrl,
   isDependencySolved,
@@ -20,6 +21,7 @@ import { checkUpdate } from "./updator";
 import { GMGetValue, GMSetValue, setWindowProperty } from "./usfunc";
 import { showAlert, showDialogFull } from "../craftmcbbs/craft-ui";
 import { getCrossOriginData } from "./crossorigin";
+import configpage from "./configpage";
 
 const activeChecking: Map<string, string> = new Map();
 function createManageHtml(meta: any, isCore: boolean, color: string) {
@@ -33,8 +35,8 @@ function createManageHtml(meta: any, isCore: boolean, color: string) {
         </span>
         &nbsp;&nbsp;&nbsp;
         <span id='vtag-${meta.id}' style='font-size:12px;color:#150029;'>
-          ${meta.id || "loader.nameless"}@${(meta.version || "1.0.0") + 
-          (isCore? "&nbsp;<span style='color:#ff0000'><b>[COREMOD]</b></span>": "")}
+          ${meta.id || "loader.nameless"}@${(meta.version || "1.0.0") +
+    (isCore ? "&nbsp;<span style='color:#ff0000'><b>[COREMOD]</b></span>" : "")}
           <span style='color:#df307f;${getTmpDisabled().includes(meta.id) ? "" : "display: none;"}'>
             [依赖关系原因停用]
           </span>
@@ -71,16 +73,20 @@ function createBtn(): void {
 }
 
 function createMenu(): void {
-  if (
-    window.location.href.startsWith(
-      "https://www.mcbbs.net/home.php?mod=spacecp"
-    )
-  ) {
+  if (window.location.href.startsWith("https://www.mcbbs.net/home.php?mod=spacecp")) {
     jQuery(() => {
       $("div.appl > div.tbn > ul").prepend(
-        "<li><a id='loader_manager' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager' style='cursor:pointer;'>模块管理</a></li>"
+        "<li><a id='loader_manager' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager'" + 
+        "style='cursor:pointer;'>模块管理</a></li>"
       );
+      $('#loader_manager').on('click', e => {
+        e.preventDefault();
+        dumpManager();
+        // null后面加!是为了让编译器闭嘴
+        history.replaceState(null, null!, "https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager");
+      })
     });
+    configpage.createMenu();
   }
 }
 
@@ -113,8 +119,8 @@ function onInstall(st: Map<string, string>) {
   if (isCore) {
     warn(
       "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
-        st.get("id") +
-        "。"
+      st.get("id") +
+      "。"
     );
   } else {
     success("成功安装了模块");
@@ -123,10 +129,11 @@ function onInstall(st: Map<string, string>) {
 
 // 安装失败时的动作
 function onFailure(st: string) {
-  showAlert(st, "安装失败", () => {});
+  showAlert(st, "安装失败", () => { });
 }
 
 function dumpManager() {
+  $("title").html("MCBBS Loader - 管理页面");
   $(".a").removeClass("a");
   setTimeout(() => $("#loader_manager").parent().addClass("a"), 50);
   let emsg = getDependencyError().replace(/\n/g, "<br>");
@@ -134,7 +141,7 @@ function dumpManager() {
     $("div[class='bm bw0']").css("user-select", "none");
     $("div[class='bm bw0']").html(
       `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}
-        <span style="font-size: 0.8em;color:red" >${ !isDependencySolved() ? "<br>依赖关系未解决" : ""}</span>
+        <span style="font-size: 0.8em;color:red" >${!isDependencySolved() ? "<br>依赖关系未解决" : ""}</span>
         <span style="font-size: 0.8em;color: brown" >${isDirty() ? "<br>当前的设置需要刷新才能生效" : ""}</span>
       </span>
       <br/>
@@ -146,15 +153,10 @@ function dumpManager() {
       <hr style='${!isDependencySolved() ? "" : "display:none;"}'/>` +
       HTML_MANAGER_FOOTER
     );
-    $("#use_mloader").on("click", () => {
-      $("#install_uno").val("MCBBS-Loader:仓库名:模块 ID:main");
-    });
-    $("#use_cv").on("click", () => {
-      $("#install_uno").val("CaveNightingale:CaveNightingale-MCBBS-Modules:模块 ID:master");
-    });
-    $("#use_mext").on("click", () => {
-      $("#install_uno").val("MCBBS-Loader:Integration-Motion:模块 ID:main");
-    });
+    $("#use_mloader").on("click", () => $("#install_uno").val("MCBBS-Loader:仓库名:模块 ID:main"));
+    $("#use_cv").on("click", () =>
+      $("#install_uno").val("CaveNightingale:CaveNightingale-MCBBS-Modules:模块 ID:master"));
+    $("#use_mext").on("click", () => $("#install_uno").val("MCBBS-Loader:Integration-Motion:模块 ID:main"));
 
     $("#debugmode").on("click", () => {
       if ($("#debugmode").attr("debug") == "false") {
@@ -201,27 +203,24 @@ function dumpManager() {
             try {
               getCrossOriginData(str, onFailure, (data: any) => {
                 let st = addModule(data);
-                if(typeof st != "string") {
+                if (typeof st != "string")
                   onInstall(st);
-                } else {
+                else
                   onFailure(st);
-                }
               });
             } catch {
               let st = addModule(str);
-              if (typeof st != "string") {
+              if (typeof st != "string")
                 onInstall(st);
-              } else {
-                installFromGID(str, onInstall, onFailure);
-              }
+              else
+                installFromGID(GIDURL.fromString(str), onInstall, onFailure);
             }
           } else {
             let st = addModule(str);
-            if (typeof st != "string") {
+            if (typeof st != "string")
               onInstall(st);
-            } else {
-              installFromGID(str, onInstall, onFailure);
-            }
+            else
+              installFromGID(GIDURL.fromString(str), onInstall, onFailure);
           }
         }
       } catch {
@@ -231,27 +230,24 @@ function dumpManager() {
           try {
             getCrossOriginData(str, onFailure, (data: any) => {
               let st = addModule(data);
-              if(typeof st != "string") {
+              if (typeof st != "string")
                 onInstall(st);
-              } else {
+              else
                 onFailure(st);
-              }
             });
           } catch {
             let st = addModule(str);
-            if (typeof st != "string") {
+            if (typeof st != "string")
               onInstall(st);
-            } else {
-              installFromGID(str, onInstall, onFailure);
-            }
+            else
+              installFromGID(GIDURL.fromString(str), onInstall, onFailure);
           }
         } else {
           let st = addModule(str);
-          if (typeof st != "string") {
+          if (typeof st != "string")
             onInstall(st);
-          } else {
-            installFromGID(str, onInstall, () => onFailure(`无效 ID 或网络错误，所有安装途径均失败`));
-          }
+          else
+            installFromGID(GIDURL.fromString(str), onInstall, () => onFailure(`无效 ID 或网络错误，所有安装途径均失败`));
         }
       }
     });
@@ -262,7 +258,7 @@ function dumpManager() {
       let ele = createManageHtml(meta, isCore, isCore ? "#ff0000" : "#5d2391");
       $("#all_modules").append(ele);
     }
-    $(".showsrc").on("click", (e) => {
+    $(".showsrc").on("click", e => {
       if ($("#debugmode").attr("debug") == "false") {
         $("#debugmode").attr("debug", "true");
         $("#install_base64").show();
@@ -270,21 +266,19 @@ function dumpManager() {
         $(".srcc").hide();
       }
       let id = $(e.target).data("mlsource") || $(e.target).parent().data("mlsource");
-      if (!id) {
+      if (!id)
         return;
-      }
       $("#install_base64").val(GMGetValue(`code-${id}`, ""));
     });
     $("#all_modules > li").each((i, e) => {
       let id = $(e).attr("id") || "loader.impossible";
       let meta: any = GMGetValue(`meta-${id}`);
 
-      if(activeChecking.get(id) != meta.version) {
+      if (activeChecking.get(id) != meta.version) {
         activeChecking.set(id, meta.version);
         checkUpdate(meta, (state, ov, nv) => {
-          if(activeChecking.get(id) != meta.version) {
+          if (activeChecking.get(id) != meta.version)
             return;
-          }
           activeChecking.delete(id);
           let gtxt;
           let shouldUpdate = false;
@@ -310,26 +304,20 @@ function dumpManager() {
           oh = `${oh}${shouldUpdate ? "&nbsp;->&nbsp;" + nv : ""}&nbsp;${gtxt}`;
 
           $(`[id='vtag-${meta.id}']`).html(oh);
-          if (shouldUpdate) {
-            $(`[id='vtag-${meta.id}']`)
-              .parent()
-              .append(
-                `<button type='button' style='float:right' class='pn pnc update' data-mlurl='${state}'>
-                  <strong>更新模块</strong>
-                </button>`
-              );
-          }
-          $(".update").on("click", (e) => {
-            let url =
-              $(e.target).data("mlurl") || $(e.target).parent().data("mlurl");
-            if (!url) {
+          if (shouldUpdate)
+            $(`[id='vtag-${meta.id}']`).parent().append(
+              `<button type='button' style='float:right' class='pn pnc update' data-mlurl='${state}'>
+                <strong>更新模块</strong>
+              </button>`
+            );
+          $(".update").on("click", e => {
+            let url = $(e.target).data("mlurl") || $(e.target).parent().data("mlurl");
+            if (!url)
               return;
-            }
-            if ($(e.target).data("mlurl")) {
+            if ($(e.target).data("mlurl"))
               $(e.target).remove();
-            } else {
+            else
               $(e.target).parent().remove();
-            }
             markDirty();
             installFromUrl(
               url,
@@ -351,13 +339,10 @@ function dumpManager() {
                   `<span style='color:#ec1c24'><b>[更新失败]</b></span>`
                 );
                 $(`[id='vtag-${meta.id}']`).html(oh);
-              }
+              },
+              GIDURL.fromString(meta.gid)
             );
-            popinfo(
-              "cloud",
-              "已尝试更新，更新效果在更新完成后刷新页面才会显示。",
-              false
-            );
+            popinfo("cloud", "已尝试更新，更新效果在更新完成后刷新页面才会显示。", false);
             registryTimer(setTimeout(closepop, 5000));
           });
         });

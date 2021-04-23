@@ -12,8 +12,20 @@ import { coreModEval, GIDURL } from "../libs/codeload";
 import configpage from "../libs/configpage";
 import { info } from "../libs/popinfo2";
 import { LoaderEvent } from "./STDEVT";
+import { showOfflineWindow } from "../craftmcbbs/craft-ui";
+import { getCrossOriginData } from "../libs/crossorigin";
 
-const ML_VERSION = 1;
+interface InternalConfig {
+  id: string;
+  type: string;
+  stgid: string;
+  name: string;
+  desc: string;
+  check: (value: string) => string | undefined;
+  value: string;
+}
+
+const ML_VERSION = 2;
 const GM: any = getGM();
 var all: any = GMGetValue("loader.all", {});
 
@@ -22,23 +34,57 @@ function forkAPI(id: string) {
 }
 
 function assert(value: any): void {
-  if(!value) {
+  if(!value)
     throw new Error("Assertion failed!");
-  }
 }
 
 // 模块导入导出
 setWindowProperty("MIDT", {});
 
+/**
+ * 给模块的单个的配置
+ */
+class Config {
+  private internalConfig: any;
+  constructor(internalConfig: any) {
+    this.internalConfig = Object.freeze(internalConfig);
+  }
+
+  get(dval?: any) {
+    return configpage.getConfigVal(this.internalConfig.id, this.internalConfig.storageId, dval);
+  }
+
+  set(val: any) {
+    configpage.setConfigVal(this.internalConfig.id, this.internalConfig.storageId, val);
+  }
+}
+
+/**
+ * 对mcbbs的common.js的封装
+ */
+class Common {
+  public static acquireCommon(): Common | null {
+    return getWindowProperty("VERHASH") ? new Common() : null;// 因为有些页面common.js不加载
+  }
+
+  public showOfflineWindow(k: string, element: HTMLElement | Text | string, menuv?: object) {
+    showOfflineWindow(k, element, menuv);
+  }
+
+  public loadExtra(script: string, callback: () => void) {
+    getWindowProperty("$F")("__onExtraScriptLoaded", [callback], script);
+  }
+}
+
 class MCBBSAPI {
-  private id: string;
+  public id: string;
   public local: Object = {};
   public LoaderEvent = LoaderEvent;
 
   constructor(id: string) {
     this.id = id;
     let gid = GMGetValue("loader.all").gid;
-    this.gid = gid ? Object.freeze(GIDURL.fromString(gid)) : null;
+    this.gid = gid ? Object.freeze(GIDURL.fromString(gid)) : GIDURL.NIL;
     if (hasPermission(id, "loader:core")) {
       this.eval = coreModEval;
       this.GM = getGM();
@@ -65,19 +111,22 @@ class MCBBSAPI {
     storeData(this.id + "-" + k, v);
   }
 
+  // 这个方法参数太多，应设法减少一些
   public createConfig(
     stgid: string,
     name: string,
     type: string,
     desc: string,
-    check: (arg: string) => string | undefined = (arg) => undefined
+    check: (arg: string) => string | undefined = (arg) => undefined,
+    value: string = ""
   ) {
     assert(typeof stgid == "string");
     assert(typeof name == "string");
     assert(typeof type == "string");
     assert(typeof desc == "string");
     assert(typeof check == "function");
-    configpage.createConfigItem(this.id, stgid, name, type, desc, check);
+    assert(typeof value == "string");
+    return new Config(configpage.createConfigItem(this.id, stgid, name, type, desc, check, value));
   }
 
   public getConfigVal(stgid: string, dval?: any) {
@@ -95,9 +144,36 @@ class MCBBSAPI {
     return getData(this.id + "-" + k, dv);
   }
 
-  public mountJS(src: string) {
-    assert(typeof src == "string");
-    $("head").append(`<script src='${src}'></script>`);
+  public mountJS(src: string | GIDURL, onsucceed: () => void = () => {}, onerror: (reason: string) => void = r => {}) {
+    assert(typeof src == "string" || src instanceof GIDURL);
+    if(typeof src == 'string' && !/^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g.test(src))
+      src = GIDURL.fromString(src);
+    if(src == GIDURL.NIL || src == '')
+      onerror("无效地址");
+    if(src instanceof GIDURL)
+      src = src.asString();
+    getCrossOriginData(src, onerror, (msg) => {
+      let script = document.createElement("script");
+      script.text = msg;
+      script.onload = onsucceed;
+      document.head.appendChild(script);
+    }, "plain");
+  }
+
+  public mountCSS(src: string | GIDURL, onsucceed: () => void = () => {}, onerror: (reason: string) => void = r => {}) {
+    assert(typeof src == "string" || src instanceof GIDURL);
+    if(typeof src == 'string' && !/^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g.test(src))
+      src = GIDURL.fromString(src);
+    if(src == GIDURL.NIL || src == '')
+      onerror("无效地址");
+    if(src instanceof GIDURL)
+      src = src.asString();
+    getCrossOriginData(src, onerror, (msg) => {
+      let style = document.createElement("style");
+      style.innerHTML = msg;
+      style.onload = onsucceed;
+      document.head.appendChild(style);
+    }, "plain");
   }
 
   public popInfo(msg: string) {
@@ -114,11 +190,15 @@ class MCBBSAPI {
     return GMXmlhttpRequest(details);
   }
 
+  public aquireCommon() {
+    return Common.acquireCommon();
+  }
+
   public sysNotification = GM.GM_notification;
   public GM;
   public eval;
   public GIDURL = GIDURL;
-  public gid: GIDURL | null;
+  public gid: GIDURL;
 }
 
 // 实现部分
@@ -167,4 +247,4 @@ function getData(tag: string, defaultVal: any): any {
   return GMGetValue("data-" + tag, defaultVal);
 }
 
-export { forkAPI, getAPIVersion };
+export { forkAPI, getAPIVersion, InternalConfig };
