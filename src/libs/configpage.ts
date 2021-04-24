@@ -4,20 +4,19 @@ import {
   GMSetValue,
   setWindowProperty,
 } from "./usfunc";
-import $ from "jquery";
-import jQuery from "jquery";
-import { success } from "./popinfo2";
 import { LoaderEvent } from "../api/STDEVT";
 import { InternalConfig } from "../api/STDAPI";
+import { showPopper } from "../craftmcbbs/craft-ui";
+import { DOMUtils, select } from "./domutils";
 function dumpConfigPage() {
-  $("title").html("MCBBS Loader - 配置页面");
-  $("div[class='bm bw0']").html(
+  select("title").html("MCBBS Loader - 配置页面");
+  select("div[class='bm bw0']").html(
     "<span style='font-size:1.5rem'>设置中心</span>&nbsp;&nbsp;" + 
     "<button id='saveconfig' type='button' class='pn pnc'>" +
     "<span>保存</span></button>&nbsp;<span style='color:#df307f'>您的设置应当会自动保存，如果没有，单击此按钮来保存。</span> " + 
     "<br/><div id='config_div'></div>"
   );
-  $("#saveconfig").on("click", autoSave);
+  select("#saveconfig").on("click", autoSave);
   renderAll();
 }
 
@@ -25,8 +24,8 @@ function autoSave() {
   for (let c of getWindowProperty("CDT") as InternalConfig[])
     GMSetValue(`configstore-${c.id}-${c.stgid}`, c.type === "checkbox" ?
       document.getElementById(`confval-${c.id}-${c.stgid}`)!.classList.contains("fa-check-square") :
-      $(`[id='confval-${c.id}-${c.stgid}']`).val());
-  success("设置保存成功！");
+      select(`[id='confval-${c.id}-${c.stgid}']`).val());
+  showPopper("设置保存成功！");
 }
 
 function getConfigVal(idIn: string, storageIdIn: string, defaultValue: any) {
@@ -38,8 +37,8 @@ function setConfigVal(idIn: string, storageIdIn: string, value: any) {
 }
 
 function renderAll() {
-  $(".a").removeClass("a");
-  $("#manage_config").parent().addClass("a");
+  select(".a").removeClass("a");
+  select("#manage_config").parent().addClass("a");
   if (LoaderEvent.emitCancelable("ConfigPagePreRender"))
     return;
   for (let c of getWindowProperty("CDT") as InternalConfig[]) {
@@ -86,13 +85,13 @@ function renderAll() {
           <br/>
         </div>`;
     }
-    $("#config_div").append(ele);
+    select("#config_div").append(ele);
     if (c.type == "checkbox") {
       let faclass = getConfigVal(c.id, c.stgid, false) ? "chkbox fa fa-check-square" : "chkbox fa fa-square";
       document.getElementById(`confval-${c.id}-${c.stgid}`)!.className = faclass;
     } else {
       let value = getConfigVal(c.id, c.stgid, "");
-      $(`[id='confval-${c.id}-${c.stgid}']`).val(value);
+      select(`[id='confval-${c.id}-${c.stgid}']`).val(value);
     }
     let element = document.getElementById(`confval-${c.id}-${c.stgid}`) as any;
     if (c.type == "button") {
@@ -100,7 +99,7 @@ function renderAll() {
     } else {
       element.oninput = function () {
         let t = this;
-        $(`#conferr-${c.id}-${c.stgid}`).html(
+        select(`#conferr-${c.id}-${c.stgid}`).html(
           c.check(c.type != "checkbox" ? t.value : t.className == "chkbox fa fa-check-square") || ""
         );
         if (c.type == "textarea")
@@ -109,12 +108,12 @@ function renderAll() {
       element.oninput();
     }
   }
-  $(".chkbox").on("click", e => {
+  select(".chkbox").on("click", (e: any) => {
     e.target.className = "chkbox fa fa-" + (e.target.className?.includes("check-square") ? "check-" : "") + "square";
     (e.target.oninput as any)();
     autoSave();
   });
-  $(".loadertextconf").on("blur", autoSave);
+  select(".loadertextconf").on("blur", autoSave);
   LoaderEvent.emit("ConfigPagePostRender");
 }
 function createConfigItem(
@@ -137,12 +136,12 @@ function createMenu(): void {
     return getConfigVal(id, sid, undefined);
   });
 
-  jQuery(() => {
-    $("div.appl > div.tbn > ul").prepend(
+  DOMUtils.load(() => {
+    select("div.appl > div.tbn > ul").prepend(
       "<li><a id='manage_config' style='cursor:pointer;' " +
       "href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=config'>模块选项中心</a></li>"
     );
-    $("#manage_config").on("click", e => {
+    select("#manage_config").on("click", (e: any) => {
       e.preventDefault();
       dumpConfigPage();
       history.replaceState(null, null!, "https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=config");

@@ -182,13 +182,13 @@ function loadNTEVT() {
       }
     });
     document.addEventListener("DOMContentLoaded", () => {
-      if(!unsafeWindow.MExt) {
+      if (!unsafeWindow.MExt) {
         O.observe(document.body, { childList: true, subtree: true });
       }
     });
-    addEventListener("DiscuzAjaxPostPost", () => 
+    addEventListener("DiscuzAjaxPostPost", () =>
       document.dispatchEvent(new CustomEvent("DiscuzAjaxPostFinished", { bubbles: true })));
-    addEventListener("DiscuzAjaxPostGet", () => 
+    addEventListener("DiscuzAjaxPostGet", () =>
       document.dispatchEvent(new CustomEvent("DiscuzAjaxGetFinished", { bubbles: true })));
   })();
 }

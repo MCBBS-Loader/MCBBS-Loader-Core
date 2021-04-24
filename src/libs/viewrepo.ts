@@ -1,34 +1,34 @@
 import { GIDURL, installFromGID, resortDependency } from "./codeload";
-import $ from "jquery";
 import manager from "./manager";
 import { GMGetValue } from "./usfunc";
 import { showAlert, showPopper, showSuccess } from "../craftmcbbs/craft-ui";
 import { HTML_VIEWREPO_BODY, IMG_MCBBS } from "./static";
 import { getCrossOriginData } from "./crossorigin";
+import { select, DOMUtils } from "./domutils";
 function getManifest(repo: GIDURL, cb: (data: any) => void) {
-  getCrossOriginData(repo.getAsURL(".json"), msg => $("#all_modules").html("无法显示该软件源的预览。<br/>" + msg), cb, "json");
+  getCrossOriginData(repo.getAsURL(".json"), msg => select("#all_modules").html("无法显示该软件源的预览。<br/>" + msg), cb, "json");
 }
 
 function dumpPreview(repo: string) {
-  $("title").html("MCBBS Loader - 软件源");
+  select("title").html("MCBBS Loader - 软件源");
   let gid = GIDURL.fromString(repo);
-  $(".a").removeClass("a");
+  select(".a").removeClass("a");
   var toApply: Set<string> = new Set();
-  $("div[class='bm bw0']").css("user-select", "none").html(
+  select("div[class='bm bw0']").css("user-select", "none").html(
     `<span style='font-size:1.0rem'>正在预览软件源 ${repo}</span>` + HTML_VIEWREPO_BODY
   );
-  $("#viewsrc").val(repo);
-  $("#loadview").on("click", () => {
+  select("#viewsrc").val(repo);
+  select("#loadview").on("click", () => {
     open(
       "https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#" +
-        encodeURIComponent(GIDURL.fromString($("#viewsrc").val() as string, gid).asString()),
+        encodeURIComponent(GIDURL.fromString(select("#viewsrc").val() as string, gid).asString()),
       "_self"
     );
-    dumpPreview(GIDURL.fromString($("#viewsrc").val() as string, gid).asString());
+    dumpPreview(GIDURL.fromString(select("#viewsrc").val() as string, gid).asString());
   });
   getManifest(gid, (data) => {
     if (typeof data != "object") {
-      $("#all_modules").html("无法显示该软件源的预览。<br/>无效的JSON");
+      select("#all_modules").html("无法显示该软件源的预览。<br/>无效的JSON");
     } else {
       for (var [m, x] of Object.entries(data)) {
         var meta = data[m];
@@ -73,15 +73,15 @@ function dumpPreview(repo: string) {
             </div>
           </div>
         </li>`;
-        $("#all_modules").append(ele);
+        select("#all_modules").append(ele);
       }
-      $(".insremote").on("click", e => {
-        var ele = $(e.target).data("gtar") != undefined ? $(e.target) : $(e.target).parent();
-        installFromGID(GIDURL.fromString(ele.data("gtar"), gid),
+      select(".insremote").on("click", (e: any) => {
+        var ele = e.target.getAttribute("gtar") != undefined ? e.target : e.target.parentElement;
+        installFromGID(GIDURL.fromString(ele.getAttribute("gtar"), gid),
             st => manager.onInstall(st), r => manager.onFailure(r));
       });
       var working = false;
-      $(".fast-install-chk").on("click", (e: any) => {
+      select(".fast-install-chk").on("click", (e: any) => {
         if (working)
           e.preventDefault();
         else if (e.target.checked)
@@ -89,7 +89,7 @@ function dumpPreview(repo: string) {
         else
           toApply.delete(e.target.getAttribute("gtar"));
       });
-      $("#apply-changes-btn").on("click", () => {
+      select("#apply-changes-btn").on("click", () => {
         if (!toApply.size) return;
         if (working) return;
         working = true;
@@ -126,9 +126,9 @@ function dumpPreview(repo: string) {
         });
         showPopper("安装中，请稍后");
       });
-      $("#select-all-btn").on("click", (e) => {
+      select("#select-all-btn").on("click", (e: any) => {
         if (working) return;
-        $(".fast-install-chk").each(HTMLLinkElement.prototype.click);
+        select(".fast-install-chk").each(HTMLLinkElement.prototype.click);
       });
     }
   });

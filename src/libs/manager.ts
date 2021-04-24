@@ -1,5 +1,3 @@
-import jQuery from "jquery";
-import $ from "jquery";
 import { getAPIVersion } from "../api/STDAPI";
 import {
   addModule,
@@ -14,14 +12,13 @@ import {
   markDirty,
   resortDependency,
 } from "./codeload";
-import { closepop, popinfo, registryTimer } from "./popinfo";
-import { warn, success } from "./popinfo2";
 import { HTML_MANAGER_FOOTER } from "./static";
 import { checkUpdate } from "./updator";
 import { GMGetValue, GMSetValue, setWindowProperty } from "./usfunc";
-import { showAlert, showDialogFull } from "../craftmcbbs/craft-ui";
+import { showAlert, showDialogFull, showPopper } from "../craftmcbbs/craft-ui";
 import { getCrossOriginData } from "./crossorigin";
 import configpage from "./configpage";
+import { DOMUtils, select } from "./domutils";
 
 const activeChecking: Map<string, string> = new Map();
 function createManageHtml(meta: any, isCore: boolean, color: string) {
@@ -65,8 +62,8 @@ function createManageHtml(meta: any, isCore: boolean, color: string) {
 }
 
 function createBtn(): void {
-  jQuery(() => {
-    $("ul.user_info_menu_btn").append(
+  DOMUtils.load(() => {
+    select("ul.user_info_menu_btn").append(
       "<li><a href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager'>MCBBS 模块管理</a></li>"
     );
   });
@@ -74,12 +71,12 @@ function createBtn(): void {
 
 function createMenu(): void {
   if (window.location.href.startsWith("https://www.mcbbs.net/home.php?mod=spacecp")) {
-    jQuery(() => {
-      $("div.appl > div.tbn > ul").prepend(
-        "<li><a id='loader_manager' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager'" + 
+    DOMUtils.load(() => {
+      select("div.appl > div.tbn > ul").prepend(
+        "<li><a id='loader_manager' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=manager'" +
         "style='cursor:pointer;'>模块管理</a></li>"
       );
-      $('#loader_manager').on('click', e => {
+      select('#loader_manager').on('click', (e: any) => {
         e.preventDefault();
         dumpManager();
         // null后面加!是为了让编译器闭嘴
@@ -97,7 +94,7 @@ function onInstall(st: Map<string, string>) {
   activeChecking.delete(st.get("id")!);
   resortDependency();
   dumpManager();
-  $("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
+  select("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
   let isCore = (st.get("permissions")?.search("loader:core") as any) >= 0;
   showDialogFull({
     msg:
@@ -117,13 +114,13 @@ function onInstall(st: Map<string, string>) {
     mode: "right",
   });
   if (isCore) {
-    warn(
+    showPopper(
       "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
       st.get("id") +
       "。"
     );
   } else {
-    success("成功安装了模块");
+    showPopper("成功安装了模块");
   }
 }
 
@@ -133,13 +130,13 @@ function onFailure(st: string) {
 }
 
 function dumpManager() {
-  $("title").html("MCBBS Loader - 管理页面");
-  $(".a").removeClass("a");
-  setTimeout(() => $("#loader_manager").parent().addClass("a"), 50);
+  select("title").html("MCBBS Loader - 管理页面");
+  select(".a").removeClass("a");
+  setTimeout(() => select("#loader_manager").parent().addClass("a"), 50);
   let emsg = getDependencyError().replace(/\n/g, "<br>");
-  jQuery(() => {
-    $("div[class='bm bw0']").css("user-select", "none");
-    $("div[class='bm bw0']").html(
+  DOMUtils.load(() => {
+    select("div[class='bm bw0']").css("user-select", "none");
+    select("div[class='bm bw0']").html(
       `<span style='font-size:1.5rem'>模块管理&nbsp;&nbsp;&nbsp;版本&nbsp;${getAPIVersion()}
         <span style="font-size: 0.8em;color:red" >${!isDependencySolved() ? "<br>依赖关系未解决" : ""}</span>
         <span style="font-size: 0.8em;color: brown" >${isDirty() ? "<br>当前的设置需要刷新才能生效" : ""}</span>
@@ -153,22 +150,22 @@ function dumpManager() {
       <hr style='${!isDependencySolved() ? "" : "display:none;"}'/>` +
       HTML_MANAGER_FOOTER
     );
-    $("#use_mloader").on("click", () => $("#install_uno").val("MCBBS-Loader:仓库名:模块 ID:main"));
-    $("#use_cv").on("click", () =>
-      $("#install_uno").val("CaveNightingale:CaveNightingale-MCBBS-Modules:模块 ID:master"));
-    $("#use_mext").on("click", () => $("#install_uno").val("MCBBS-Loader:Integration-Motion:模块 ID:main"));
+    select("#use_mloader").on("click", () => select("#install_uno").val("MCBBS-Loader:仓库名:模块 ID:main"));
+    select("#use_cv").on("click", () =>
+      select("#install_uno").val("CaveNightingale:CaveNightingale-MCBBS-Modules:模块 ID:master"));
+    select("#use_mext").on("click", () => select("#install_uno").val("MCBBS-Loader:Integration-Motion:模块 ID:main"));
 
-    $("#debugmode").on("click", () => {
-      if ($("#debugmode").attr("debug") == "false") {
-        $("#debugmode").attr("debug", "true");
-        $("#install_base64").show();
-        $("#install_uno").hide();
-        $(".srcc").hide();
+    select("#debugmode").on("click", () => {
+      if (select("#debugmode").attr("debug") == "false") {
+        select("#debugmode").attr("debug", "true");
+        select("#install_base64").show();
+        select("#install_uno").hide();
+        select(".srcc").hide();
       } else {
-        $("#debugmode").attr("debug", "false");
-        $("#install_base64").hide();
-        $("#install_uno").show();
-        $(".srcc").show();
+        select("#debugmode").attr("debug", "false");
+        select("#install_base64").hide();
+        select("#install_uno").show();
+        select(".srcc").show();
       }
     });
 
@@ -176,8 +173,7 @@ function dumpManager() {
       deleteModule(id, () => {
         resortDependency();
         dumpManager();
-        popinfo("trash", "成功移除了模块", false);
-        registryTimer(setTimeout(closepop, 4000));
+        showPopper("成功移除了模块");
       });
     });
     setWindowProperty("notifyOnOff", (id: string) => {
@@ -188,9 +184,9 @@ function dumpManager() {
       resortDependency();
       dumpManager();
     });
-    $("#install").on("click", () => {
-      let src = $("#debugmode").attr("debug") == "true" ? "#install_base64" : "#install_uno";
-      let str = $(src).val()?.toString() || "";
+    select("#install").on("click", () => {
+      let src = select("#debugmode").attr("debug") == "true" ? "#install_base64" : "#install_uno";
+      let str = select(src).val()?.toString() || "";
 
       try {
         let st = addModule(atob(str));
@@ -199,7 +195,7 @@ function dumpManager() {
         } else {
           let isUrlRegex = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g;
           if (isUrlRegex.test(str)) {
-            popinfo("cloud", "正在获取数据……");
+            showPopper("正在获取数据……");
             try {
               getCrossOriginData(str, onFailure, (data: any) => {
                 let st = addModule(data);
@@ -226,7 +222,7 @@ function dumpManager() {
       } catch {
         let isUrlRegex = /^((file|https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/g;
         if (isUrlRegex.test(str)) {
-          popinfo("cloud", "正在获取数据……");
+          showPopper("正在获取数据……");
           try {
             getCrossOriginData(str, onFailure, (data: any) => {
               let st = addModule(data);
@@ -256,22 +252,22 @@ function dumpManager() {
       let meta = GMGetValue("meta-" + m[0], { id: "impossible" });
       let isCore = meta.permissions.search("loader:core") != -1;
       let ele = createManageHtml(meta, isCore, isCore ? "#ff0000" : "#5d2391");
-      $("#all_modules").append(ele);
+      select("#all_modules").append(ele);
     }
-    $(".showsrc").on("click", e => {
-      if ($("#debugmode").attr("debug") == "false") {
-        $("#debugmode").attr("debug", "true");
-        $("#install_base64").show();
-        $("#install_uno").hide();
-        $(".srcc").hide();
+    select(".showsrc").on("click", (e: { target: string; }) => {
+      if (select("#debugmode").attr("debug") == "false") {
+        select("#debugmode").attr("debug", "true");
+        select("#install_base64").show();
+        select("#install_uno").hide();
+        select(".srcc").hide();
       }
-      let id = $(e.target).data("mlsource") || $(e.target).parent().data("mlsource");
+      let id = select(e.target).data("mlsource") || select(e.target).parent().data("mlsource");
       if (!id)
         return;
-      $("#install_base64").val(GMGetValue(`code-${id}`, ""));
+      select("#install_base64").val(GMGetValue(`code-${id}`, ""));
     });
-    $("#all_modules > li").each((i, e) => {
-      let id = $(e).attr("id") || "loader.impossible";
+    select("#all_modules > li").foreach((_i, e) => {
+      let id = select(e).attr("id") || "loader.impossible";
       let meta: any = GMGetValue(`meta-${id}`);
 
       if (activeChecking.get(id) != meta.version) {
@@ -299,51 +295,50 @@ function dumpManager() {
                 shouldUpdate = true;
               }
           }
-          let oh = $(`[id='vtag-${meta.id}']`).html();
+          let oh = select(`[id='vtag-${meta.id}']`).html();
 
           oh = `${oh}${shouldUpdate ? "&nbsp;->&nbsp;" + nv : ""}&nbsp;${gtxt}`;
 
-          $(`[id='vtag-${meta.id}']`).html(oh);
+          select(`[id='vtag-${meta.id}']`).html(oh);
           if (shouldUpdate)
-            $(`[id='vtag-${meta.id}']`).parent().append(
+            select(`[id='vtag-${meta.id}']`).parent().append(
               `<button type='button' style='float:right' class='pn pnc update' data-mlurl='${state}'>
                 <strong>更新模块</strong>
               </button>`
             );
-          $(".update").on("click", e => {
-            let url = $(e.target).data("mlurl") || $(e.target).parent().data("mlurl");
+          select(".update").on("click", (e: { target: string; }) => {
+            let url = select(e.target).data("mlurl") || select(e.target).parent().data("mlurl");
             if (!url)
               return;
-            if ($(e.target).data("mlurl"))
-              $(e.target).remove();
+            if (select(e.target).data("mlurl"))
+              select(e.target).remove();
             else
-              $(e.target).parent().remove();
+              select(e.target).parent().remove();
             markDirty();
             installFromUrl(
               url,
               () => {
                 dumpManager();
 
-                let oh = $(`[id='vtag-${meta.id}']`).html();
+                let oh = select(`[id='vtag-${meta.id}']`).html();
 
                 oh = oh.replace(
                   `<span style="color:#ffaec8"><b>[有可用更新]</b></span>`,
                   `<span style='color:#df307f'><b>[已更新]</b></span>`
                 );
-                $(`[id='vtag-${meta.id}']`).html(oh);
+                select(`[id='vtag-${meta.id}']`).html(oh);
               },
               () => {
-                let oh = $(`[id='vtag-${meta.id}']`).html();
+                let oh = select(`[id='vtag-${meta.id}']`).html();
                 oh = oh.replace(
                   `<span style="color:#ffaec8"><b>[有可用更新]</b></span>`,
                   `<span style='color:#ec1c24'><b>[更新失败]</b></span>`
                 );
-                $(`[id='vtag-${meta.id}']`).html(oh);
+                select(`[id='vtag-${meta.id}']`).html(oh);
               },
               GIDURL.fromString(meta.gid)
             );
-            popinfo("cloud", "已尝试更新，更新效果在更新完成后刷新页面才会显示。", false);
-            registryTimer(setTimeout(closepop, 5000));
+            showPopper("已尝试更新，更新效果在更新完成后刷新页面才会显示。");
           });
         });
       }

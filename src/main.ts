@@ -12,23 +12,21 @@ import {
   GMSetValue,
   setWindowProperty,
 } from "./libs/usfunc";
-import jQuery from "jquery";
-import $ from "jquery";
 import { getUnsafeWindow, setLockedProperty } from "./libs/native";
 import { forkAPI, getAPIVersion } from "./api/STDAPI";
 import { loadNTEVT } from "./api/NTEVT";
 import { getAPIToken } from "./libs/encrypt";
 import viewrepo from "./libs/viewrepo";
-import { error } from "./libs/popinfo2";
 import { COMMON_CSS } from "./libs/static";
 import { loadEvents } from "./api/STDEVT";
+import { DOMUtils, select } from "./libs/domutils"
 const isManagerRegex = /bbsmod=manager/i;
 main();
 // verify(() => {});
 function fixMuteScreen() {
-  if ($("#ct").hasClass("wp cl w")) {// 禁言用户无法打开设置界面，这里是对用户是否被禁言的判断
-    $("#ct").remove();
-    $("#wp").html(`<div id="pt" class="bm cl">
+  if (select("#ct").hasClass("wp cl w")) {// 禁言用户无法打开设置界面，这里是对用户是否被禁言的判断
+    select("#ct").remove();
+    select("#wp").html(`<div id="pt" class="bm cl">
     <div class="z">
     <a href="./" class="nvhm" title="首页">Minecraft(我的世界)中文论坛</a> <em>›</em>
     <a href="home.php?mod=spacecp">设置</a> <em>›</em>个人资料
@@ -45,21 +43,15 @@ function fixMuteScreen() {
 
 function main() {
   setWindowProperty("__onExtraScriptLoaded", (cb: () => any) => cb());
-  $(loadNTEVT);
-  $(loadEvents);
-  $.ajaxSetup({
-    timeout: 10000,
-    cache: false,
-  });
-  jQuery(() => {
-    $("head").append(
+  DOMUtils.load(loadNTEVT).load(loadEvents).load(() => {
+    select("head").append(
       `<link type='text/css' rel='stylesheet'
           href='https://cdn.staticfile.org/font-awesome/5.15.1/css/all.min.css'/>`
     ).append(
       `<link type='text/css' rel='stylesheet'
           href='https://cdn.staticfile.org/font-awesome/5.15.1/css/v4-shims.min.css'/>`
     ).append(`<style id="mcbbs-loader-common-css">${COMMON_CSS}</style>`);
-    $("#debuginfo").after(
+    select("#debuginfo").after(
       `<br/><span>With MCBBS Loader Version ${getAPIVersion()}.<br/>MCBBS Loader 是独立的项目，与我的世界中文论坛没有从属关系</span>`
     );
   });
@@ -86,7 +78,7 @@ function main() {
   GMLog("[MCBBS Loader] 重置令牌：reset_" + RESET_TOKEN);
   setLockedProperty(getUnsafeWindow(), "forkAPI_" + getAPIToken(), forkAPI);
   setWindowProperty("CDT", []);
-  let all = GMGetValue("loader.all");
+  let all = GMGetValue("loader.all", {});
   for (let [id, enabled] of Object.entries(all))
     if (enabled && GMGetValue("meta-" + id, {}).permissions.indexOf("loader:earlyload") != -1)
       try {
@@ -94,7 +86,7 @@ function main() {
       } catch (ex) {
         console.error(ex);// 不要殃及其他部分
       }
-  jQuery(() => {
+  DOMUtils.load(() => {
     // 用户可能是从老版本升级上来的，因此需要立即补全排序好的依赖信息
     let sortedList = GMGetValue("loader.sortedModuleList") || resortDependency();
     for (let id of sortedList) {
@@ -107,12 +99,8 @@ function main() {
       })(id);
     }
     let errmsg = getDependencyError();
-    if (errmsg.length) {
+    if (errmsg.length)
       GMLog("[MCBBS Loader] 部分模块未加载，请到管理页面修复依赖关系错误");
-
-      if (isManagerRegex.test(String(window.location.search)))
-        error("<b>ECONFLICT！</b>自动加载模块失败，你现在正在模块管理页面，请解决依赖冲突。");
-    }
 
     // 这样可以在管理界面显示依赖关系是否满足
     manager.createBtn();

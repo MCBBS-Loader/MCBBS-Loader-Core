@@ -1,4 +1,3 @@
-import $ from "jquery";
 import { getAPIVersion } from "../api/STDAPI";
 import { parseMeta, GIDURL } from "./codeload";
 import { getCrossOriginData } from "./crossorigin";

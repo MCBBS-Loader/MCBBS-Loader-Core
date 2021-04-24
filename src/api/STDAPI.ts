@@ -5,14 +5,12 @@ import {
   GMXmlhttpRequest,
   setWindowProperty,
 } from "../libs/usfunc";
-import $ from "jquery";
 import { hasPermission } from "../libs/permissions";
 import { getGM } from "../libs/native";
 import { coreModEval, GIDURL } from "../libs/codeload";
 import configpage from "../libs/configpage";
-import { info } from "../libs/popinfo2";
 import { LoaderEvent } from "./STDEVT";
-import { showOfflineWindow } from "../craftmcbbs/craft-ui";
+import { showDialogFull, showOfflineWindow, showSuccess } from "../craftmcbbs/craft-ui";
 import { getCrossOriginData } from "../libs/crossorigin";
 
 interface InternalConfig {
@@ -100,7 +98,10 @@ class MCBBSAPI {
     moduleExport(this.id, obj);
   };
   public import_ = moduleImport;
-  public $ = $;
+
+  public get $() {
+    return getWindowProperty("jq");
+  }
 
   // Polyfills
   public GM_download = GM.GM_download;
@@ -178,7 +179,7 @@ class MCBBSAPI {
 
   public popInfo(msg: string) {
     assert(typeof msg == "string");
-    info(`[ ${this.id} ] ` + msg);
+    showSuccess(msg);// 这个东西暂时这样
   }
 
   public isModRunning(id: string) {

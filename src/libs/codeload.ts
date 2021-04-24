@@ -1,12 +1,12 @@
-import $ from "jquery";
 import { getAPIVersion } from "../api/STDAPI";
 import { getAPIToken } from "./encrypt";
 import { setProperty } from "./native";
 import { GMDeleteValue, GMGetValue, GMSetValue } from "./usfunc";
-import { warn } from "./popinfo";
 import manager from "./manager";
 import { IMG_MCBBS } from "./static";
 import { getCrossOriginData } from "./crossorigin";
+import { showPopper } from "../craftmcbbs/craft-ui";
+import { DOMUtils, select, trim } from "./domutils";
 
 // 解析 GID
 class GIDURL {
@@ -98,7 +98,7 @@ function resortDependencyInternal(all: any, dependencyError: string, tmpDisabled
     if ((GMGetValue("meta-" + id, {}).apiVersion || getAPIVersion()) != getAPIVersion()) {
       deleteModule(id, () => {
         console.log("[MCBBS Loader] 由于 API 版本不兼容，移除了 ID 为 " + id + " 的脚本。\n如有需要，你可以重新安装。");
-        warn("[MCBBS Loader] 由于 API 版本不兼容，移除了 ID 为 " + id + " 的脚本。\n如有需要，你可以重新安装。");
+        showPopper("[MCBBS Loader] 由于 API 版本不兼容，移除了 ID 为 " + id + " 的脚本。\n如有需要，你可以重新安装。");
       });
     }
   }
@@ -311,6 +311,7 @@ function addModule(code: string, gid: GIDURL = GIDURL.NIL): Map<string, string> 
     return "未知错误";
   }
 }
+
 // 解析头部信息
 function parseMeta(code: string, map: Map<string, string>): void {
   let extractMetaRegex = /(?<=\/\*( )*MCBBS[ -]*Module)[\s\S]*?(?=\*\/)/;
@@ -322,10 +323,10 @@ function parseMeta(code: string, map: Map<string, string>): void {
   let kRegex = /.+?(?=\=)/;
   let vRegex = /(?<=\=).*/;
   for (let l of allmeta) {
-    if (isItemRegex.test($.trim(l))) {
-      let k = ($.trim(l).match(kRegex) || [])[0] || "";
-      let v = ($.trim(l).match(vRegex) || [])[0] || "";
-      map.set($.trim(k), $.trim(v));
+    if (isItemRegex.test(trim(l))) {
+      let k = (trim(l).match(kRegex) || [])[0] || "";
+      let v = (trim(l).match(vRegex) || [])[0] || "";
+      map.set(trim(k), trim(v));
     }
   }
 }
@@ -343,8 +344,8 @@ function regMeta(id: string, meta: any): boolean {
 }
 // 加载代码
 function mountCode(id: string, code: string): void {
-  $(() => {
-    $("body").append(
+  DOMUtils.load(() => {
+    select("body").append(
       `<script id='code-${id}' onload='this.remove();'>
         (function(){
           let MCBBS = Object.freeze(window.forkAPI_${getAPIToken()}("${id}"));
@@ -356,8 +357,8 @@ function mountCode(id: string, code: string): void {
 }
 // 卸载代码
 function unmountCode(id: string): void {
-  $(() => {
-    $(`#code-${id}`).remove();
+  DOMUtils.load(() => {
+    select(`#code-${id}`).remove();
   });
 }
 // 删除模块
