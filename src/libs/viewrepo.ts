@@ -76,8 +76,8 @@ function dumpPreview(repo: string) {
         select("#all_modules").append(ele);
       }
       select(".insremote").on("click", (e: any) => {
-        var ele = e.target.getAttribute("gtar") != undefined ? e.target : e.target.parentElement;
-        installFromGID(GIDURL.fromString(ele.getAttribute("gtar"), gid),
+        var ele = e.target.getAttribute("data-gtar") != undefined ? e.target : e.target.parentElement;
+        installFromGID(GIDURL.fromString(ele.getAttribute("data-gtar"), gid),
             st => manager.onInstall(st), r => manager.onFailure(r));
       });
       var working = false;
@@ -85,9 +85,9 @@ function dumpPreview(repo: string) {
         if (working)
           e.preventDefault();
         else if (e.target.checked)
-          toApply.add(e.target.getAttribute("gtar"));
+          toApply.add(e.target.getAttribute("data-gtar"));
         else
-          toApply.delete(e.target.getAttribute("gtar"));
+          toApply.delete(e.target.getAttribute("data-gtar"));
       });
       select("#apply-changes-btn").on("click", () => {
         if (!toApply.size) return;
@@ -128,7 +128,7 @@ function dumpPreview(repo: string) {
       });
       select("#select-all-btn").on("click", (e: any) => {
         if (working) return;
-        select(".fast-install-chk").each(HTMLLinkElement.prototype.click);
+        select(".fast-install-chk").each(v => v.click());
       });
     }
   });

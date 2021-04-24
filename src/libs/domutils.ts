@@ -12,9 +12,6 @@ class DOMUtils {
     this.elements = [];
     for (let x of nodeList)
       this.elements.push(x);
-    if(this.elements.length == 0) {
-      console.warn(`nothing selected`);
-    }
   }
 
   static select(selector: string) {
@@ -125,11 +122,11 @@ class DOMUtils {
   }
 
   attr(k: string, value?: string) {
-    return typeof value == "string" ? this.each(v => v.attibutes[k] = value) : this.elements[0]?.attibutes[k];
+    return typeof value == "string" ? this.each(v => v.setAttribute(k, value)) : this.elements[0]?.getAttribute(k);
   }
 
   data(k: string, value?: string) {
-    return this.attr("data" + k, value);
+    return this.attr("data-" + k, value);
   }
 
   foreach(cb: (i: number, v: any) => void) {
