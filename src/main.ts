@@ -86,7 +86,7 @@ function main() {
   GMLog("[MCBBS Loader] 重置令牌：reset_" + RESET_TOKEN);
   setLockedProperty(getUnsafeWindow(), "forkAPI_" + getAPIToken(), forkAPI);
   setWindowProperty("CDT", []);
-  let all = GMGetValue("loader.all");
+  let all = GMGetValue("loader.all", {});
   for (let [id, enabled] of Object.entries(all))
     if (enabled && GMGetValue("meta-" + id, {}).permissions.indexOf("loader:earlyload") != -1)
       try {
