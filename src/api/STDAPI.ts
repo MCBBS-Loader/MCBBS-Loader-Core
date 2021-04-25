@@ -14,6 +14,9 @@ import { info } from "../libs/popinfo2";
 import { LoaderEvent } from "./STDEVT";
 import { showOfflineWindow } from "../craftmcbbs/craft-ui";
 import { getCrossOriginData } from "../libs/crossorigin";
+import _ from "lodash";
+import {uiVersion} from "../craftmcbbs/uiv";
+import {getUserDisplayName} from "../craftmcbbs/craft-user";
 
 interface InternalConfig {
   id: string;
@@ -27,7 +30,7 @@ interface InternalConfig {
 
 const ML_VERSION = 2;
 const GM: any = getGM();
-var all: any = GMGetValue("loader.all", {});
+const all: any = GMGetValue("loader.all", {});
 
 function forkAPI(id: string) {
   return new MCBBSAPI(id);
@@ -80,7 +83,7 @@ class MCBBSAPI {
   public id: string;
   public local: Object = {};
   public LoaderEvent = LoaderEvent;
-
+  public user:unknown = {}
   constructor(id: string) {
     this.id = id;
     let gid = GMGetValue("loader.all").gid;
@@ -91,16 +94,29 @@ class MCBBSAPI {
     } else {
       this.eval = undefined;
       this.GM = undefined;
+      // 用户控制需要特殊权限，API 文档待编写
+      if(hasPermission(id,"mcbbs:usercontrol")){
+        this.user = {
+          // TODO 用户名支持
+          getUserDisplayName: getUserDisplayName()
+        }
+      }else{
+        this.user = {}
+      }
     }
   }
 
   public getAPIVersion = getAPIVersion;
+  // MCBBS V3/V2
+  public getUIVersion = uiVersion();
   public download = GM.GM_download;
   public export_ = (obj: any) => {
     moduleExport(this.id, obj);
   };
   public import_ = moduleImport;
   public $ = $;
+  // Lodash
+  public lodash = _;
 
   // Polyfills
   public GM_download = GM.GM_download;
@@ -215,7 +231,7 @@ function moduleImport(id: string, callback: (arg: any) => void): boolean {
   if (getWindowProperty(`module-export-${id}`)) {
     callback(getWindowProperty(`module-export-${id}`));
   } else {
-    var origin = getWindowProperty("MIDT")[id];
+    const origin = getWindowProperty("MIDT")[id];
     if (origin) {
       getWindowProperty("MIDT")[id] = (obj: any) => {
         origin(obj);
@@ -229,10 +245,10 @@ function moduleImport(id: string, callback: (arg: any) => void): boolean {
 }
 
 function notifyExport(id: string) {
-  for (var x in getWindowProperty("MIDT")) {
+  for (const x in getWindowProperty("MIDT")) {
     if (x == id) {
       getWindowProperty("MIDT")[x](getWindowProperty(`module-export-${id}`));
-      var m = getWindowProperty("MIDT");
+      const m = getWindowProperty("MIDT");
       delete m[x];
       setWindowProperty("MIDT", m);
     }
