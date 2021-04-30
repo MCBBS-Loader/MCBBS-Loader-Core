@@ -345,14 +345,11 @@ function regMeta(id: string, meta: any): boolean {
 // 加载代码
 function mountCode(id: string, code: string): void {
   DOMUtils.load(() => {
-    select("body").append(
-      `<script id='code-${id}'>
-        (() => {
-          let MCBBS = Object.freeze(window.forkAPI_${getAPIToken()}("${id}"));
-          ${code}
-        })();
-      </script>`
-    );
+    let script = document.createElement("script");
+    script.text = `(MCBBS => {${code}})(Object.freeze(window.forkAPI_${getAPIToken()}("${id}")))`;
+    script.id = "code-" + id;
+    script.onload = () => script.remove();
+    document.body.appendChild(script);
   });
 }
 // 卸载代码

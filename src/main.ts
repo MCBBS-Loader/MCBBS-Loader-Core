@@ -11,8 +11,10 @@ import {
   GMLog,
   setWindowProperty,
 } from "./libs/usfunc";
-import { getAPIVersion } from "./api/STDAPI";
+import { getUnsafeWindow, setLockedProperty } from "./libs/native";
+import { forkAPI, getAPIVersion } from "./api/STDAPI";
 import { loadNTEVT } from "./api/NTEVT";
+import { getAPIToken } from "./libs/encrypt";
 import viewrepo from "./libs/viewrepo";
 import { COMMON_CSS } from "./libs/static";
 import { loadEvents } from "./api/STDEVT";
@@ -47,9 +49,23 @@ function main() {
       `<link type='text/css' rel='stylesheet'
           href='https://cdn.staticfile.org/font-awesome/5.15.1/css/v4-shims.min.css'/>`
     ).append(`<style id="mcbbs-loader-common-css">${COMMON_CSS}</style>`);
+    select("#debuginfo").after(
+      `<br/><span>With MCBBS Loader Version ${getAPIVersion()}.<br/>MCBBS Loader 是独立的项目，与我的世界中文论坛没有从属关系</span>`
+    );
   });
 
-  GMLog(`[LoaderMin] 加载器和 API 版本：${getAPIVersion()}`);
+  GMLog(`[MCBBS Loader] 加载器和 API 版本： Min-${getAPIVersion()}`);
+
+  setLockedProperty(getUnsafeWindow(), "forkAPI_" + getAPIToken(), forkAPI);
+  setWindowProperty("CDT", []);
+  let all = GMGetValue("loader.all", {});
+  for (let [id, enabled] of Object.entries(all))
+    if (enabled && GMGetValue("meta-" + id, {}).permissions.indexOf("loader:earlyload") != -1)
+      try {
+        eval(`(() => {let MCBBS = null; ${GMGetValue("code-" + id)}})()`);
+      } catch (ex) {
+        console.error(ex);// 不要殃及其他部分
+      }
   DOMUtils.load(() => {
     // 用户可能是从老版本升级上来的，因此需要立即补全排序好的依赖信息
     let sortedList = GMGetValue("loader.sortedModuleList") || resortDependency();
@@ -62,10 +78,6 @@ function main() {
         });
       })(id);
     }
-    let errmsg = getDependencyError();
-    if (errmsg.length)
-      console.log("[MCBBS Loader] 部分模块未加载，请到管理页面修复依赖关系错误");
-
     // 这样可以在管理界面显示依赖关系是否满足
     manager.createBtn();
     manager.createMenu();

@@ -21,7 +21,7 @@ import configpage from "./configpage";
 import { DOMUtils, select } from "./domutils";
 
 const activeChecking: Map<string, string> = new Map();
-function createManageHtml(meta: any, isCore: boolean, color: string) {
+function createManageHtml(meta: any, isCore: boolean, earlyLoad: boolean, color: string) {
   return `<li id='${meta.id}'>
     <div style='display:inline;'>
       <img src='${meta.icon || ""}' width='50' height='50' style="vertical-align:middle;float:left;"/>
@@ -33,7 +33,8 @@ function createManageHtml(meta: any, isCore: boolean, color: string) {
         &nbsp;&nbsp;&nbsp;
         <span id='vtag-${meta.id}' style='font-size:12px;color:#150029;'>
           ${meta.id || "loader.nameless"}@${(meta.version || "1.0.0") +
-    (isCore ? "&nbsp;<span style='color:#ff0000'><b>[COREMOD]</b></span>" : "")}
+    (isCore ? "&nbsp;<span style='color:#ff0000'><b>[核心模组]</b></span>" : "") +
+    (earlyLoad ? "&nbsp;<span style='color:#0000ff'><b>[早期加载]</b></span>" : "")}
           <span style='color:#df307f;${getTmpDisabled().includes(meta.id) ? "" : "display: none;"}'>
             [依赖关系原因停用]
           </span>
@@ -239,8 +240,8 @@ function dumpManager() {
     let all_modules = GMGetValue("loader.all", {});
     for (let m of Object.entries(all_modules)) {
       let meta = GMGetValue("meta-" + m[0], { id: "impossible" });
-      let isCore = meta.permissions.search("loader:core") != -1;
-      let ele = createManageHtml(meta, isCore, isCore ? "#ff0000" : "#5d2391");
+      let ele = createManageHtml(meta, meta.permissions.contains("loader:core"),
+        meta.permissions.contains("loader:earlyload"), "#5d2391");
       select("#all_modules").append(ele);
     }
     select(".showsrc").on("click", (e: { target: string; }) => {
