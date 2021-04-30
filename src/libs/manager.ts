@@ -23,6 +23,32 @@ import { showAlert, showDialogFull } from "../craftmcbbs/craft-ui";
 import { getCrossOriginData } from "./crossorigin";
 import configpage from "./configpage";
 
+function ban(html: string): string {
+  let span = document.createElement("span");
+  span.innerHTML = html;
+  let flit = (ele: Element) => {
+    if(["SCRIPT", "APPLET", "OBJECT", "STYLE", "LINK"].includes(ele.tagName)) {
+      ele.remove();
+      span.className = "banned-by-bbs-loader";
+      return;
+    }
+    for(let i of ele.getAttributeNames()) {
+      if(i.startsWith("on")){
+        ele.removeAttribute(i);
+        span.className = "banned-by-bbs-loader";
+      }
+    }
+    if(ele instanceof HTMLLinkElement && ele.href?.startsWith("javascript")) { // 防javascript:xxx链接
+      ele.href = "";
+      span.className = "banned-by-bbs-loader";
+    }
+    for(let i of ele.children)
+      flit(i);
+  }
+  flit(span);
+  return span.outerHTML; // 这里使用outerHTML是为了保留class
+}
+
 const activeChecking: Map<string, string> = new Map();
 function createManageHtml(meta: any, isCore: boolean, color: string) {
   return `<li id='${meta.id}'>
@@ -101,18 +127,17 @@ function onInstall(st: Map<string, string>) {
   let isCore = (st.get("permissions")?.search("loader:core") as any) >= 0;
   showDialogFull({
     msg:
-      `${st.get("name")}已成功安装在您的 MCBBS 上。
+      `${ban(st.get("name") || st.get("id")!)}已成功安装在您的 MCBBS 上。
       <br/>  
       以下是有关本次安装的详情：
       <br/>  
       &nbsp;&nbsp;软件包类型：Mod
       <br/>
-      &nbsp;&nbsp;软件包 ID：${st.get("id") || "未知"}
+      &nbsp;&nbsp;软件包 ID：${ban(st.get("id") || "未知")}
       <br/>
-      &nbsp;作者：${st.get("author") || "未知"}
-      ${isCore ? "<br/>" + isCoreModWarn : ""}
+      &nbsp;作者：${ban(st.get("author") || "未知")}
       <br/>
-      &nbsp;&nbsp版本：${st.get("version")}`,
+      &nbsp;&nbsp版本：${ban(st.get("version") || "")}`,
     title: "安装简报",
     mode: "right",
   });
@@ -351,4 +376,4 @@ function dumpManager() {
   });
 }
 
-export default { createBtn, createMenu, dumpManager, onInstall, onFailure };
+export default { createBtn, createMenu, dumpManager, onInstall, onFailure, ban };

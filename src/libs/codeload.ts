@@ -249,16 +249,16 @@ function addModule(code: string, gid: GIDURL = GIDURL.NIL): Map<string, string> 
   let obj: object = {
     id: id,
     permissions: dataMap.get("permissions") || "",
-    name: dataMap.get("name") || dataMap.get("id"),
-    author: dataMap.get("author") || "Someone",
+    name: ban(dataMap.get("name") || dataMap.get("id")!),
+    author: ban(dataMap.get("author") || "Someone"),
     icon: dataMap.get("icon") || IMG_MCBBS,
     depend: depend,
     before: (before = dataMap.get("before") || ""),
     after: (after = dataMap.get("after") || ""),
-    description: dataMap.get("description") || "No description provided.",
+    description: ban(dataMap.get("description") || "No description provided."),
     updateURL: dataMap.get("updateURL"),
     apiVersion: (apiVersion = dataMap.get("apiVersion")),
-    version: dataMap.get("version"),
+    version: dataMap.get("version") ? ban(dataMap.get("version")!) : undefined,
     gid: gid != GIDURL.NIL ? gid.asString() : dataMap.get("gid")
   };
   if ((apiVersion || STRING_API_VERSION) != STRING_API_VERSION) {
@@ -425,3 +425,7 @@ export {
   isDependencySolved,
   installFromGID,
 };
+
+function ban(arg0: string) {
+    throw new Error("Function not implemented.");
+  }
