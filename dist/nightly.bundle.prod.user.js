@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         MCBBS Loader
 // @namespace    https://mcbbs-loader.xuogroup.top
-// @version      1.2.0
+// @version      1.2.1
 // @description  Load custom modules into MCBBS!
 // @author       mcbbs-loader
 // @match        https://www.mcbbs.net/*
 // @run-at       document-start
-// @updateURL    https://cdn.jsdelivr.net/gh/MCBBS-Loader/MCBBS-Loader-Core@main/dist/nightly.bundle.prod.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/MCBBS-Loader/MCBBS-Loader-Core@min/dist/nightly.bundle.prod.user.js
 // @grant        unsafeWindow
 // @grant        GM_addStyle
 // @grant        GM_deleteValue
