@@ -8,6 +8,7 @@ import { LoaderEvent } from "../api/STDEVT";
 import { InternalConfig } from "../api/STDAPI";
 import { showPopper } from "../craftmcbbs/craft-ui";
 import { DOMUtils, select } from "./domutils";
+import { isDirty } from "./codeload";
 function dumpConfigPage() {
   select("title").html("MCBBS Loader - 配置页面");
   select("div[class='bm bw0']").html(
@@ -142,6 +143,8 @@ function createMenu(): void {
       "href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=config'>模块选项中心</a></li>"
     );
     select("#manage_config").on("click", (e: any) => {
+      if(isDirty())
+        return;
       e.preventDefault();
       dumpConfigPage();
       history.replaceState(null, null!, "https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=config");

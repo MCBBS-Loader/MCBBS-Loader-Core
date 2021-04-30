@@ -249,16 +249,16 @@ function addModule(code: string, gid: GIDURL = GIDURL.NIL): Map<string, string> 
   let obj: object = {
     id: id,
     permissions: dataMap.get("permissions") || "",
-    name: dataMap.get("name") || dataMap.get("id"),
-    author: dataMap.get("author") || "Someone",
+    name: DOMUtils.ban(dataMap.get("name") || dataMap.get("id")!),
+    author: DOMUtils.ban(dataMap.get("author") || "Someone"),
     icon: dataMap.get("icon") || IMG_MCBBS,
     depend: depend,
     before: (before = dataMap.get("before") || ""),
     after: (after = dataMap.get("after") || ""),
-    description: dataMap.get("description") || "No description provided.",
+    description: DOMUtils.ban(dataMap.get("description") || "No description provided."),
     updateURL: dataMap.get("updateURL"),
     apiVersion: (apiVersion = dataMap.get("apiVersion")),
-    version: dataMap.get("version"),
+    version: dataMap.get("version") ? DOMUtils.ban(dataMap.get("version")!) : undefined,
     gid: gid != GIDURL.NIL ? gid.asString() : dataMap.get("gid")
   };
   if ((apiVersion || STRING_API_VERSION) != STRING_API_VERSION) {
@@ -346,8 +346,8 @@ function regMeta(id: string, meta: any): boolean {
 function mountCode(id: string, code: string): void {
   DOMUtils.load(() => {
     select("body").append(
-      `<script id='code-${id}' onload='this.remove();'>
-        (function(){
+      `<script id='code-${id}'>
+        (() => {
           let MCBBS = Object.freeze(window.forkAPI_${getAPIToken()}("${id}"));
           ${code}
         })();

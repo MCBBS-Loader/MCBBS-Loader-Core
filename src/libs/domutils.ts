@@ -8,14 +8,40 @@ window.addEventListener("load", () => {
 
 class DOMUtils {
   public elements: any[];
-  constructor(nodeList: NodeList | HTMLCollection) {
+  constructor(nodeList: NodeList | HTMLCollection | Array<Element>) {
     this.elements = [];
     for (let x of nodeList)
       this.elements.push(x);
   }
 
-  static select(selector: string) {
-    return new DOMUtils(document.querySelectorAll(selector));
+  static select(selector: string | Element) {
+    return typeof selector == "string" ? new DOMUtils(document.querySelectorAll(selector)) : new DOMUtils([selector]);
+  }
+
+  static ban(html: string): string {
+    let span = document.createElement("span");
+    span.innerHTML = html;
+    let flit = (ele: Element) => {
+      if(["SCRIPT", "APPLET", "OBJECT", "STYLE", "LINK"].includes(ele.tagName)) {
+        ele.remove();
+        span.className = "banned-by-bbs-loader";
+        return;
+      }
+      for(let i of ele.getAttributeNames()) {
+        if(i.startsWith("on")){
+          ele.removeAttribute(i);
+          span.className = "banned-by-bbs-loader";
+        }
+      }
+      if(ele instanceof HTMLLinkElement && ele.href?.startsWith("javascript")) { // 防javascript:xxx链接
+        ele.href = "";
+        span.className = "banned-by-bbs-loader";
+      }
+      for(let i of ele.children)
+        flit(i);
+    }
+    flit(span);
+    return span.outerHTML; // 这里使用outerHTML是为了保留class
   }
 
   static load(cb: () => void) {
@@ -136,7 +162,7 @@ class DOMUtils {
   }
 }
 
-function select(selector: string) {
+function select(selector: string | Element) {
   return DOMUtils.select(selector);
 }
 

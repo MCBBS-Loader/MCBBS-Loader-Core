@@ -77,6 +77,8 @@ function createMenu(): void {
         "style='cursor:pointer;'>模块管理</a></li>"
       );
       select('#loader_manager').on('click', (e: any) => {
+        if(isDirty())
+          return;
         e.preventDefault();
         dumpManager();
         // null后面加!是为了让编译器闭嘴
@@ -87,41 +89,28 @@ function createMenu(): void {
   }
 }
 
-const isCoreModWarn: string =
-  "这是一个 CoreMod，它拥有和 MCBBS Loader 一样的权限，在使用时，请注意安全。";
-
 function onInstall(st: Map<string, string>) {
   activeChecking.delete(st.get("id")!);
   resortDependency();
   dumpManager();
   select("#install_base64").val(GMGetValue(`code-${st.get("id")}`, ""));
-  let isCore = (st.get("permissions")?.search("loader:core") as any) >= 0;
   showDialogFull({
     msg:
-      `${st.get("name")}已成功安装在您的 MCBBS 上。
+      `${DOMUtils.ban(st.get("name") || st.get("id")!)}已成功安装在您的 MCBBS 上。
       <br/>  
       以下是有关本次安装的详情：
       <br/>  
       &nbsp;&nbsp;软件包类型：Mod
       <br/>
-      &nbsp;&nbsp;软件包 ID：${st.get("id") || "未知"}
+      &nbsp;&nbsp;软件包 ID：${DOMUtils.ban(st.get("id")!)}
       <br/>
-      &nbsp;作者：${st.get("author") || "未知"}
-      ${isCore ? "<br/>" + isCoreModWarn : ""}
+      &nbsp;作者：${DOMUtils.ban(st.get("author") || "未知")}
       <br/>
-      &nbsp;&nbsp版本：${st.get("version")}`,
+      &nbsp;&nbsp版本：${DOMUtils.ban(st.get("version") || "")}`,
     title: "安装简报",
     mode: "right",
   });
-  if (isCore) {
-    showPopper(
-      "您安装了一个 CoreMod，请当心，CoreMod 拥有很高的权限，可能会破坏 MCBBS Loader。如果这不是您安装的，请移除它：" +
-      st.get("id") +
-      "。"
-    );
-  } else {
-    showPopper("成功安装了模块");
-  }
+  showPopper("成功安装了模块");
 }
 
 // 安装失败时的动作

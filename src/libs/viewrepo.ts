@@ -13,7 +13,7 @@ function dumpPreview(repo: string) {
   select("title").html("MCBBS Loader - 软件源");
   let gid = GIDURL.fromString(repo);
   select(".a").removeClass("a");
-  var toApply: Set<string> = new Set();
+  let toApply: Set<string> = new Set();
   select("div[class='bm bw0']").css("user-select", "none").html(
     `<span style='font-size:1.0rem'>正在预览软件源 ${repo}</span>` + HTML_VIEWREPO_BODY
   );
@@ -30,18 +30,19 @@ function dumpPreview(repo: string) {
     if (typeof data != "object") {
       select("#all_modules").html("无法显示该软件源的预览。<br/>无效的JSON");
     } else {
-      for (var [m, x] of Object.entries(data)) {
-        var meta = data[m];
+      for (let [m, x] of Object.entries(data)) {
+        let meta = data[m];
         meta.id = meta.id || "impossible";
         meta.name = meta.name || "Nameless";
         meta.author = meta.author || "Someone";
         meta.description = meta.description || "No description provided.";
         meta.permissions = meta.permissions || "";
-        var isCore = meta.permissions.search("loader:core") != -1;
-        var isInstalled: boolean = GMGetValue(`meta-${meta.id}`) != undefined;
-        var color = isInstalled ? "#575757" : isCore ? "#ff0000" : "#5d2391";
-        var installText = isInstalled ? "&nbsp;<span style='color:#575757'><b>[已安装]</b></span>" : "";
-        var ele =
+        let isCore = meta.permissions.includes("loader:core");
+        let earlyLoad = meta.permissions.includes("loader:earlyload");
+        let isInstalled: boolean = GMGetValue(`meta-${meta.id}`) != undefined;
+        let color = isInstalled ? "#575757" : "#5d2391";
+        let installText = isInstalled ? "&nbsp;<span style='color:#575757'><b>[已安装]</b></span>" : "";
+        let ele =
           `<li id='${meta.id}'>
           <div style='display:inline;'>
             <img src='${meta.icon || IMG_MCBBS}' width='50' height='50' style="vertical-align:middle;float:left;"/>
@@ -53,7 +54,8 @@ function dumpPreview(repo: string) {
               &nbsp;&nbsp;&nbsp;
               <span id='vtag-${meta.id}' style='font-size:12px;color:#150029;'>
                 ${meta.id}@${(meta.version || "1.0.0") +
-                (isCore ? "&nbsp;<span style='color:#ff0000'><b>[COREMOD]</b></span>": "") +
+                (isCore ? "&nbsp;<span style='color:#ff0000'><b>[核心模块]</b></span>": "") +
+                (earlyLoad ? "&nbsp;<span style='color:#0000ff'><b>[早期加载]</b></span>": "") +
                 installText}
               </span>
               <br/>
@@ -76,11 +78,11 @@ function dumpPreview(repo: string) {
         select("#all_modules").append(ele);
       }
       select(".insremote").on("click", (e: any) => {
-        var ele = e.target.getAttribute("data-gtar") != undefined ? e.target : e.target.parentElement;
+        let ele = e.target.getAttribute("data-gtar") != undefined ? e.target : e.target.parentElement;
         installFromGID(GIDURL.fromString(ele.getAttribute("data-gtar"), gid),
             st => manager.onInstall(st), r => manager.onFailure(r));
       });
-      var working = false;
+      let working = false;
       select(".fast-install-chk").on("click", (e: any) => {
         if (working)
           e.preventDefault();
@@ -93,17 +95,17 @@ function dumpPreview(repo: string) {
         if (!toApply.size) return;
         if (working) return;
         working = true;
-        var succeed: any = [],
+        let succeed: any = [],
           fail: any = [],
           update = () => {
             resortDependency();
             if (succeed.length + fail.length == toApply.size) {
-              var msg = `成功安装了 ${succeed.length} 个模块:`;
-              for (var x of succeed)
+              let msg = `成功安装了 ${succeed.length} 个模块:`;
+              for (let x of succeed)
                 msg += `<br>&nbsp;&nbsp;&nbsp;&nbsp;${x.get("name")}`;
               if (fail.length) {
                 msg += `<br>未能安装 ${fail.length} 个模块:`;
-                for (var [id, err] of fail)
+                for (let [id, err] of fail)
                   msg += `<br>&nbsp;&nbsp;&nbsp;&nbsp;${id}&nbsp;&nbsp;&nbsp;&nbsp${err}`;
                 showAlert(msg, "安装失败", () => manager.dumpManager());
               }
