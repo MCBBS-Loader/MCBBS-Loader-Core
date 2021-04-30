@@ -240,8 +240,8 @@ function dumpManager() {
     let all_modules = GMGetValue("loader.all", {});
     for (let m of Object.entries(all_modules)) {
       let meta = GMGetValue("meta-" + m[0], { id: "impossible" });
-      let ele = createManageHtml(meta, meta.permissions.contains("loader:core"),
-        meta.permissions.contains("loader:earlyload"), "#5d2391");
+      let ele = createManageHtml(meta, meta.permissions.includes("loader:core"),
+        meta.permissions.includes("loader:earlyload"), "#5d2391");
       select("#all_modules").append(ele);
     }
     select(".showsrc").on("click", (e: { target: string; }) => {
