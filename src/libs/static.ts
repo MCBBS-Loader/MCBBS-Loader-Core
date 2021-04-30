@@ -41,7 +41,7 @@ const HTML_MANAGER_FOOTER =
   </button>
   <span class='srcc'>
     洞穴夜莺的软件源中包含许多轻松使用模块，
-    <a id='preview_cv' style='color:#df307f'href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#CaveNightingale%3ACaveNightingale-MCBBS-Modules%3Amanifest%3Amaster' target='_blank'>
+    <a id='preview_cv' style='color:#df307f'href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#gitee%3ACaveNightingale%3ACaveNightingale-MCBBS-Modules%3Amanifest%3Av2' target='_blank'>
       预览该软件源
     </a>
     。

@@ -106,6 +106,8 @@ function createMenu(): void {
         "style='cursor:pointer;'>模块管理</a></li>"
       );
       $('#loader_manager').on('click', e => {
+        if(isDirty())
+          return;
         e.preventDefault();
         dumpManager();
         // null后面加!是为了让编译器闭嘴
@@ -116,8 +118,6 @@ function createMenu(): void {
   }
 }
 
-const isCoreModWarn: string =
-  "这是一个 CoreMod，它拥有和 MCBBS Loader 一样的权限，在使用时，请注意安全。";
 
 function onInstall(st: Map<string, string>) {
   activeChecking.delete(st.get("id")!);

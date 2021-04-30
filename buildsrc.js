@@ -86,10 +86,10 @@ fs.readdir(sourceDir, (err, data) => {
 	if(err) {
 		console.error(err)
 	} else{
-		let success = 0, total = 0, jsons = [];
+		let success = 0, total = 0, jsons = [], stick = [];
 		const updateStatus = () => {
 			if(success == total) {
-				fs.writeFile(targetFile, `{\n${jsons.join(",\n")}\n}`, err => {
+				fs.writeFile(targetFile, `{\n${stick.concat(jsons).join(",\n")}\n}`, err => {
 					if(err) {
 						console.error(err);
 					}
@@ -108,11 +108,17 @@ fs.readdir(sourceDir, (err, data) => {
 						const module = parseMeta(context);
 						if(module.id && module.version) {
 							const innerJSON = [];
-							for(const key of ["id", "name", "description", "author", "version", "icon", "apiVersion"])
+							if(module["permissions"] && module["permissions"].split(" ").includes("loader:settop")) {
+								module.name += "<img src='template/mcbbs/image/settop.png' />";
+							}
+							for(const key of ["id", "name", "description", "author", "version", "icon", "apiVersion", "permissions"])
 								if(module[key])
 									innerJSON.push(`\t\t"${key}": ${JSON.stringify(module[key])}`);
 							innerJSON.push(`\t\t"gid": ${JSON.stringify(genGid(name.replace(/\.js$/, "")))}`);
-							jsons.push(`\t${JSON.stringify(module.id)}: {\n${innerJSON.join(",\n")}\n\t}`);
+							if(module["permissions"] && module["permissions"].split(" ").includes("loader:settop"))
+								stick.push(`\t${JSON.stringify(module.id)}: {\n${innerJSON.join(",\n")}\n\t}`);
+							else
+								jsons.push(`\t${JSON.stringify(module.id)}: {\n${innerJSON.join(",\n")}\n\t}`);
 						} else {
 							console.warn(name + "不是一个模块");
 						}

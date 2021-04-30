@@ -9,6 +9,7 @@ import jQuery from "jquery";
 import { success } from "./popinfo2";
 import { LoaderEvent } from "../api/STDEVT";
 import { InternalConfig } from "../api/STDAPI";
+import { isDirty } from "./codeload";
 function dumpConfigPage() {
   $("title").html("MCBBS Loader - 配置页面");
   $("div[class='bm bw0']").html(
@@ -143,6 +144,8 @@ function createMenu(): void {
       "href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=config'>模块选项中心</a></li>"
     );
     $("#manage_config").on("click", e => {
+      if(isDirty())
+        return;
       e.preventDefault();
       dumpConfigPage();
       history.replaceState(null, null!, "https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=config");
