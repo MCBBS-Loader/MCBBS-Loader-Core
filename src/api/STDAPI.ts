@@ -10,7 +10,7 @@ import { getGM } from "../libs/native";
 import { coreModEval, GIDURL } from "../libs/codeload";
 import configpage from "../libs/configpage";
 import { LoaderEvent } from "./STDEVT";
-import { showDialogFull, showOfflineWindow, showSuccess } from "../craftmcbbs/craft-ui";
+import { showOfflineWindow, showSuccess } from "../craftmcbbs/craft-ui";
 import { getCrossOriginData } from "../libs/crossorigin";
 
 interface InternalConfig {
@@ -49,11 +49,11 @@ class Config {
   }
 
   get(dval?: any) {
-    return configpage.getConfigVal(this.internalConfig.id, this.internalConfig.storageId, dval);
+    return configpage.getConfigVal(this.internalConfig.id, this.internalConfig.stgid, dval);
   }
 
   set(val: any) {
-    configpage.setConfigVal(this.internalConfig.id, this.internalConfig.storageId, val);
+    configpage.setConfigVal(this.internalConfig.id, this.internalConfig.stgid, val);
   }
 }
 
