@@ -1,5 +1,4 @@
 import {
-  getDependencyError,
   mountCode,
   resortDependency,
 } from "./libs/codeload";
@@ -19,7 +18,8 @@ import viewrepo from "./libs/viewrepo";
 import { COMMON_CSS } from "./libs/static";
 import { loadEvents } from "./api/STDEVT";
 import { DOMUtils, select } from "./libs/domutils"
-main();
+if(!frameElement)
+  main();
 // verify(() => {});
 function fixMuteScreen() {
   if (select("#ct").hasClass("wp cl w")) {// 禁言用户无法打开设置界面，这里是对用户是否被禁言的判断
