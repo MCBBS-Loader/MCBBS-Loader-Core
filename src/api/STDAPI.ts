@@ -51,11 +51,11 @@ class Config {
   }
 
   get(dval?: any) {
-    return configpage.getConfigVal(this.internalConfig.id, this.internalConfig.storageId, dval);
+    return configpage.getConfigVal(this.internalConfig.id, this.internalConfig.stgid, dval);
   }
 
   set(val: any) {
-    configpage.setConfigVal(this.internalConfig.id, this.internalConfig.storageId, val);
+    configpage.setConfigVal(this.internalConfig.id, this.internalConfig.stgid, val);
   }
 }
 

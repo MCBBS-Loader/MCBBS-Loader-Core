@@ -8,6 +8,7 @@ import manager from "./manager";
 import { IMG_MCBBS } from "./static";
 import { getCrossOriginData } from "./crossorigin";
 
+let ban = manager.ban;
 // 解析 GID
 class GIDURL {
   static NIL = new GIDURL("", "", "", "", "", null);
@@ -425,7 +426,3 @@ export {
   isDependencySolved,
   installFromGID,
 };
-
-function ban(arg0: string) {
-    throw new Error("Function not implemented.");
-  }
