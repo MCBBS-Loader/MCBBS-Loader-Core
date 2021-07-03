@@ -54,7 +54,7 @@ function createManageHtml(meta: any, isCore: boolean, color: string) {
   return `<li id='${meta.id}'>
     <div style='display:inline;'>
       <img src='${meta.icon || ""}' width='50' height='50' style="vertical-align:middle;float:left;"/>
-      <div style="height: 8em">
+      <div style="min-height: 8em" class="manager_mod_details">
         &nbsp;&nbsp;
         <span style='font-size:18px;color:${color}'>
           <strong>${meta.name || "Nameless"}</strong>
@@ -87,6 +87,7 @@ function createManageHtml(meta: any, isCore: boolean, color: string) {
         </div>
       </div>
     </div>
+    <hr class="manager_mod_hr"/>
   </li>`;
 }
 

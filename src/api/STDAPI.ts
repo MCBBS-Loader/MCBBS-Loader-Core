@@ -59,6 +59,15 @@ class Config {
   }
 }
 
+class Utils {
+  static mergeObject<T>(dest: T, obj: object, callback: (obj:T) => void = () => {}) {
+    for(let [k, v] of Object.entries(obj))
+      (dest as any)[k] = v;
+    callback(dest);
+    return dest;
+  }
+}
+
 /**
  * 对mcbbs的common.js的封装
  */
@@ -73,6 +82,52 @@ class Common {
 
   public loadExtra(script: string, callback: () => void) {
     getWindowProperty("$F")("__onExtraScriptLoaded", [callback], script);
+  }
+
+  public getPostRootAndPID(post: HTMLElement) {
+    let parse;
+    while(!(parse = /post_([0-9]+)/.exec(post.id)))
+      post = post.parentElement!;   
+    return { post, pid: parse[1] };
+  }
+
+  public v3() {
+    return document.body.classList.contains("v3")
+  }
+
+  public addPostOperation(post: HTMLElement, text: string,
+      callback: (event: Event, element: HTMLElement, post: HTMLElement) => void, href: string = "javascript:;", icon?: string) {
+    let pid = this.getPostRootAndPID(post).pid;
+    let lastul = document.querySelector("#favatar" + pid + " > ul.xl.xl2.o.cl");
+    while(lastul?.nextElementSibling?.tagName == "UL")
+      lastul = lastul.nextElementSibling;
+    let insertli = Utils.mergeObject(document.createElement("li"), { className: "post_operation_common",
+        style: "background: url(" + icon + ") no-repeat 1px 2px; background-size: 16px; width: 90px;" },
+        obj => obj.appendChild(Utils.mergeObject(document.createElement("a"), { text, href, title: text, className: "xi2" },
+            obj => obj.onclick = e => callback(e, obj, post))));
+    if(!lastul)
+      document.querySelector("#favatar" + pid)!.appendChild(
+          lastul = Utils.mergeObject(document.createElement("ul"), { className: "xl xl2 o cl" }));
+    lastul.appendChild(insertli);
+    if(document.body.classList.contains("v3")) { // v3模板还需处理手机版的问题
+      let mv3ul = document.getElementById("mauthorctrl_" + pid + "_menu")!.firstElementChild!;
+      mv3ul.appendChild(document.createElement("hr"));
+      mv3ul.appendChild(Utils.mergeObject(document.createElement("a"), { text, href },
+          obj => obj.onclick = e => callback(e, obj, post)));
+    }
+  }
+
+  public addUserOperation(text: string,
+      callback: (event: Event, element: HTMLElement) => void, href: string = "javascript:;", icon?: string) {
+    if(document.getElementById("uhd") && !document.querySelector("#uhd div.h.cl div.mn"))
+      document.querySelector("#uhd div.h.cl")!.appendChild(
+        Utils.mergeObject(document.createElement("div"), { className: "mn" },
+          x => x.appendChild(document.createElement("ul"))))
+    document.querySelector("#uhd div.mn > ul")?.appendChild(Utils.mergeObject(document.createElement("li"), {},
+      x => x.appendChild(Utils.mergeObject(document.createElement("a"), { text, href, title: text, className: "xi2",
+          style: this.v3() ? "box-shadow: 0 0 0 2px rgba(0,0,0,0.2); background-color: rgba(0,0,0,0.4)" :
+              "background: url(" + icon + ") no-repeat 1px 2px; background-size: 16px;"},
+          obj => obj.onclick = e => callback(e, obj)))));
   }
 }
 

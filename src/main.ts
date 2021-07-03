@@ -95,6 +95,10 @@ function main() {
         console.error(ex);// 不要殃及其他部分
       }
   jQuery(() => {
+    if((document.getElementById("css_extstyle") as HTMLLinkElement | null)?.href ==
+        "https://www.mcbbs.net/template/MCBBS_v3/style/t2/style.css") {
+      document.body.classList.add("v3");
+    }
     // 用户可能是从老版本升级上来的，因此需要立即补全排序好的依赖信息
     let sortedList = GMGetValue("loader.sortedModuleList") || resortDependency();
     for (let id of sortedList) {

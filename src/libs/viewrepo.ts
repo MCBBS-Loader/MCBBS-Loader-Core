@@ -45,7 +45,7 @@ function dumpPreview(repo: string) {
           `<li id='${meta.id}'>
           <div style='display:inline;'>
             <img src='${meta.icon || IMG_MCBBS}' width='50' height='50' style="vertical-align:middle;float:left;"/>
-            <div style="height: 8em">
+            <div style="height: 8em" class='viewrepo_mod_details'>
               &nbsp;&nbsp;
               <span style='font-size:18px;color:${color}'>
                 <strong>${meta.name || "Nameless"}</strong>
@@ -72,6 +72,7 @@ function dumpPreview(repo: string) {
               </button>
             </div>
           </div>
+          <hr class='viewrepo_mod_hr'>
         </li>`;
         $("#all_modules").append(ele);
       }

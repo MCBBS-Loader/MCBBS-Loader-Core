@@ -7,7 +7,7 @@ const HTML_MANAGER_FOOTER =
   <div style='overflow:auto;'>
     <ul id='all_modules'></ul>
   </div>
-  <hr/>
+  <hr class="hide_on_v3_mobile"/>
   <span style='font-size:1rem'>安装新模块</span>
   <button debug='false' type='button' id='debugmode' class='pn pnc'>
     <strong>调试模式</strong>
@@ -24,7 +24,8 @@ const HTML_MANAGER_FOOTER =
   <br/>
   <br/>
   <br/>
-  <button class='pn pnc srcc' type='button' id='use_mloader'>
+  <!--说实在的，手机版用户手输gid很麻烦，这个按钮占地方，不好用-->
+  <button class='pn pnc srcc hide_on_v3_mobile' type='button' id='use_mloader'>
     <strong>快速使用 MCBBS Loader 源（MCBBS-Loader）</strong>
   </button>
   <span class='srcc'>
@@ -36,7 +37,7 @@ const HTML_MANAGER_FOOTER =
   </span>
   <br/>
   <br/>
-  <button class='pn pnc srcc' type='button' id='use_cv'>
+  <button class='pn pnc srcc hide_on_v3_mobile' type='button' id='use_cv'>
     <strong>快速使用 洞穴夜莺 源（CaveNightingale）</strong>
   </button>
   <span class='srcc'>
@@ -48,7 +49,7 @@ const HTML_MANAGER_FOOTER =
   </span>
   <br/>
   <br/>
-  <button class='pn pnc srcc' type='button' id='use_mext'>
+  <button class='pn pnc srcc hide_on_v3_mobile' type='button' id='use_mext'>
     <strong>快速使用 MExt 整合运动 源（MExt-IM）</strong>
   </button>
   <span class='srcc'>
@@ -93,9 +94,41 @@ const COMMON_CSS =
   color: #ffffff;
 }
 
+.v3 .post_operation_common {
+  padding-left: 18px;
+}
+
 input.loadertextconf {
   background-color: white;
   float: right;
   width:50%;
+}
+
+.manager_mod_hr, .viewrepo_mod_hr {
+  display: none;
+}
+
+@media (max-width: 1200px) {
+  .v3 .manager_mod_hr {
+    display: block;
+    margin-top: 40px;
+    margin-bottom: 10px;
+  }
+  .v3 .viewrepo_mod_hr {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .v3 .manager_mod_details {
+    height: auto !important;
+    min-height: 12em;
+  }
+  .v3 .viewrepo_mod_details {
+    height: auto !important;
+    min-height: 8em;
+  }
+  .v3 .hide_on_v3_mobile {
+    display: none;
+  }
 }`;
 export { IMG_MCBBS, HTML_MANAGER_FOOTER, HTML_VIEWREPO_BODY, COMMON_CSS };
