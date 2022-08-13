@@ -111,7 +111,7 @@ function renderAll() {
     }
   }
   $(".chkbox").on("click", e => {
-    e.target.className = "chkbox fa fa-" + (e.target.className?.includes("check-square") ? "check-" : "") + "square";
+    e.target.className = "chkbox fa fa-" + (e.target.className?.includes("check-square") ? "" : "check-") + "square";
     (e.target.oninput as any)();
     autoSave();
   });

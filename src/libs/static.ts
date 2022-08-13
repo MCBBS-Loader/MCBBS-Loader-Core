@@ -25,24 +25,12 @@ const HTML_MANAGER_FOOTER =
   <br/>
   <br/>
   <!--说实在的，手机版用户手输gid很麻烦，这个按钮占地方，不好用-->
-  <button class='pn pnc srcc hide_on_v3_mobile' type='button' id='use_mloader'>
-    <strong>快速使用 MCBBS Loader 源（MCBBS-Loader）</strong>
-  </button>
-  <span class='srcc'>
-    MCBBS Loader 电池源，其中的模块是为用户专门设计的，
-    <a id='preview_ml' style='color:#df307f' href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#MCBBS-Loader%3AMCBBS-Loader-Batteries%3Amanifest%3Amain' target='_blank'>
-      预览该软件源
-    </a>
-    。
-  </span>
-  <br/>
-  <br/>
   <button class='pn pnc srcc hide_on_v3_mobile' type='button' id='use_cv'>
     <strong>快速使用 洞穴夜莺 源（CaveNightingale）</strong>
   </button>
   <span class='srcc'>
     洞穴夜莺的软件源中包含许多轻松使用模块，
-    <a id='preview_cv' style='color:#df307f'href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#gitee%3ACaveNightingale%3ACaveNightingale-MCBBS-Modules%3Amanifest%3Av2' target='_blank'>
+    <a id='preview_cv' style='color:#df307f'href='https://www.mcbbs.net/home.php?mod=spacecp&bbsmod=repopreview#github%3ACaveNightingale%3ACaveNightingale-MCBBS-Modules%3Amanifest%3Avv2' target='_blank'>
       预览该软件源
     </a>
     。

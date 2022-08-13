@@ -9,6 +9,27 @@ function getManifest(repo: GIDURL, cb: (data: any) => void) {
   getCrossOriginData(repo.getAsURL(".json"), msg => $("#all_modules").html("无法显示该软件源的预览。<br/>" + msg), cb, "json");
 }
 
+function noExec(...data: string[]) {
+  let find = (ele: Element) => {
+    // disallow javascript, java, flash and iframe
+    if(ele.tagName == "script" || ele.tagName == "object" || ele.tagName == "iframe" || ele.tagName == "frame" || ele.tagName == "applet")
+      throw 1;
+    for(var attr of ele.attributes) {
+      if(attr.name.startsWith("on")) {
+        throw 1;
+      }
+    }
+    for(var child of ele.children) {
+      find(child);
+    }
+  };
+  for(var i of data) {
+    var span = document.createElement("span");
+    span.innerHTML = i;
+    find(span);
+  }
+}
+
 function dumpPreview(repo: string) {
   $("title").html("MCBBS Loader - 软件源");
   let gid = GIDURL.fromString(repo);
@@ -37,6 +58,12 @@ function dumpPreview(repo: string) {
         meta.author = meta.author || "Someone";
         meta.description = meta.description || "No description provided.";
         meta.permissions = meta.permissions || "";
+        try {
+          noExec(meta.id, meta.name, meta.author, meta.description, meta.permissions);
+        } catch(e) {
+          console.warn("%s is an illegal module which includes executable code in it's meta data");
+          continue;
+        }
         var isCore = meta.permissions.search("loader:core") != -1;
         var isInstalled: boolean = GMGetValue(`meta-${meta.id}`) != undefined;
         var color = isInstalled ? "#575757" : isCore ? "#ff0000" : "#5d2391";

@@ -92,7 +92,7 @@ class Common {
   }
 
   public v3() {
-    return document.body.classList.contains("v3")
+    return false;
   }
 
   public addPostOperation(post: HTMLElement, text: string,
@@ -109,12 +109,6 @@ class Common {
       document.querySelector("#favatar" + pid)!.appendChild(
           lastul = Utils.mergeObject(document.createElement("ul"), { className: "xl xl2 o cl" }));
     lastul.appendChild(insertli);
-    if(document.body.classList.contains("v3")) { // v3模板还需处理手机版的问题
-      let mv3ul = document.getElementById("mauthorctrl_" + pid + "_menu")!.firstElementChild!;
-      mv3ul.appendChild(document.createElement("hr"));
-      mv3ul.appendChild(Utils.mergeObject(document.createElement("a"), { text, href },
-          obj => obj.onclick = e => callback(e, obj, post)));
-    }
   }
 
   public addUserOperation(text: string,
